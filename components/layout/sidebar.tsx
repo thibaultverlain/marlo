@@ -33,19 +33,23 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="fixed left-0 top-0 bottom-0 w-[240px] bg-[#1c1917] flex flex-col z-50">
+    <aside className="fixed left-0 top-0 bottom-0 w-[220px] bg-[var(--color-bg-sidebar)] flex flex-col z-50 border-r border-[var(--color-border)]">
       {/* Logo */}
-      <div className="px-6 py-6 border-b border-white/10">
-        <h1 className="text-2xl text-white tracking-tight" style={{ fontFamily: "DM Serif Display, serif" }}>
-          Marlo
-        </h1>
-        <p className="text-[11px] text-stone-500 mt-0.5 tracking-widest uppercase">
-          Luxe Resell
-        </p>
+      <div className="px-5 py-5">
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
+            <span className="text-white text-xs font-bold">M</span>
+          </div>
+          <div>
+            <h1 className="text-[15px] font-semibold text-white tracking-tight" style={{ fontFamily: "Inter, sans-serif" }}>
+              Marlo
+            </h1>
+          </div>
+        </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+      <nav className="flex-1 px-2.5 py-1 space-y-px overflow-y-auto">
         {NAV_ITEMS.map((item) => {
           const isActive = pathname.startsWith(item.href);
           const Icon = item.icon;
@@ -53,30 +57,35 @@ export default function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-150 ${
+              className={`flex items-center gap-2.5 px-2.5 py-[7px] rounded-md text-[13px] transition-all duration-100 ${
                 isActive
-                  ? "bg-amber-700/20 text-amber-400"
-                  : "text-stone-400 hover:text-stone-200 hover:bg-white/5"
+                  ? "bg-white/[0.08] text-white"
+                  : "text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.04]"
               }`}
             >
-              <Icon size={18} strokeWidth={isActive ? 2 : 1.5} />
-              <span className={isActive ? "font-medium" : ""}>{item.label}</span>
+              <Icon size={16} strokeWidth={isActive ? 1.8 : 1.5} />
+              <span className={isActive ? "font-medium" : "font-normal"}>{item.label}</span>
             </Link>
           );
         })}
       </nav>
 
       {/* Bottom nav */}
-      <div className="px-3 py-4 border-t border-white/10">
+      <div className="px-2.5 py-3 border-t border-[var(--color-border)]">
         {BOTTOM_ITEMS.map((item) => {
           const Icon = item.icon;
+          const isActive = pathname.startsWith(item.href);
           return (
             <Link
               key={item.href}
               href={item.href}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-stone-500 hover:text-stone-300 hover:bg-white/5 transition-all"
+              className={`flex items-center gap-2.5 px-2.5 py-[7px] rounded-md text-[13px] transition-all duration-100 ${
+                isActive
+                  ? "bg-white/[0.08] text-white"
+                  : "text-zinc-600 hover:text-zinc-400 hover:bg-white/[0.04]"
+              }`}
             >
-              <Icon size={18} strokeWidth={1.5} />
+              <Icon size={16} strokeWidth={1.5} />
               <span>{item.label}</span>
             </Link>
           );
