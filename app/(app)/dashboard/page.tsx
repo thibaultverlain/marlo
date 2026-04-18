@@ -117,7 +117,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* KPIs du jour */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
         <StatCard
           label="CA aujourd'hui"
           value={formatCurrency(todayStats.revenue)}
@@ -174,7 +174,7 @@ export default async function DashboardPage() {
       <RevenueChart />
 
       {/* Two columns: Marge par canal | Dernières ventes */}
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Margin by channel */}
         <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6">
           <h2 className="text-[15px] font-semibold text-white mb-5">Marge par canal</h2>
