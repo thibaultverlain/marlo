@@ -1,10 +1,11 @@
 import { TrendingUp, TrendingDown, Package, AlertTriangle, Search, Truck } from "lucide-react";
 import Link from "next/link";
 import { formatCurrency, formatPercent } from "@/lib/utils";
+import { db } from "@/lib/db/client";
+import { sales, products } from "@/lib/db/schema";
+import { sql, gte, lte, and, eq } from "drizzle-orm";
 import {
-  getCurrentMonthStats,
   getMarginByChannel,
-  getTopBrands,
   getRecentSales,
   getPendingShipments,
 } from "@/lib/db/queries/sales";
@@ -14,33 +15,59 @@ import {
   getUpcomingSourcingDeadlines,
 } from "@/lib/db/queries/sourcing";
 import { CHANNELS } from "@/lib/data";
+import RevenueChart from "@/components/dashboard/revenue-chart";
 
 export const dynamic = "force-dynamic";
 
-function pctChange(current: number, previous: number): number {
-  if (previous === 0) return current > 0 ? 100 : 0;
-  return Math.round(((current - previous) / previous) * 100);
+async function getTodayStats() {
+  const now = new Date();
+  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+
+  const rows = await db
+    .select({
+      revenue: sql<number>`coalesce(sum(sale_price), 0)::numeric`,
+      margin: sql<number>`coalesce(sum(margin), 0)::numeric`,
+      count: sql<number>`count(*)::int`,
+      avgMarginPct: sql<number>`coalesce(avg(margin_pct), 0)::numeric`,
+    })
+    .from(sales)
+    .where(and(gte(sales.soldAt, startOfDay), lte(sales.soldAt, endOfDay)));
+
+  return {
+    revenue: Number(rows[0]?.revenue ?? 0),
+    margin: Number(rows[0]?.margin ?? 0),
+    count: rows[0]?.count ?? 0,
+    avgMarginPct: Number(rows[0]?.avgMarginPct ?? 0),
+  };
 }
 
-function StatCard({ label, value, change }: {
+async function getAllTimeStats() {
+  const rows = await db
+    .select({
+      revenue: sql<number>`coalesce(sum(sale_price), 0)::numeric`,
+      margin: sql<number>`coalesce(sum(margin), 0)::numeric`,
+      count: sql<number>`count(*)::int`,
+    })
+    .from(sales);
+
+  return {
+    revenue: Number(rows[0]?.revenue ?? 0),
+    margin: Number(rows[0]?.margin ?? 0),
+    count: rows[0]?.count ?? 0,
+  };
+}
+
+function StatCard({ label, value, sub }: {
   label: string;
   value: string;
-  change?: number;
+  sub?: string;
 }) {
   return (
     <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-5 hover:border-[var(--color-border-hover)] transition-colors">
       <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">{label}</p>
-      <div className="flex items-end gap-2 mt-2">
-        <p className="text-2xl font-semibold text-white tabular-nums">{value}</p>
-        {change !== undefined && change !== 0 && (
-          <span className={`text-xs font-medium flex items-center gap-0.5 mb-1 ${
-            change >= 0 ? "text-emerald-400" : "text-red-400"
-          }`}>
-            {change >= 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
-            {change >= 0 ? "+" : ""}{change}%
-          </span>
-        )}
-      </div>
+      <p className="text-2xl font-semibold text-white tabular-nums mt-2">{value}</p>
+      {sub && <p className="text-[11px] text-zinc-600 mt-1">{sub}</p>}
     </div>
   );
 }
@@ -51,22 +78,14 @@ function EmptyState() {
       <div>
         <h1 className="text-3xl text-white">Dashboard</h1>
         <p className="text-zinc-500 mt-1 text-sm">
-          {new Intl.DateTimeFormat("fr-FR", { month: "long", year: "numeric" }).format(new Date())}
+          {new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date())}
         </p>
       </div>
-
       <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-12 text-center">
         <Package size={40} className="mx-auto text-zinc-700 mb-3" />
         <h2 className="text-xl text-white mb-2">Bienvenue sur Marlo</h2>
-        <p className="text-zinc-500 mb-6 max-w-md mx-auto text-sm">
-          Aucune donnée pour le moment. Commence par ajouter tes articles en stock.
-        </p>
-        <Link
-          href="/products/new"
-          className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-500 transition-colors"
-        >
-          Ajouter mon premier article
-        </Link>
+        <p className="text-zinc-500 mb-6 max-w-md mx-auto text-sm">Commence par ajouter tes articles en stock.</p>
+        <Link href="/products/new" className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-500 transition-colors">Ajouter mon premier article</Link>
       </div>
     </div>
   );
@@ -74,38 +93,49 @@ function EmptyState() {
 
 export default async function DashboardPage() {
   const [
-    monthStats, stockStats, marginByChannel, topBrands, recentSales,
-    pendingShipments, activeSourcing, upcomingDeadlines,
+    todayStats, allTimeStats, stockStats, marginByChannel,
+    recentSales, pendingShipments, activeSourcing, upcomingDeadlines,
   ] = await Promise.all([
-    getCurrentMonthStats(), getStockStats(), getMarginByChannel(),
-    getTopBrands(5), getRecentSales(5), getPendingShipments(),
+    getTodayStats(), getAllTimeStats(), getStockStats(),
+    getMarginByChannel(), getRecentSales(5), getPendingShipments(),
     getActiveSourcingCount(), getUpcomingSourcingDeadlines(7),
   ]);
 
-  const hasAnyData = stockStats.total > 0 || monthStats.current.count > 0;
+  const hasAnyData = stockStats.total > 0 || allTimeStats.count > 0;
   if (!hasAnyData) return <EmptyState />;
 
-  const revenueChange = pctChange(monthStats.current.revenue, monthStats.previous.revenue);
-  const marginChange = pctChange(monthStats.current.margin, monthStats.previous.margin);
-  const salesChange = pctChange(monthStats.current.count, monthStats.previous.count);
   const dormant = stockStats.dormant;
   const totalAlerts = dormant + pendingShipments + upcomingDeadlines;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div>
         <h1 className="text-3xl text-white">Dashboard</h1>
         <p className="text-zinc-500 mt-1 text-sm">
-          {new Intl.DateTimeFormat("fr-FR", { month: "long", year: "numeric" }).format(new Date())}
+          {new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date())}
         </p>
       </div>
 
-      {/* KPIs */}
+      {/* KPIs du jour */}
       <div className="grid grid-cols-4 gap-4">
-        <StatCard label="Chiffre d'affaires" value={formatCurrency(monthStats.current.revenue)} change={revenueChange} />
-        <StatCard label="Marge nette" value={formatCurrency(monthStats.current.margin)} change={marginChange} />
-        <StatCard label="Ventes" value={String(monthStats.current.count)} change={salesChange} />
-        <StatCard label="Marge moyenne" value={formatPercent(monthStats.current.avgMargin)} />
+        <StatCard
+          label="CA aujourd'hui"
+          value={formatCurrency(todayStats.revenue)}
+          sub={`${todayStats.count} vente${todayStats.count > 1 ? "s" : ""}`}
+        />
+        <StatCard
+          label="Marge aujourd'hui"
+          value={formatCurrency(todayStats.margin)}
+        />
+        <StatCard
+          label="CA total"
+          value={formatCurrency(allTimeStats.revenue)}
+          sub={`${allTimeStats.count} vente${allTimeStats.count > 1 ? "s" : ""}`}
+        />
+        <StatCard
+          label="Marge totale"
+          value={formatCurrency(allTimeStats.margin)}
+        />
       </div>
 
       {/* Alerts */}
@@ -121,7 +151,7 @@ export default async function DashboardPage() {
             {dormant > 0 && (
               <Link href="/products" className="flex items-center gap-3 text-sm text-amber-400/80 hover:text-amber-300 transition-colors">
                 <Package size={14} />
-                <span>{dormant} article{dormant > 1 ? "s" : ""} dormant{dormant > 1 ? "s" : ""} depuis plus de 30 jours</span>
+                <span>{dormant} article{dormant > 1 ? "s" : ""} dormant{dormant > 1 ? "s" : ""}</span>
               </Link>
             )}
             {pendingShipments > 0 && (
@@ -133,20 +163,23 @@ export default async function DashboardPage() {
             {upcomingDeadlines > 0 && (
               <Link href="/sourcing" className="flex items-center gap-3 text-sm text-amber-400/80 hover:text-amber-300 transition-colors">
                 <Search size={14} />
-                <span>{upcomingDeadlines} sourcing avec deadline dans moins de 7 jours</span>
+                <span>{upcomingDeadlines} sourcing deadline &lt; 7 jours</span>
               </Link>
             )}
           </div>
         </div>
       )}
 
-      {/* Two columns */}
+      {/* Revenue chart - full width */}
+      <RevenueChart />
+
+      {/* Two columns: Marge par canal | Dernières ventes */}
       <div className="grid grid-cols-2 gap-6">
         {/* Margin by channel */}
         <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6">
           <h2 className="text-[15px] font-semibold text-white mb-5">Marge par canal</h2>
           {marginByChannel.length === 0 ? (
-            <p className="text-sm text-zinc-600">Aucune vente enregistrée</p>
+            <p className="text-sm text-zinc-600">Aucune vente</p>
           ) : (
             <div className="space-y-4">
               {marginByChannel.map((item) => {
@@ -156,9 +189,12 @@ export default async function DashboardPage() {
                   <div key={item.channel}>
                     <div className="flex justify-between items-center mb-1.5">
                       <span className="text-sm text-zinc-400">{channelLabel}</span>
-                      <span className="text-sm font-medium text-white tabular-nums">
-                        {formatPercent(item.avgMarginPct)}
-                      </span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-[11px] text-zinc-600">{item.count} vente{item.count > 1 ? "s" : ""}</span>
+                        <span className="text-sm font-medium text-white tabular-nums w-12 text-right">
+                          {formatPercent(item.avgMarginPct)}
+                        </span>
+                      </div>
                     </div>
                     <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
                       <div
@@ -173,61 +209,38 @@ export default async function DashboardPage() {
           )}
         </div>
 
-        {/* Top brands */}
+        {/* Recent sales */}
         <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6">
-          <h2 className="text-[15px] font-semibold text-white mb-5">Top marques</h2>
-          {topBrands.length === 0 ? (
-            <p className="text-sm text-zinc-600">Aucune vente enregistrée</p>
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="text-[15px] font-semibold text-white">Dernières ventes</h2>
+            <Link href="/sales" className="text-xs text-indigo-400 hover:text-indigo-300 font-medium transition-colors">Voir tout</Link>
+          </div>
+          {recentSales.length === 0 ? (
+            <p className="text-sm text-zinc-600">Aucune vente</p>
           ) : (
-            <div className="space-y-3">
-              {topBrands.map((item, i) => (
-                <div key={item.brand} className="flex items-center justify-between py-2 border-b border-[var(--color-border)] last:border-0">
-                  <div className="flex items-center gap-3">
-                    <span className="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center text-[11px] font-semibold text-zinc-400">
-                      {i + 1}
-                    </span>
-                    <span className="text-sm text-zinc-300">{item.brand}</span>
+            <div>
+              {recentSales.map((sale) => (
+                <div key={sale.id} className="flex items-center justify-between py-3 border-b border-[var(--color-border)] last:border-0">
+                  <div>
+                    <p className="text-[13px] text-zinc-200">{sale.productTitle ?? "Supprimé"}</p>
+                    <p className="text-[11px] text-zinc-600 mt-0.5">
+                      {CHANNELS.find((c) => c.value === sale.channel)?.label ?? sale.channel}
+                      {sale.soldAt && ` · ${new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short" }).format(new Date(sale.soldAt))}`}
+                    </p>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <span className="text-xs text-zinc-600">{item.count} vente{item.count > 1 ? "s" : ""}</span>
-                    <span className="text-sm font-medium text-emerald-400 tabular-nums">{formatPercent(item.avgMarginPct)}</span>
+                  <div className="text-right">
+                    <p className="text-[13px] font-medium text-white tabular-nums">{formatCurrency(sale.salePrice)}</p>
+                    {sale.margin && (
+                      <p className={`text-[11px] tabular-nums ${Number(sale.margin) >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                        {Number(sale.margin) >= 0 ? "+" : ""}{formatCurrency(sale.margin)}
+                      </p>
+                    )}
                   </div>
                 </div>
               ))}
             </div>
           )}
         </div>
-      </div>
-
-      {/* Recent sales */}
-      <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6">
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-[15px] font-semibold text-white">Dernières ventes</h2>
-          <Link href="/sales" className="text-xs text-indigo-400 hover:text-indigo-300 font-medium transition-colors">Voir tout</Link>
-        </div>
-        {recentSales.length === 0 ? (
-          <p className="text-sm text-zinc-600">Aucune vente enregistrée</p>
-        ) : (
-          <div>
-            {recentSales.map((sale) => (
-              <div key={sale.id} className="flex items-center justify-between py-3 border-b border-[var(--color-border)] last:border-0">
-                <div>
-                  <p className="text-sm text-zinc-200">{sale.productTitle ?? "Article supprimé"}</p>
-                  <p className="text-xs text-zinc-600 mt-0.5">
-                    {CHANNELS.find((c) => c.value === sale.channel)?.label ?? sale.channel}
-                    {sale.soldAt && ` · ${new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short" }).format(new Date(sale.soldAt))}`}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-medium text-white tabular-nums">{formatCurrency(sale.salePrice)}</p>
-                  {sale.margin && (
-                    <p className="text-xs text-emerald-400 tabular-nums">+{formatCurrency(sale.margin)}</p>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );
