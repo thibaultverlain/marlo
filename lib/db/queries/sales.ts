@@ -91,7 +91,7 @@ export async function getCurrentMonthStats() {
 
   const currentMonth = await db
     .select({
-      revenue: sql<number>`coalesce(sum(net_revenue), 0)::numeric`,
+      revenue: sql<number>`coalesce(sum(sale_price), 0)::numeric`,
       margin: sql<number>`coalesce(sum(margin), 0)::numeric`,
       count: sql<number>`count(*)::int`,
       avgMargin: sql<number>`coalesce(avg(margin_pct), 0)::numeric`,
@@ -101,7 +101,7 @@ export async function getCurrentMonthStats() {
 
   const previousMonth = await db
     .select({
-      revenue: sql<number>`coalesce(sum(net_revenue), 0)::numeric`,
+      revenue: sql<number>`coalesce(sum(sale_price), 0)::numeric`,
       margin: sql<number>`coalesce(sum(margin), 0)::numeric`,
       count: sql<number>`count(*)::int`,
     })
