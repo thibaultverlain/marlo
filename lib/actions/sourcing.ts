@@ -10,13 +10,18 @@ import {
   getSourcingById,
 } from "@/lib/db/queries/sourcing";
 
+function cleanNum(s: string | null | undefined): string {
+  if (!s || s.trim() === "") return "0";
+  return s.replace(/[€%\s]/g, "").replace(",", ".").trim() || "0";
+}
+
 const sourcingSchema = z.object({
   customerId: z.string().uuid("Client requis"),
   description: z.string().min(1, "Description requise"),
   brand: z.string().optional().nullable(),
   model: z.string().optional().nullable(),
-  targetBudget: z.string().regex(/^\d+([.,]\d{1,2})?$/).transform((s) => s.replace(",", ".")).optional().or(z.literal("")),
-  commissionRate: z.string().regex(/^\d+([.,]\d{1,4})?$/).transform((s) => s.replace(",", ".")).optional().or(z.literal("")),
+  targetBudget: z.string().transform(cleanNum).optional().or(z.literal("")),
+  commissionRate: z.string().transform(cleanNum).optional().or(z.literal("")),
   deadline: z.string().optional().nullable(),
   notes: z.string().optional().nullable(),
 });

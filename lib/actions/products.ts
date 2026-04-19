@@ -5,8 +5,15 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createProduct, updateProduct, deleteProduct } from "@/lib/db/queries/products";
 
-const priceRegex = /^\d+([.,]\d{1,2})?$/;
-const cleanPrice = (s: string) => s.replace(",", ".");
+function cleanPrice(s: string | null | undefined): string {
+  if (!s || s.trim() === "") return "0";
+  return s.replace(/[€\s]/g, "").replace(",", ".").trim() || "0";
+}
+
+function isValidPrice(s: string): boolean {
+  const cleaned = cleanPrice(s);
+  return !isNaN(parseFloat(cleaned)) && isFinite(Number(cleaned));
+}
 
 const productSchema = z.object({
   title: z.string().min(1, "Le titre est requis"),
@@ -16,8 +23,8 @@ const productSchema = z.object({
   size: z.string().optional().nullable(),
   color: z.string().optional().nullable(),
   condition: z.enum(["neuf_avec_etiquettes", "neuf_sans_etiquettes", "comme_neuf", "tres_bon", "bon", "correct"]),
-  purchasePrice: z.string().regex(priceRegex, "Prix invalide").transform(cleanPrice),
-  targetPrice: z.string().regex(priceRegex, "Prix invalide").transform(cleanPrice).optional().nullable(),
+  purchasePrice: z.string().refine(isValidPrice, "Prix invalide").transform(cleanPrice),
+  targetPrice: z.string().transform(cleanPrice).optional().nullable(),
   purchaseSource: z.string().optional().nullable(),
   purchaseDate: z.string().optional().nullable(),
   listedOn: z.array(z.string()).optional(),

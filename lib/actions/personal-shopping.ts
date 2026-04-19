@@ -18,13 +18,18 @@ const missionSchema = z.object({
   notes: z.string().optional().nullable(),
 });
 
+function cleanNum(s: string | null | undefined): string {
+  if (!s || s.trim() === "") return "0";
+  return s.replace(/[€%\s]/g, "").replace(",", ".").trim() || "0";
+}
+
 const itemSchema = z.object({
   missionId: z.string().uuid(),
   customerId: z.string().uuid("Client requis"),
   description: z.string().min(1, "Description requise"),
   brand: z.string().optional().nullable(),
-  purchasePrice: z.string().regex(/^\d+([.,]\d{1,2})?$/, "Prix invalide").transform((s) => s.replace(",", ".")),
-  commissionRate: z.string().regex(/^\d+([.,]\d{1,4})?$/).transform((s) => s.replace(",", ".")).optional().or(z.literal("")),
+  purchasePrice: z.string().refine((s) => !isNaN(parseFloat(cleanNum(s))), "Prix invalide").transform(cleanNum),
+  commissionRate: z.string().transform(cleanNum).optional().or(z.literal("")),
   notes: z.string().optional().nullable(),
 });
 
