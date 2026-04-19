@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createProduct, updateProduct, deleteProduct } from "@/lib/db/queries/products";
+import { convertToEur } from "@/lib/currency";
 
 function cleanPrice(s: string | null | undefined): string {
   if (!s || s.trim() === "") return "0";
@@ -50,12 +51,17 @@ export async function createProductAction(formData: FormData) {
     notes: formData.get("notes") as string | null,
   };
 
+  const purchaseCurrency = (formData.get("purchaseCurrency") as string) || "EUR";
+
   const parsed = productSchema.safeParse(raw);
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Données invalides" };
   }
 
   try {
+    const priceNum = parseFloat(parsed.data.purchasePrice) || 0;
+    const priceEur = purchaseCurrency !== "EUR" ? String(convertToEur(priceNum, purchaseCurrency)) : parsed.data.purchasePrice;
+
     await createProduct({
       title: parsed.data.title,
       brand: parsed.data.brand,
@@ -65,6 +71,8 @@ export async function createProductAction(formData: FormData) {
       color: parsed.data.color ?? null,
       condition: parsed.data.condition,
       purchasePrice: parsed.data.purchasePrice,
+      purchaseCurrency,
+      purchasePriceEur: priceEur,
       targetPrice: parsed.data.targetPrice ?? null,
       purchaseSource: parsed.data.purchaseSource ?? null,
       purchaseDate: parsed.data.purchaseDate ?? null,
@@ -84,14 +92,29 @@ export async function createProductAction(formData: FormData) {
 }
 
 export async function updateProductAction(id: string, formData: FormData) {
-  const raw = Object.fromEntries(formData.entries());
+  const raw: Record<string, any> = {};
+  formData.forEach((value, key) => {
+    if (key === "listedOn") {
+      if (!raw.listedOn) raw.listedOn = [];
+      raw.listedOn.push(value);
+    } else {
+      raw[key] = value;
+    }
+  });
+  if (!raw.listedOn) raw.listedOn = [];
+
   const parsed = productSchema.partial().safeParse(raw);
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Données invalides" };
   }
 
   try {
-    await updateProduct(id, parsed.data);
+    const updateData: Record<string, any> = { ...parsed.data };
+    // Include status if provided
+    const status = formData.get("status") as string;
+    if (status) updateData.status = status;
+
+    await updateProduct(id, updateData);
   } catch (err) {
     console.error("updateProductAction error:", err);
     return { error: "Erreur lors de la mise à jour." };

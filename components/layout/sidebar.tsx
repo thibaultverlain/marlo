@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Package, ShoppingCart, Users, Search,
-  ShoppingBag, FileText, Calculator, Settings, Menu, X, Mail,
+  ShoppingBag, FileText, Calculator, Settings, Menu, X, Mail, BarChart3,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -13,6 +13,7 @@ const NAV_ITEMS = [
   { href: "/products", label: "Stock", icon: Package, alertKey: "products" },
   { href: "/sales", label: "Ventes", icon: ShoppingCart },
   { href: "/customers", label: "Clients", icon: Users },
+  { href: "/analytics", label: "Analytique", icon: BarChart3 },
   { href: "/sourcing", label: "Sourcing", icon: Search, alertKey: "sourcing" },
   { href: "/personal-shopping", label: "Personal Shop", icon: ShoppingBag },
   { href: "/import-email", label: "Import email", icon: Mail },

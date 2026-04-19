@@ -2,7 +2,7 @@
 
 import { useTransition } from "react";
 import Link from "next/link";
-import { Trash2, ShoppingCart } from "lucide-react";
+import { Trash2, ShoppingCart, Edit2 } from "lucide-react";
 import { deleteProductAction } from "@/lib/actions/products";
 
 export default function ProductActions({ productId, status }: { productId: string; status: string }) {
@@ -19,11 +19,16 @@ export default function ProductActions({ productId, status }: { productId: strin
       <button onClick={handleDelete} disabled={isPending} className="flex items-center gap-2 px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded-lg transition-colors disabled:opacity-50">
         <Trash2 size={14} />Supprimer
       </button>
-      {canBeSold && (
-        <Link href={`/sales/new?productId=${productId}`} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-500 transition-colors">
-          <ShoppingCart size={14} />Enregistrer la vente
+      <div className="flex gap-2">
+        <Link href={`/products/${productId}/edit`} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-zinc-300 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg hover:bg-[var(--color-bg-hover)] transition-colors">
+          <Edit2 size={14} />Modifier
         </Link>
-      )}
+        {canBeSold && (
+          <Link href={`/sales/new?productId=${productId}`} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-500 transition-colors">
+            <ShoppingCart size={14} />Vendre
+          </Link>
+        )}
+      </div>
     </div>
   );
 }

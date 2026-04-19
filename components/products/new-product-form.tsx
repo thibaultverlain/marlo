@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Camera, Save, AlertCircle } from "lucide-react";
 import { formatCurrency, formatPercent } from "@/lib/utils";
 import { LUXURY_BRANDS, CATEGORIES, CONDITIONS, CHANNELS } from "@/lib/data";
+import { CURRENCIES, convertToEur } from "@/lib/currency";
 import { createProductAction } from "@/lib/actions/products";
 
 const inputClass = "w-full px-3 py-2.5 text-[13px] bg-[var(--color-bg-raised)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500/50 focus:border-indigo-500/50 text-zinc-200 placeholder:text-zinc-600";
@@ -13,7 +14,7 @@ const labelClass = "block text-[11px] font-medium text-zinc-500 uppercase tracki
 export default function NewProductForm() {
   const [form, setForm] = useState({
     title: "", brand: "", model: "", category: "sacs", size: "", color: "",
-    condition: "tres_bon", purchasePrice: "", targetPrice: "", purchaseSource: "",
+    condition: "tres_bon", purchasePrice: "", targetPrice: "", purchaseCurrency: "EUR", purchaseSource: "",
     purchaseDate: new Date().toISOString().split("T")[0],
     listedOn: [] as string[], serialNumber: "", notes: "",
   });
@@ -49,6 +50,7 @@ export default function NewProductForm() {
     formData.append("category", form.category); formData.append("size", form.size);
     formData.append("color", form.color); formData.append("condition", form.condition);
     formData.append("purchasePrice", form.purchasePrice); formData.append("targetPrice", form.targetPrice);
+    formData.append("purchaseCurrency", form.purchaseCurrency);
     formData.append("purchaseSource", form.purchaseSource); formData.append("purchaseDate", form.purchaseDate);
     form.listedOn.forEach((ch) => formData.append("listedOn", ch));
     formData.append("serialNumber", form.serialNumber); formData.append("notes", form.notes);
@@ -96,8 +98,9 @@ export default function NewProductForm() {
 
         <div className="border-t border-[var(--color-border)] pt-5">
           <h3 className="text-sm font-semibold text-zinc-300 mb-4">Prix</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div><label className={labelClass}>Prix d'achat *</label><div className="relative"><input type="number" step="0.01" required value={form.purchasePrice} onChange={(e) => updateField("purchasePrice", e.target.value)} placeholder="0.00" className={`${inputClass} pr-8`} /><span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zinc-600">€</span></div></div>
+          <div className="grid grid-cols-3 gap-4">
+            <div><label className={labelClass}>Prix d'achat *</label><div className="relative"><input type="number" step="0.01" required value={form.purchasePrice} onChange={(e) => updateField("purchasePrice", e.target.value)} placeholder="0.00" className={`${inputClass} pr-8`} /><span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zinc-600">{CURRENCIES.find(c => c.code === form.purchaseCurrency)?.symbol ?? "€"}</span></div></div>
+            <div><label className={labelClass}>Devise</label><select value={form.purchaseCurrency} onChange={(e) => updateField("purchaseCurrency", e.target.value)} className={inputClass}>{CURRENCIES.map((c) => <option key={c.code} value={c.code}>{c.code} - {c.label}</option>)}</select>{form.purchaseCurrency !== "EUR" && form.purchasePrice && <p className="text-[10px] text-indigo-400 mt-1">≈ {formatCurrency(convertToEur(parseFloat(form.purchasePrice) || 0, form.purchaseCurrency))} EUR</p>}</div>
             <div><label className={labelClass}>Prix de vente visé</label><div className="relative"><input type="number" step="0.01" value={form.targetPrice} onChange={(e) => updateField("targetPrice", e.target.value)} placeholder="0.00" className={`${inputClass} pr-8`} /><span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zinc-600">€</span></div></div>
           </div>
           {marginPreview && (

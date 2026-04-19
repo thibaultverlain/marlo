@@ -67,6 +67,8 @@ export const products = pgTable("products", {
   color: text("color"),
   condition: productConditionEnum("condition").notNull().default("bon"),
   purchasePrice: decimal("purchase_price", { precision: 10, scale: 2 }).notNull(),
+  purchaseCurrency: text("purchase_currency").default("EUR"),
+  purchasePriceEur: decimal("purchase_price_eur", { precision: 10, scale: 2 }),
   targetPrice: decimal("target_price", { precision: 10, scale: 2 }),
   purchaseSource: text("purchase_source"),
   purchaseDate: date("purchase_date"),
