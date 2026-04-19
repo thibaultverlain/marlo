@@ -16,10 +16,10 @@ export default async function AccountingPage({ searchParams }: { searchParams: P
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div><h1 className="text-3xl text-white">Comptabilité</h1><p className="text-zinc-500 mt-1 text-sm">Livre de recettes et registre des achats</p></div>
+        <div><h1 className="text-2xl lg:text-3xl text-white">Comptabilité</h1><p className="text-zinc-500 mt-1 text-sm">Livre de recettes et registre des achats</p></div>
         <form><select name="year" defaultValue={String(year)} className="text-[13px] bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-zinc-300 focus:outline-none focus:ring-1 focus:ring-indigo-500/50">{[currentYear-2,currentYear-1,currentYear].map((y)=><option key={y} value={y}>Année {y}</option>)}</select><button type="submit" className="ml-2 px-3 py-2 text-sm text-zinc-500 hover:text-zinc-300">Afficher</button></form>
       </div>
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 lg:gap-4">
         <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-5"><div className="flex items-center gap-2 mb-1"><TrendingUp size={14} className="text-emerald-400" /><p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Recettes {year}</p></div><p className="text-2xl font-semibold text-white tabular-nums">{formatCurrency(stats.revenue)}</p><p className="text-[11px] text-zinc-600 mt-0.5">{stats.salesCount} vente{stats.salesCount>1?"s":""}</p></div>
         <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-5"><div className="flex items-center gap-2 mb-1"><TrendingDown size={14} className="text-red-400" /><p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Dépenses {year}</p></div><p className="text-2xl font-semibold text-white tabular-nums">{formatCurrency(stats.expenses)}</p></div>
         <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-5"><p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Résultat brut</p><p className={`text-2xl font-semibold tabular-nums ${benefit>=0?"text-emerald-400":"text-red-400"}`}>{formatCurrency(benefit)}</p></div>

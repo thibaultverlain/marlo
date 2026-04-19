@@ -49,7 +49,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
 
       <ProductPhotos productId={product.id} images={product.images ?? []} />
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-5">
           <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Prix d'achat</p>
           <p className="text-2xl font-semibold text-white tabular-nums">{formatCurrency(purchasePrice)}</p>

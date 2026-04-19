@@ -57,17 +57,17 @@ export default function RevenueChart() {
   const total = data.reduce((s, d) => s + d.revenue, 0);
 
   return (
-    <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6">
-      <div className="flex items-center justify-between mb-6">
+    <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-4 lg:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div>
           <h2 className="text-[15px] font-semibold text-white">Chiffre d'affaires</h2>
-          <p className="text-2xl font-bold text-white tabular-nums mt-1">
+          <p className="text-xl lg:text-2xl font-bold text-white tabular-nums mt-1">
             {new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(total)}
           </p>
         </div>
 
         {/* Period tabs */}
-        <div className="flex bg-zinc-800/60 rounded-lg p-0.5">
+        <div className="flex bg-zinc-800/60 rounded-lg p-0.5 self-start sm:self-auto">
           {PERIOD_LABELS.map(({ key, label }) => (
             <button
               key={key}
@@ -84,7 +84,7 @@ export default function RevenueChart() {
         </div>
       </div>
 
-      <div className="h-[280px]">
+      <div className="h-[200px] lg:h-[280px]">
         {loading ? (
           <div className="h-full flex items-center justify-center">
             <div className="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />

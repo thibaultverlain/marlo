@@ -42,11 +42,11 @@ export default function SettingsForm({ initialData }: { initialData: ShopSetting
 
       <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6 space-y-5">
         <h2 className="text-[15px] font-semibold text-white">Identité légale</h2>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div><label className={labelClass}>Raison sociale *</label><input type="text" required value={form.legalName} onChange={(e) => updateField("legalName", e.target.value)} placeholder="Dupont Thibault" className={inputClass} /></div>
           <div><label className={labelClass}>Nom commercial</label><input type="text" value={form.commercialName} onChange={(e) => updateField("commercialName", e.target.value)} placeholder="Marlo Luxury" className={inputClass} /></div>
         </div>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div><label className={labelClass}>Statut</label><select value={form.legalStatus} onChange={(e) => updateField("legalStatus", e.target.value)} className={inputClass}>{["Micro-entrepreneur (EI)","Entrepreneur individuel (EI)","EURL","SASU","SAS","SARL","Autre"].map((s)=><option key={s} value={s}>{s}</option>)}</select></div>
           <div><label className={labelClass}>SIRET</label><input type="text" value={form.siret} onChange={(e) => updateField("siret", e.target.value.replace(/\D/g,"").slice(0,14))} placeholder="14 chiffres" className={`${inputClass} font-mono`} /></div>
           <div><label className={labelClass}>Code APE</label><input type="text" value={form.apeCode} onChange={(e) => updateField("apeCode", e.target.value)} placeholder="4771Z" className={inputClass} /></div>
@@ -56,7 +56,7 @@ export default function SettingsForm({ initialData }: { initialData: ShopSetting
       <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6 space-y-5">
         <h2 className="text-[15px] font-semibold text-white">Adresse</h2>
         <div><label className={labelClass}>Adresse *</label><input type="text" required value={form.address} onChange={(e) => updateField("address", e.target.value)} placeholder="12 rue de Rivoli" className={inputClass} /></div>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div><label className={labelClass}>Code postal *</label><input type="text" required value={form.postalCode} onChange={(e) => updateField("postalCode", e.target.value)} placeholder="75001" className={inputClass} /></div>
           <div><label className={labelClass}>Ville *</label><input type="text" required value={form.city} onChange={(e) => updateField("city", e.target.value)} placeholder="Paris" className={inputClass} /></div>
           <div><label className={labelClass}>Pays</label><input type="text" value={form.country} onChange={(e) => updateField("country", e.target.value)} className={inputClass} /></div>
@@ -66,7 +66,7 @@ export default function SettingsForm({ initialData }: { initialData: ShopSetting
       <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6 space-y-5">
         <h2 className="text-[15px] font-semibold text-white">Régime TVA</h2>
         <label className="flex items-start gap-3 cursor-pointer"><input type="checkbox" checked={form.vatSubject} onChange={(e) => updateField("vatSubject", e.target.checked)} className="mt-1 rounded border-zinc-600 bg-zinc-800 text-indigo-500 focus:ring-indigo-500" /><div><p className="text-sm text-zinc-200">Je suis assujetti à la TVA</p><p className="text-[11px] text-zinc-500 mt-0.5">Si décoché : mention "TVA non applicable, art. 293 B du CGI" automatique sur les factures.</p></div></label>
-        {form.vatSubject && <div className="grid grid-cols-2 gap-4 pt-2">
+        {form.vatSubject && <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
           <div><label className={labelClass}>N° TVA</label><input type="text" value={form.vatNumber} onChange={(e) => updateField("vatNumber", e.target.value)} placeholder="FR12345678901" className={`${inputClass} font-mono`} /></div>
           <div><label className={labelClass}>Taux TVA</label><select value={form.vatRate} onChange={(e) => updateField("vatRate", e.target.value)} className={inputClass}><option value="0.20">20%</option><option value="0.10">10%</option><option value="0.055">5,5%</option><option value="0">0%</option></select></div>
         </div>}
@@ -75,7 +75,7 @@ export default function SettingsForm({ initialData }: { initialData: ShopSetting
       <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6 space-y-5">
         <h2 className="text-[15px] font-semibold text-white">Banque</h2>
         <div><label className={labelClass}>IBAN</label><input type="text" value={form.iban} onChange={(e) => updateField("iban", e.target.value.toUpperCase())} placeholder="FR76 3000..." className={`${inputClass} font-mono`} /></div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div><label className={labelClass}>BIC</label><input type="text" value={form.bic} onChange={(e) => updateField("bic", e.target.value.toUpperCase())} placeholder="BDFEFRPP" className={`${inputClass} font-mono`} /></div>
           <div><label className={labelClass}>Banque</label><input type="text" value={form.bankName} onChange={(e) => updateField("bankName", e.target.value)} placeholder="Crédit Agricole" className={inputClass} /></div>
         </div>
@@ -83,7 +83,7 @@ export default function SettingsForm({ initialData }: { initialData: ShopSetting
 
       <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6 space-y-5">
         <h2 className="text-[15px] font-semibold text-white">Facturation</h2>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div><label className={labelClass}>Préfixe facture</label><input type="text" value={form.invoicePrefix} onChange={(e) => updateField("invoicePrefix", e.target.value.toUpperCase().slice(0,5))} className={inputClass} /><p className="text-[10px] text-zinc-600 mt-1">Format : {form.invoicePrefix||"F"}-2026-0001</p></div>
           <div><label className={labelClass}>Conditions paiement</label><input type="text" value={form.paymentTerms} onChange={(e) => updateField("paymentTerms", e.target.value)} className={inputClass} /></div>
         </div>

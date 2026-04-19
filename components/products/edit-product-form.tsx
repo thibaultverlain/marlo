@@ -91,12 +91,12 @@ export default function EditProductForm({ product }: { product: ProductData }) {
           )}
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div><label className={labelClass}>Modèle</label><input type="text" value={form.model} onChange={(e) => updateField("model", e.target.value)} className={inputClass} /></div>
           <div><label className={labelClass}>Titre</label><input type="text" value={form.title} onChange={(e) => updateField("title", e.target.value)} className={inputClass} /></div>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div><label className={labelClass}>Catégorie</label><select value={form.category} onChange={(e) => updateField("category", e.target.value)} className={inputClass}>{CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}</select></div>
           <div><label className={labelClass}>Taille</label><input type="text" value={form.size} onChange={(e) => updateField("size", e.target.value)} className={inputClass} /></div>
           <div><label className={labelClass}>Couleur</label><input type="text" value={form.color} onChange={(e) => updateField("color", e.target.value)} className={inputClass} /></div>
@@ -106,7 +106,7 @@ export default function EditProductForm({ product }: { product: ProductData }) {
 
         <div className="border-t border-[var(--color-border)] pt-5">
           <h3 className="text-sm font-semibold text-zinc-300 mb-4">Prix</h3>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div><label className={labelClass}>Prix d'achat</label><div className="relative"><input type="number" step="0.01" value={form.purchasePrice} onChange={(e) => updateField("purchasePrice", e.target.value)} className={`${inputClass} pr-8`} /><span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zinc-600">€</span></div></div>
             <div><label className={labelClass}>Prix de vente visé</label><div className="relative"><input type="number" step="0.01" value={form.targetPrice} onChange={(e) => updateField("targetPrice", e.target.value)} className={`${inputClass} pr-8`} /><span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zinc-600">€</span></div></div>
           </div>
@@ -118,7 +118,7 @@ export default function EditProductForm({ product }: { product: ProductData }) {
           )}
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div><label className={labelClass}>Source d'achat</label><input type="text" value={form.purchaseSource} onChange={(e) => updateField("purchaseSource", e.target.value)} className={inputClass} /></div>
           <div><label className={labelClass}>Date d'achat</label><input type="date" value={form.purchaseDate} onChange={(e) => updateField("purchaseDate", e.target.value)} className={inputClass} /></div>
         </div>

@@ -10,9 +10,9 @@ export default async function CustomersPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-start sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-3xl text-white">Clients</h1>
+          <h1 className="text-2xl lg:text-3xl text-white">Clients</h1>
           <p className="text-zinc-500 mt-1 text-sm">{stats.total} client{stats.total > 1 ? "s" : ""}{stats.vipCount > 0 && ` · ${stats.vipCount} VIP`}</p>
         </div>
         <Link href="/customers/new" className="flex items-center gap-2 px-4 py-2 text-[13px] font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-500 transition-colors"><Plus size={14} />Ajouter</Link>
@@ -28,7 +28,7 @@ export default async function CustomersPage() {
         <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] overflow-hidden">
           <div className="divide-y divide-[var(--color-border)]">
             {customers.map((c) => (
-              <Link key={c.id} href={`/customers/${c.id}`} className="flex items-center justify-between px-5 py-3.5 hover:bg-[var(--color-bg-hover)] transition-colors">
+              <Link key={c.id} href={`/customers/${c.id}`} className="flex items-start sm:items-center justify-between gap-3 px-5 py-3.5 hover:bg-[var(--color-bg-hover)] transition-colors">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-sm font-semibold text-zinc-400">{c.firstName[0]}{c.lastName[0]}</div>
                   <div>

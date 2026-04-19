@@ -19,7 +19,7 @@ export default async function SourcingDetailPage({ params }: { params: Promise<{
         <div className="flex-1"><p className="text-[11px] text-zinc-600">Créée le {formatDate(req.createdAt)}</p><h1 className="text-2xl text-white">{req.description}</h1></div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 lg:gap-4">
         <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-5"><p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Budget</p><p className="text-2xl font-semibold text-white tabular-nums">{req.targetBudget ? formatCurrency(req.targetBudget) : "—"}</p></div>
         <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-5"><p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Commission</p><p className="text-2xl font-semibold text-indigo-400">{commissionPct > 0 ? `${commissionPct.toFixed(0)}%` : "—"}</p>{req.commissionAmount && <p className="text-[11px] text-zinc-500 mt-0.5">{formatCurrency(req.commissionAmount)}</p>}</div>
         <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-5"><p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Deadline</p><p className="text-lg font-semibold text-white">{req.deadline ? formatDate(req.deadline) : "—"}</p></div>

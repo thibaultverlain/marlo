@@ -71,9 +71,9 @@ export default async function SalesPage({ searchParams }: { searchParams: Promis
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-start sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-3xl text-white">Ventes</h1>
+          <h1 className="text-2xl lg:text-3xl text-white">Ventes</h1>
           <p className="text-zinc-500 mt-1 text-sm">
             {salesData.length} vente{salesData.length > 1 ? "s" : ""} · CA {formatCurrency(totalRevenue)} · Marge {formatCurrency(totalMargin)}
           </p>
@@ -94,7 +94,7 @@ export default async function SalesPage({ searchParams }: { searchParams: Promis
         <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] overflow-hidden">
           <div className="divide-y divide-[var(--color-border)]">
             {salesData.map((sale) => (
-              <Link key={sale.id} href={`/sales/${sale.id}`} className="flex items-center justify-between px-5 py-3.5 hover:bg-[var(--color-bg-hover)] transition-colors">
+              <Link key={sale.id} href={`/sales/${sale.id}`} className="flex items-start sm:items-center justify-between gap-3 px-5 py-3.5 hover:bg-[var(--color-bg-hover)] transition-colors">
                 <div>
                   <p className="text-[13px] font-medium text-zinc-200">{sale.productTitle ?? "Article supprimé"}</p>
                   <div className="flex items-center gap-2 mt-1">

@@ -11,9 +11,9 @@ export default async function ProductsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-start sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-3xl text-white">Stock</h1>
+          <h1 className="text-2xl lg:text-3xl text-white">Stock</h1>
           <p className="text-zinc-500 mt-1 text-sm">
             {stats.inStock} article{stats.inStock > 1 ? "s" : ""} en stock
             {stats.dormant > 0 && (
@@ -23,10 +23,10 @@ export default async function ProductsPage() {
             )}
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-shrink-0">
           <Link
             href="/products/import"
-            className="flex items-center gap-2 px-4 py-2 text-[13px] font-medium text-zinc-400 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg hover:bg-[var(--color-bg-hover)] hover:text-zinc-200 transition-colors"
+            className="hidden sm:flex items-center gap-2 px-4 py-2 text-[13px] font-medium text-zinc-400 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg hover:bg-[var(--color-bg-hover)] hover:text-zinc-200 transition-colors"
           >
             <Upload size={14} />
             Importer

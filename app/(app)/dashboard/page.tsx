@@ -76,7 +76,7 @@ function EmptyState() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl text-white">Dashboard</h1>
+        <h1 className="text-2xl lg:text-3xl text-white">Dashboard</h1>
         <p className="text-zinc-500 mt-1 text-sm">
           {new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date())}
         </p>
@@ -110,7 +110,7 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl text-white">Dashboard</h1>
+        <h1 className="text-2xl lg:text-3xl text-white">Dashboard</h1>
         <p className="text-zinc-500 mt-1 text-sm">
           {new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date())}
         </p>

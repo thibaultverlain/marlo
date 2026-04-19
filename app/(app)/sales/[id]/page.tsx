@@ -32,7 +32,7 @@ export default async function SaleDetailPage({ params }: { params: Promise<{ id:
         <div className="flex-1"><p className="text-[11px] text-zinc-600">Vente du {formatDate(sale.soldAt)}</p><h1 className="text-2xl text-white">{product?.title ?? "Article supprimé"}</h1></div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 lg:gap-4">
         <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-5"><p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Prix de vente</p><p className="text-2xl font-semibold text-white tabular-nums">{formatCurrency(sale.salePrice)}</p><p className="text-[11px] text-zinc-600 mt-0.5">sur {channelLabel}</p></div>
         <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-5"><p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Revenu net</p><p className="text-2xl font-semibold text-white tabular-nums">{formatCurrency(sale.netRevenue)}</p><p className="text-[11px] text-zinc-600 mt-0.5">Après {formatCurrency(sale.platformFees)} de frais</p></div>
         <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-5"><p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Marge nette</p><p className={`text-2xl font-semibold tabular-nums ${Number(sale.margin) >= 0 ? "text-emerald-400" : "text-red-400"}`}>{formatCurrency(sale.margin)}</p><p className={`text-[11px] mt-0.5 ${Number(sale.marginPct) >= 0 ? "text-emerald-500" : "text-red-500"}`}>{formatPercent(Number(sale.marginPct))}</p></div>

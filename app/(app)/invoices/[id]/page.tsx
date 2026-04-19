@@ -20,14 +20,14 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
         <div className="flex-1"><p className="text-[11px] text-zinc-600">{formatDate(invoice.createdAt)}</p><div className="flex items-center gap-3"><h1 className="text-2xl text-white">Facture {invoice.invoiceNumber}</h1><span className={`inline-flex px-2.5 py-1 rounded-md text-[11px] font-medium ${st.cl}`}>{st.label}</span></div></div>
         <a href={`/api/invoices/${invoice.id}/pdf?download=1`} className="flex items-center gap-2 px-4 py-2 text-[13px] font-medium text-zinc-300 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg hover:bg-[var(--color-bg-hover)] transition-colors"><Download size={14} />Télécharger</a>
       </div>
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 lg:gap-4">
         <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-5"><p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Client</p><p className="text-lg font-semibold text-white">{customer ? `${customer.firstName} ${customer.lastName}` : "Sans client"}</p></div>
         <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-5"><p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Montant TTC</p><p className="text-2xl font-semibold text-white tabular-nums">{formatCurrency(invoice.amountTtc)}</p>{invoice.vatMention && <p className="text-[10px] text-zinc-600 mt-1">{invoice.vatMention}</p>}</div>
         <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-5"><p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-1">État</p><p className="text-lg font-semibold text-white">{st.label}</p>{invoice.paidAt && <p className="text-[11px] text-zinc-600 mt-0.5">Payée le {formatDate(invoice.paidAt)}</p>}</div>
       </div>
       <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] overflow-hidden">
         <div className="px-6 py-3 border-b border-[var(--color-border)] flex items-center justify-between"><p className="text-sm font-medium text-zinc-300">Aperçu</p><a href={`/api/invoices/${invoice.id}/pdf`} target="_blank" rel="noopener noreferrer" className="text-xs text-indigo-400 hover:text-indigo-300 font-medium">Ouvrir en grand</a></div>
-        <iframe src={`/api/invoices/${invoice.id}/pdf`} className="w-full h-[900px] border-0 bg-white" title="Aperçu facture" />
+        <iframe src={`/api/invoices/${invoice.id}/pdf`} className="w-full h-[500px] lg:h-[900px] border-0 bg-white" title="Aperçu facture" />
       </div>
       <InvoiceActions invoiceId={invoice.id} status={invoice.status ?? "brouillon"} />
       <div className="pb-8" />

@@ -74,7 +74,7 @@ export default function ImportEmailPage() {
             <CheckCircle size={16} className="text-emerald-400 mt-0.5" />
             <div className="flex-1">
               <p className="text-sm text-emerald-300 font-medium">Vente importée</p>
-              <div className="mt-3 grid grid-cols-2 gap-3 text-[13px]">
+              <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3 text-[13px]">
                 <div>
                   <p className="text-zinc-500 text-[11px]">Article</p>
                   <p className="text-zinc-200">{result.productTitle}</p>

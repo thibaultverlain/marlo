@@ -68,8 +68,8 @@ export default function ProductsList({ products }: { products: ProductListItem[]
 
   return (
     <>
-      <div className="flex items-center gap-3">
-        <div className="relative flex-1 max-w-md">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+        <div className="relative flex-1">
           <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600" />
           <input
             type="text"
@@ -150,7 +150,7 @@ export default function ProductsList({ products }: { products: ProductListItem[]
                     )}
                   </div>
 
-                  <div className="text-right flex-shrink-0">
+                  <div className="text-right flex-shrink-0 hidden sm:block">
                     <p className="text-[13px] font-medium text-zinc-200 tabular-nums">{formatCurrency(product.targetPrice)}</p>
                     <p className="text-[11px] text-zinc-600 tabular-nums">Achat : {formatCurrency(product.purchasePrice)}</p>
                     {expectedMargin > 0 && (
@@ -158,8 +158,9 @@ export default function ProductsList({ products }: { products: ProductListItem[]
                     )}
                   </div>
 
-                  <div className="flex-shrink-0 w-24 text-right">
+                  <div className="flex-shrink-0 sm:w-24 text-right">
                     <StatusBadge status={product.status} />
+                    <p className="text-[11px] text-zinc-400 tabular-nums mt-1 sm:hidden">{formatCurrency(product.targetPrice)}</p>
                   </div>
                 </Link>
               );

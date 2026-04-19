@@ -40,21 +40,21 @@ export default function NewSaleForm({ products, customers, preselectedProductId 
       {error && <div className="flex items-start gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-sm text-red-400"><AlertCircle size={16} className="flex-shrink-0 mt-0.5" /><span>{error}</span></div>}
       <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6 space-y-5">
         <div><label className={labelClass}>Article vendu *</label><select required value={form.productId} onChange={(e) => updateField("productId", e.target.value)} className={inputClass}><option value="">Sélectionner...</option>{products.map((p) => <option key={p.id} value={p.id}>{p.sku} — {p.title} ({formatCurrency(p.purchasePrice)})</option>)}</select></div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div><label className={labelClass}>Canal *</label><select value={form.channel} onChange={(e) => updateField("channel", e.target.value)} className={inputClass}>{CHANNELS.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}</select></div>
           <div><label className={labelClass}>Client</label><select value={form.customerId} onChange={(e) => updateField("customerId", e.target.value)} className={inputClass}><option value="">Aucun</option>{customers.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></div>
         </div>
         <div className="border-t border-[var(--color-border)] pt-5">
           <h3 className="text-sm font-semibold text-zinc-300 mb-4">Montants</h3>
           <div><label className={labelClass}>Prix de vente *</label><div className="relative"><input type="number" step="0.01" required value={form.salePrice} onChange={(e) => updateField("salePrice", e.target.value)} placeholder="0.00" className={`${inputClass} pr-8`} /><span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zinc-600">€</span></div></div>
-          <div className="grid grid-cols-2 gap-4 mt-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
             <div><div className="flex items-center justify-between mb-1.5"><label className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Frais plateforme</label><label className="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" checked={form.platformFeesAuto} onChange={(e) => updateField("platformFeesAuto", e.target.checked)} className="rounded border-zinc-600 bg-zinc-800 text-indigo-500 focus:ring-indigo-500" /><span className="text-[10px] text-zinc-500">Auto</span></label></div><div className="relative"><input type="number" step="0.01" value={form.platformFeesAuto ? autoFees.toFixed(2) : form.platformFees} onChange={(e) => updateField("platformFees", e.target.value)} disabled={form.platformFeesAuto} className={`${inputClass} pr-8 disabled:opacity-50`} /><span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zinc-600">€</span></div></div>
             <div><label className={labelClass}>Frais de port</label><div className="relative"><input type="number" step="0.01" value={form.shippingCost} onChange={(e) => updateField("shippingCost", e.target.value)} placeholder="0.00" className={`${inputClass} pr-8`} /><span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zinc-600">€</span></div></div>
           </div>
           <div className="mt-3"><label className={`${labelClass} mb-2`}>Port payé par</label><div className="flex gap-2">{[{v:"acheteur",l:"Acheteur"},{v:"vendeur",l:"Moi"},{v:"offert",l:"Offert"}].map((o) => <button key={o.v} type="button" onClick={() => updateField("shippingPaidBy", o.v)} className={`px-3 py-1.5 text-[13px] rounded-lg border transition-colors ${form.shippingPaidBy === o.v ? "bg-indigo-600 text-white border-indigo-600" : "bg-transparent text-zinc-400 border-[var(--color-border)] hover:border-zinc-600"}`}>{o.l}</button>)}</div></div>
           {marginCalc && (
             <div className={`mt-4 p-4 rounded-lg border ${marginCalc.margin >= 0 ? "bg-emerald-500/[0.08] border-emerald-500/20" : "bg-red-500/[0.08] border-red-500/20"}`}>
-              <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
                 <div><p className="text-[11px] text-zinc-500 mb-1">Revenu net</p><p className="text-lg font-semibold text-white tabular-nums">{formatCurrency(marginCalc.netRevenue)}</p></div>
                 <div><p className="text-[11px] text-zinc-500 mb-1">Marge</p><p className={`text-lg font-semibold tabular-nums ${marginCalc.margin >= 0 ? "text-emerald-400" : "text-red-400"}`}>{formatCurrency(marginCalc.margin)}</p></div>
                 <div><p className="text-[11px] text-zinc-500 mb-1">%</p><p className={`text-lg font-semibold tabular-nums ${marginCalc.marginPct >= 0 ? "text-emerald-400" : "text-red-400"}`}>{formatPercent(marginCalc.marginPct)}</p></div>
@@ -62,7 +62,7 @@ export default function NewSaleForm({ products, customers, preselectedProductId 
             </div>
           )}
         </div>
-        <div className="border-t border-[var(--color-border)] pt-5 grid grid-cols-2 gap-4">
+        <div className="border-t border-[var(--color-border)] pt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div><label className={labelClass}>Paiement</label><select value={form.paymentMethod} onChange={(e) => updateField("paymentMethod", e.target.value)} className={inputClass}><option value="plateforme">Via plateforme</option><option value="virement">Virement</option><option value="especes">Espèces</option><option value="cb">CB</option><option value="paypal">PayPal</option><option value="autre">Autre</option></select></div>
           <div><label className={labelClass}>N° de suivi</label><input type="text" value={form.trackingNumber} onChange={(e) => updateField("trackingNumber", e.target.value)} placeholder="Tracking" className={inputClass} /></div>
         </div>

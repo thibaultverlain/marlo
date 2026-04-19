@@ -85,7 +85,7 @@ export default function ProductImageUpload({
     <div className="space-y-3">
       {/* Image grid */}
       {images.length > 0 && (
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {images.map((url, i) => (
             <div key={url} className="relative group aspect-square rounded-lg overflow-hidden bg-stone-100">
               <img
