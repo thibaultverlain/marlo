@@ -7,14 +7,17 @@ import { createSale } from "@/lib/db/queries/sales";
 import { getProductById } from "@/lib/db/queries/products";
 import { calculatePlatformFees, calculateMargin } from "@/lib/data";
 
+const priceRegex = /^\d+([.,]\d{1,2})?$/;
+const cleanPrice = (s: string) => s.replace(",", ".");
+
 const saleSchema = z.object({
   productId: z.string().uuid("Article requis"),
   customerId: z.string().uuid().optional().nullable().or(z.literal("")),
   channel: z.enum(["vinted", "vestiaire", "stockx", "prive", "autre"]),
-  salePrice: z.string().regex(/^\d+(\.\d{1,2})?$/, "Prix de vente invalide"),
-  platformFees: z.string().regex(/^\d+(\.\d{1,2})?$/).optional(),
+  salePrice: z.string().regex(priceRegex, "Prix de vente invalide").transform(cleanPrice),
+  platformFees: z.string().regex(priceRegex).transform(cleanPrice).optional(),
   platformFeesAuto: z.string().optional(),
-  shippingCost: z.string().regex(/^\d+(\.\d{1,2})?$/).optional(),
+  shippingCost: z.string().regex(priceRegex).transform(cleanPrice).optional(),
   shippingPaidBy: z.enum(["vendeur", "acheteur", "offert"]).default("acheteur"),
   paymentMethod: z.enum(["virement", "especes", "cb", "paypal", "plateforme", "autre"]).optional(),
   trackingNumber: z.string().optional().nullable(),

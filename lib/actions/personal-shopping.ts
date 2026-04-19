@@ -23,8 +23,8 @@ const itemSchema = z.object({
   customerId: z.string().uuid("Client requis"),
   description: z.string().min(1, "Description requise"),
   brand: z.string().optional().nullable(),
-  purchasePrice: z.string().regex(/^\d+(\.\d{1,2})?$/, "Prix invalide"),
-  commissionRate: z.string().regex(/^\d+(\.\d{1,4})?$/).optional().or(z.literal("")),
+  purchasePrice: z.string().regex(/^\d+([.,]\d{1,2})?$/, "Prix invalide").transform((s) => s.replace(",", ".")),
+  commissionRate: z.string().regex(/^\d+([.,]\d{1,4})?$/).transform((s) => s.replace(",", ".")).optional().or(z.literal("")),
   notes: z.string().optional().nullable(),
 });
 

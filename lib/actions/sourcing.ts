@@ -15,8 +15,8 @@ const sourcingSchema = z.object({
   description: z.string().min(1, "Description requise"),
   brand: z.string().optional().nullable(),
   model: z.string().optional().nullable(),
-  targetBudget: z.string().regex(/^\d+(\.\d{1,2})?$/).optional().or(z.literal("")),
-  commissionRate: z.string().regex(/^\d+(\.\d{1,4})?$/).optional().or(z.literal("")),
+  targetBudget: z.string().regex(/^\d+([.,]\d{1,2})?$/).transform((s) => s.replace(",", ".")).optional().or(z.literal("")),
+  commissionRate: z.string().regex(/^\d+([.,]\d{1,4})?$/).transform((s) => s.replace(",", ".")).optional().or(z.literal("")),
   deadline: z.string().optional().nullable(),
   notes: z.string().optional().nullable(),
 });
