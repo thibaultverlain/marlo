@@ -7,6 +7,8 @@ import {
   LayoutDashboard, Package, ShoppingCart, Users, Search,
   ShoppingBag, FileText, Calculator, Settings, Menu, X, Mail, BarChart3,
 } from "lucide-react";
+import PushNotificationToggle from "./push-toggle";
+import ThemeToggle from "./theme-toggle";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, alertKey: "dashboard" },
@@ -125,7 +127,9 @@ export default function Sidebar() {
         </nav>
 
         {/* Bottom nav */}
-        <div className="px-2.5 py-3 border-t border-[var(--color-border)]">
+        <div className="px-2.5 py-3 border-t border-[var(--color-border)] space-y-1">
+          <PushNotificationToggle />
+          <ThemeToggle />
           {BOTTOM_ITEMS.map((item) => {
             const Icon = item.icon;
             const isActive = pathname.startsWith(item.href);

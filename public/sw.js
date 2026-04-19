@@ -1,4 +1,4 @@
-const CACHE_NAME = "marlo-v1";
+const CACHE_NAME = "marlo-v2";
 const STATIC_ASSETS = ["/dashboard", "/products", "/sales", "/customers"];
 
 self.addEventListener("install", (event) => {
@@ -18,13 +18,10 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
-  // Network-first strategy: try network, fall back to cache
   if (event.request.method !== "GET") return;
-
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        // Cache successful HTML responses
         if (response.ok && response.headers.get("content-type")?.includes("text/html")) {
           const clone = response.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
@@ -32,5 +29,52 @@ self.addEventListener("fetch", (event) => {
         return response;
       })
       .catch(() => caches.match(event.request))
+  );
+});
+
+// Push notification received
+self.addEventListener("push", (event) => {
+  if (!event.data) return;
+
+  try {
+    const data = event.data.json();
+    const options = {
+      body: data.body || "",
+      icon: data.icon || "/icons/icon-192.png",
+      badge: data.badge || "/icons/icon-192.png",
+      vibrate: [100, 50, 100],
+      data: {
+        url: data.url || "/dashboard",
+      },
+      actions: [
+        { action: "open", title: "Voir" },
+        { action: "dismiss", title: "Ignorer" },
+      ],
+    };
+
+    event.waitUntil(
+      self.registration.showNotification(data.title || "Marlo", options)
+    );
+  } catch (err) {
+    console.error("Push parse error:", err);
+  }
+});
+
+// Notification click
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+
+  if (event.action === "dismiss") return;
+
+  const url = event.notification.data?.url || "/dashboard";
+  event.waitUntil(
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
+      for (const client of clientList) {
+        if (client.url.includes(url) && "focus" in client) {
+          return client.focus();
+        }
+      }
+      return clients.openWindow(url);
+    })
   );
 });
