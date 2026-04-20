@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus, Upload, Package } from "lucide-react";
+import { Plus, Upload, Package, FileDown } from "lucide-react";
 import { getAllProducts, getStockStats } from "@/lib/db/queries/products";
 import { daysSince } from "@/lib/utils";
 import ProductsList from "@/components/products/products-list";
@@ -24,6 +24,13 @@ export default async function ProductsPage() {
           </p>
         </div>
         <div className="flex gap-2 flex-shrink-0">
+          <a
+            href="/api/stock/pdf?download=1"
+            className="hidden sm:flex items-center gap-2 px-4 py-2 text-[13px] font-medium text-zinc-400 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg hover:bg-[var(--color-bg-hover)] hover:text-zinc-200 transition-colors"
+          >
+            <FileDown size={14} />
+            PDF
+          </a>
           <Link
             href="/products/import"
             className="hidden sm:flex items-center gap-2 px-4 py-2 text-[13px] font-medium text-zinc-400 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg hover:bg-[var(--color-bg-hover)] hover:text-zinc-200 transition-colors"

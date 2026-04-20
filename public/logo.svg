@@ -1,0 +1,21 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="96" fill="#0c0c0e"/>
+  <!-- Left laurel -->
+  <g transform="translate(256, 80) scale(3.2)" opacity="0.9">
+    <path d="M-3,85 C-8,73 -18,63 -14,48" fill="none" stroke="#d4d4d8" stroke-width="1.2"/>
+    <ellipse cx="-17" cy="52" rx="7" ry="12" fill="none" stroke="#d4d4d8" stroke-width="0.9" transform="rotate(-15,-17,52)"/>
+    <ellipse cx="-20" cy="64" rx="6" ry="11" fill="none" stroke="#d4d4d8" stroke-width="0.9" transform="rotate(-8,-20,64)"/>
+    <ellipse cx="-17" cy="40" rx="6" ry="10" fill="none" stroke="#d4d4d8" stroke-width="0.9" transform="rotate(-25,-17,40)"/>
+    <ellipse cx="-12" cy="29" rx="5" ry="9" fill="none" stroke="#d4d4d8" stroke-width="0.9" transform="rotate(-38,-12,29)"/>
+    <ellipse cx="-6" cy="19" rx="4" ry="8" fill="none" stroke="#d4d4d8" stroke-width="0.9" transform="rotate(-50,-6,19)"/>
+    <!-- Right laurel -->
+    <path d="M3,85 C8,73 18,63 14,48" fill="none" stroke="#d4d4d8" stroke-width="1.2"/>
+    <ellipse cx="17" cy="52" rx="7" ry="12" fill="none" stroke="#d4d4d8" stroke-width="0.9" transform="rotate(15,17,52)"/>
+    <ellipse cx="20" cy="64" rx="6" ry="11" fill="none" stroke="#d4d4d8" stroke-width="0.9" transform="rotate(8,20,64)"/>
+    <ellipse cx="17" cy="40" rx="6" ry="10" fill="none" stroke="#d4d4d8" stroke-width="0.9" transform="rotate(25,17,40)"/>
+    <ellipse cx="12" cy="29" rx="5" ry="9" fill="none" stroke="#d4d4d8" stroke-width="0.9" transform="rotate(38,12,29)"/>
+    <ellipse cx="6" cy="19" rx="4" ry="8" fill="none" stroke="#d4d4d8" stroke-width="0.9" transform="rotate(50,6,19)"/>
+  </g>
+  <!-- M -->
+  <text x="256" y="320" text-anchor="middle" font-family="'Cormorant Garamond', Georgia, serif" font-size="140" font-weight="300" fill="#fafafa">M</text>
+</svg>

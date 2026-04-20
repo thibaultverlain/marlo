@@ -27,6 +27,13 @@ const styles = StyleSheet.create({
   issuer: {
     width: "55%",
   },
+  brandName: {
+    fontSize: 18,
+    fontWeight: 700,
+    letterSpacing: 4,
+    marginBottom: 8,
+    color: "#1c1917",
+  },
   issuerName: {
     fontSize: 14,
     fontWeight: 700,
@@ -252,6 +259,7 @@ export const InvoiceDocument = ({ data }: { data: InvoicePDFData }) => {
         {/* Header: Issuer (left) + Invoice info (right) */}
         <View style={styles.header}>
           <View style={styles.issuer}>
+            <Text style={styles.brandName}>MARLO</Text>
             <Text style={styles.issuerName}>
               {settings.commercialName || settings.legalName}
             </Text>

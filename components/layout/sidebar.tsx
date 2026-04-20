@@ -9,6 +9,8 @@ import {
 } from "lucide-react";
 import PushNotificationToggle from "./push-toggle";
 import ThemeToggle from "./theme-toggle";
+import LogoutButton from "./logout-button";
+import { MarloIcon, MarloWordmark } from "./marlo-logo";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, alertKey: "dashboard" },
@@ -56,11 +58,9 @@ export default function Sidebar() {
     <>
       {/* Mobile top bar */}
       <div className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-[var(--color-bg-sidebar)] border-b border-[var(--color-border)] flex items-center justify-between px-4 z-50">
-        <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
-            <span className="text-white text-xs font-bold">M</span>
-          </div>
-          <span className="text-[15px] font-semibold text-white">Marlo</span>
+        <div className="flex items-center gap-1.5">
+          <MarloIcon size={28} />
+          <MarloWordmark />
         </div>
         <button
           onClick={() => setOpen(!open)}
@@ -87,11 +87,9 @@ export default function Sidebar() {
       >
         {/* Logo - hidden on mobile (top bar has it) */}
         <div className="px-5 py-5 hidden lg:block">
-          <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
-              <span className="text-white text-xs font-bold">M</span>
-            </div>
-            <h1 className="text-[15px] font-semibold text-white tracking-tight">Marlo</h1>
+          <div className="flex items-center gap-1.5">
+            <MarloIcon size={28} />
+            <MarloWordmark />
           </div>
         </div>
 
@@ -148,6 +146,7 @@ export default function Sidebar() {
               </Link>
             );
           })}
+          <LogoutButton />
         </div>
       </aside>
     </>
