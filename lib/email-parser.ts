@@ -1,6 +1,6 @@
 /**
- * Parse Vinted and Vestiaire Collective sale confirmation emails
- * to extract sale data automatically.
+ * Parse Vinted and Vestiaire Collective sale confirmation emails.
+ * Handles both HTML email bodies and plain text, single-line and multi-line.
  */
 
 export type ParsedSaleEmail = {
@@ -11,185 +11,149 @@ export type ParsedSaleEmail = {
   netRevenue: number;
   buyerName?: string;
   date: Date;
-  trackingNumber?: string;
   raw: string;
 };
 
-/**
- * Detect which platform the email is from and parse accordingly.
- */
 export function parseSaleEmail(subject: string, body: string): ParsedSaleEmail | null {
-  const lowerSubject = subject.toLowerCase();
-  const lowerBody = body.toLowerCase();
+  const lower = (subject + " " + body).toLowerCase();
 
-  if (lowerSubject.includes("vinted") || lowerBody.includes("vinted")) {
-    return parseVintedEmail(subject, body);
+  if (lower.includes("vinted")) {
+    return parseEmail("vinted", subject, body);
+  }
+  if (lower.includes("vestiaire")) {
+    return parseEmail("vestiaire", subject, body);
   }
 
-  if (
-    lowerSubject.includes("vestiaire") ||
-    lowerBody.includes("vestiaire collective") ||
-    lowerBody.includes("vestiairecollective")
-  ) {
-    return parseVestiaireEmail(subject, body);
+  // Fallback: try to parse anyway if it mentions "vendu"
+  if (lower.includes("vendu") || lower.includes("sold")) {
+    return parseEmail("vinted", subject, body);
   }
 
   return null;
 }
 
-function parseEurAmount(text: string): number | null {
-  // Match patterns like "250,00 €", "250.00€", "250,00€", "EUR 250.00"
-  const patterns = [
-    /(\d+[.,]\d{2})\s*€/,
-    /€\s*(\d+[.,]\d{2})/,
-    /EUR\s*(\d+[.,]\d{2})/,
-    /(\d+[.,]\d{2})\s*EUR/,
-  ];
+function parseAllEurAmounts(text: string): number[] {
+  const amounts: number[] = [];
+  // Match all euro amounts in any format
+  const regex = /(\d[\d\s]*[.,]\d{2})\s*€|€\s*(\d[\d\s]*[.,]\d{2})|(\d[\d\s]*[.,]\d{2})\s*EUR|EUR\s*(\d[\d\s]*[.,]\d{2})/gi;
+  let match;
+  while ((match = regex.exec(text)) !== null) {
+    const raw = (match[1] || match[2] || match[3] || match[4]).replace(/\s/g, "");
+    const num = parseFloat(raw.replace(",", "."));
+    if (!isNaN(num)) amounts.push(num);
+  }
+  return amounts;
+}
 
-  for (const pat of patterns) {
-    const match = text.match(pat);
-    if (match) {
-      return parseFloat(match[1].replace(",", "."));
-    }
+function findAmountNear(text: string, keywords: string[]): number | null {
+  const lower = text.toLowerCase();
+  for (const kw of keywords) {
+    const idx = lower.indexOf(kw);
+    if (idx === -1) continue;
+    // Look at the text within 80 chars after the keyword
+    const snippet = text.substring(idx, idx + 80);
+    const amounts = parseAllEurAmounts(snippet);
+    if (amounts.length > 0) return amounts[0];
   }
   return null;
 }
 
-function parseVintedEmail(subject: string, body: string): ParsedSaleEmail | null {
+function parseEmail(platform: "vinted" | "vestiaire", subject: string, body: string): ParsedSaleEmail | null {
   try {
-    // Vinted emails typically say "Tu as vendu [article]" or "Your item [article] has been sold"
+    // Clean HTML tags
+    const clean = body.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+    const fullText = subject + " " + clean;
+
+    // Extract product title
     let productTitle = "";
-
-    // Try French format
-    const titleMatch =
-      body.match(/tu as vendu\s*[:\-]?\s*(.+?)(?:\n|<br|\.)/i) ||
-      body.match(/article vendu\s*[:\-]?\s*(.+?)(?:\n|<br|\.)/i) ||
-      subject.match(/vendu\s*[:\-]?\s*(.+)/i);
-
-    if (titleMatch) {
-      productTitle = titleMatch[1].trim().replace(/<[^>]*>/g, "").trim();
-    }
-
-    // Extract amounts
-    // Look for sale price, fees, and net amount
-    const lines = body.split(/\n|<br\s*\/?>/).map((l) => l.replace(/<[^>]*>/g, "").trim());
-
-    let salePrice = 0;
-    let fees = 0;
-    let netRevenue = 0;
-
-    for (const line of lines) {
-      const lower = line.toLowerCase();
-      if (lower.includes("prix de vente") || lower.includes("prix total") || lower.includes("montant de la vente")) {
-        const amt = parseEurAmount(line);
-        if (amt) salePrice = amt;
-      }
-      if (lower.includes("frais") || lower.includes("commission") || lower.includes("protection")) {
-        const amt = parseEurAmount(line);
-        if (amt) fees = amt;
-      }
-      if (lower.includes("vous recevrez") || lower.includes("tu recevras") || lower.includes("montant versé") || lower.includes("revenu")) {
-        const amt = parseEurAmount(line);
-        if (amt) netRevenue = amt;
+    const titlePatterns = [
+      /tu as vendu\s*[:\-–]?\s*(.+?)(?:\.|!|\n|$)/i,
+      /article vendu\s*[:\-–]?\s*(.+?)(?:\.|!|\n|$)/i,
+      /vous avez vendu\s*[:\-–]?\s*(.+?)(?:\.|!|\n|$)/i,
+      /vendu\s*[:\-–]?\s*(.+?)(?:\.|!|\n|$)/i,
+      /article\s*[:\-–]?\s*(.+?)(?:a été vendu|vendu|sold)/i,
+    ];
+    for (const pat of titlePatterns) {
+      const m = fullText.match(pat);
+      if (m && m[1].trim().length > 2) {
+        productTitle = m[1].trim().slice(0, 80);
+        break;
       }
     }
 
-    // If we have sale price but not net, calculate
-    if (salePrice > 0 && netRevenue === 0) {
-      netRevenue = salePrice - fees;
+    // Extract amounts by looking for keywords near euro amounts
+    const salePrice = findAmountNear(fullText, [
+      "prix de vente", "prix total", "montant de la vente",
+      "prix final", "vendu pour", "vendu à", "sale price",
+    ]);
+
+    const fees = findAmountNear(fullText, [
+      "frais plateforme", "frais de service", "frais", "commission",
+      "protection", "platform fees", "service fee",
+    ]);
+
+    const netRevenue = findAmountNear(fullText, [
+      "tu recevras", "vous recevrez", "montant versé", "net reçu",
+      "virement", "revenu net", "you will receive", "montant net",
+    ]);
+
+    // Fallback: if we found no labeled amounts, try to get all amounts and guess
+    let finalSalePrice = salePrice ?? 0;
+    let finalFees = fees ?? 0;
+    let finalNet = netRevenue ?? 0;
+
+    if (finalSalePrice === 0 && finalNet === 0) {
+      // Get all amounts from the text
+      const allAmounts = parseAllEurAmounts(fullText);
+      if (allAmounts.length >= 3) {
+        // Assume: sale price (largest), fees, net revenue
+        const sorted = [...allAmounts].sort((a, b) => b - a);
+        finalSalePrice = sorted[0];
+        finalNet = sorted[1];
+        finalFees = sorted[2];
+        // Verify: if sale - fees ≈ net, we have it right
+        if (Math.abs(finalSalePrice - finalFees - finalNet) > 1) {
+          // Try: largest = sale, smallest = fees, middle = net
+          finalFees = sorted[sorted.length - 1];
+          finalNet = sorted[1];
+        }
+      } else if (allAmounts.length === 2) {
+        finalSalePrice = Math.max(...allAmounts);
+        finalNet = Math.min(...allAmounts);
+        finalFees = finalSalePrice - finalNet;
+      } else if (allAmounts.length === 1) {
+        finalSalePrice = allAmounts[0];
+        finalNet = allAmounts[0];
+      }
     }
-    // If we have net but not sale price
-    if (netRevenue > 0 && salePrice === 0) {
-      salePrice = netRevenue + fees;
+
+    // Fill in missing values
+    if (finalSalePrice > 0 && finalNet === 0 && finalFees >= 0) {
+      finalNet = finalSalePrice - finalFees;
+    }
+    if (finalNet > 0 && finalSalePrice === 0) {
+      finalSalePrice = finalNet + finalFees;
+    }
+    if (finalSalePrice > 0 && finalFees === 0 && finalNet > 0) {
+      finalFees = finalSalePrice - finalNet;
     }
 
-    if (salePrice === 0 && netRevenue === 0) return null;
+    // Default fees for Vestiaire (15%) if we only have sale price
+    if (platform === "vestiaire" && finalSalePrice > 0 && finalFees === 0 && finalNet === 0) {
+      finalFees = Math.round(finalSalePrice * 0.15 * 100) / 100;
+      finalNet = finalSalePrice - finalFees;
+    }
 
-    // Try to extract buyer name
-    let buyerName: string | undefined;
-    const buyerMatch = body.match(/acheteur\s*[:\-]?\s*(.+?)(?:\n|<br)/i) ||
-      body.match(/acheté par\s*[:\-]?\s*(.+?)(?:\n|<br)/i);
-    if (buyerMatch) buyerName = buyerMatch[1].replace(/<[^>]*>/g, "").trim();
-
-    // Tracking number
-    let trackingNumber: string | undefined;
-    const trackingMatch = body.match(/suivi\s*[:\-]?\s*([A-Z0-9]{8,})/i) ||
-      body.match(/tracking\s*[:\-]?\s*([A-Z0-9]{8,})/i);
-    if (trackingMatch) trackingNumber = trackingMatch[1];
+    if (finalSalePrice === 0 && finalNet === 0) return null;
 
     return {
-      platform: "vinted",
-      productTitle: productTitle || "Article Vinted",
-      salePrice,
-      platformFees: fees,
-      netRevenue: netRevenue || salePrice - fees,
-      buyerName,
+      platform,
+      productTitle: productTitle || `Article ${platform === "vinted" ? "Vinted" : "Vestiaire Collective"}`,
+      salePrice: finalSalePrice,
+      platformFees: finalFees,
+      netRevenue: finalNet || finalSalePrice - finalFees,
       date: new Date(),
-      trackingNumber,
-      raw: body.slice(0, 500),
-    };
-  } catch {
-    return null;
-  }
-}
-
-function parseVestiaireEmail(subject: string, body: string): ParsedSaleEmail | null {
-  try {
-    let productTitle = "";
-
-    // Vestiaire emails: "Votre article a été vendu" / "Félicitations"
-    const titleMatch =
-      body.match(/article\s*[:\-]?\s*(.+?)(?:\n|<br|a été vendu)/i) ||
-      body.match(/vous avez vendu\s*[:\-]?\s*(.+?)(?:\n|<br|\.)/i) ||
-      subject.match(/vendu\s*[:\-]?\s*(.+)/i);
-
-    if (titleMatch) {
-      productTitle = titleMatch[1].trim().replace(/<[^>]*>/g, "").trim();
-    }
-
-    const lines = body.split(/\n|<br\s*\/?>/).map((l) => l.replace(/<[^>]*>/g, "").trim());
-
-    let salePrice = 0;
-    let fees = 0;
-    let netRevenue = 0;
-
-    for (const line of lines) {
-      const lower = line.toLowerCase();
-      if (lower.includes("prix de vente") || lower.includes("prix final")) {
-        const amt = parseEurAmount(line);
-        if (amt) salePrice = amt;
-      }
-      if (lower.includes("commission") || lower.includes("frais")) {
-        const amt = parseEurAmount(line);
-        if (amt) fees = amt;
-      }
-      if (lower.includes("vous recevrez") || lower.includes("montant versé") || lower.includes("virement")) {
-        const amt = parseEurAmount(line);
-        if (amt) netRevenue = amt;
-      }
-    }
-
-    // Vestiaire takes 15% commission typically
-    if (salePrice > 0 && fees === 0) {
-      fees = Math.round(salePrice * 0.15 * 100) / 100;
-    }
-    if (salePrice > 0 && netRevenue === 0) {
-      netRevenue = salePrice - fees;
-    }
-    if (netRevenue > 0 && salePrice === 0) {
-      salePrice = netRevenue + fees;
-    }
-
-    if (salePrice === 0 && netRevenue === 0) return null;
-
-    return {
-      platform: "vestiaire",
-      productTitle: productTitle || "Article Vestiaire Collective",
-      salePrice,
-      platformFees: fees,
-      netRevenue: netRevenue || salePrice - fees,
-      date: new Date(),
-      raw: body.slice(0, 500),
+      raw: fullText.slice(0, 300),
     };
   } catch {
     return null;
