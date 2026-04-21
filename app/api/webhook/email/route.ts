@@ -130,7 +130,7 @@ export async function POST(req: NextRequest) {
         paymentStatus: "en_attente",
         shippingStatus: "a_expedier",
         soldAt: parsed.date,
-        notes: `Auto-import email ${parsed.platform}${matchedProduct ? "" : " (produit non matché)"}`,
+        notes: matchedProduct ? `Auto-import email ${parsed.platform}` : `${parsed.productTitle} (import ${parsed.platform})`,
       })
       .returning();
 

@@ -40,6 +40,7 @@ async function getSalesForPeriod(period: string) {
       id: sales.id, productId: sales.productId, channel: sales.channel,
       salePrice: sales.salePrice, netRevenue: sales.netRevenue, margin: sales.margin,
       marginPct: sales.marginPct, paymentStatus: sales.paymentStatus, soldAt: sales.soldAt,
+      notes: sales.notes,
       productTitle: products.title,
       customerFirstName: customers.firstName, customerLastName: customers.lastName,
     })
@@ -96,7 +97,7 @@ export default async function SalesPage({ searchParams }: { searchParams: Promis
             {salesData.map((sale) => (
               <Link key={sale.id} href={`/sales/${sale.id}`} className="flex items-start sm:items-center justify-between gap-3 px-5 py-3.5 hover:bg-[var(--color-bg-hover)] transition-colors">
                 <div>
-                  <p className="text-[13px] font-medium text-zinc-200">{sale.productTitle ?? "Article supprimé"}</p>
+                  <p className="text-[13px] font-medium text-zinc-200">{sale.productTitle ?? sale.notes ?? "Article"}</p>
                   <div className="flex items-center gap-2 mt-1">
                     <ChannelBadge channel={sale.channel} />
                     {sale.customerName && <span className="text-[11px] text-zinc-500">{sale.customerName}</span>}

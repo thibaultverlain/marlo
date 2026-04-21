@@ -10,6 +10,7 @@ import { eq } from "drizzle-orm";
 import { formatCurrency, formatPercent, formatDate } from "@/lib/utils";
 import { CHANNELS } from "@/lib/data";
 import SaleActions from "@/components/sales/sale-actions";
+import SaleDeleteButton from "@/components/sales/sale-delete-button";
 
 export const dynamic = "force-dynamic";
 
@@ -69,6 +70,8 @@ export default async function SaleDetailPage({ params }: { params: Promise<{ id:
       </div>
 
       {sale.notes && <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6"><h2 className="text-[15px] font-semibold text-white mb-3">Notes</h2><p className="text-sm text-zinc-400 whitespace-pre-line">{sale.notes}</p></div>}
+
+      <SaleDeleteButton saleId={sale.id} />
       <div className="pb-8" />
     </div>
   );

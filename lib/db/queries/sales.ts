@@ -175,3 +175,7 @@ export async function getPendingShipments() {
     .where(eq(sales.shippingStatus, "a_expedier"));
   return rows[0]?.count ?? 0;
 }
+
+export async function deleteSale(id: string) {
+  await db.delete(sales).where(eq(sales.id, id));
+}

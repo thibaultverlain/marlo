@@ -100,3 +100,18 @@ export async function createSaleAction(formData: FormData) {
   revalidatePath("/dashboard");
   redirect("/sales");
 }
+
+export async function deleteSaleAction(saleId: string) {
+  const { deleteSale } = await import("@/lib/db/queries/sales");
+
+  try {
+    await deleteSale(saleId);
+  } catch (err) {
+    console.error("deleteSaleAction error:", err);
+    return { error: "Erreur lors de la suppression." };
+  }
+
+  revalidatePath("/sales");
+  revalidatePath("/dashboard");
+  redirect("/sales");
+}
