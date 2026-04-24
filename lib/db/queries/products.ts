@@ -71,6 +71,7 @@ export async function getStockStats() {
       inStock: sql<number>`count(*) filter (where status in ('en_stock', 'en_vente', 'reserve'))::int`,
       sold: sql<number>`count(*) filter (where status in ('vendu', 'expedie', 'livre'))::int`,
       totalValue: sql<number>`coalesce(sum(purchase_price) filter (where status in ('en_stock', 'en_vente', 'reserve')), 0)::numeric`,
+      targetValue: sql<number>`coalesce(sum(target_price) filter (where status in ('en_stock', 'en_vente', 'reserve')), 0)::numeric`,
       dormant: sql<number>`count(*) filter (where status in ('en_stock', 'en_vente') and created_at < NOW() - INTERVAL '30 days')::int`,
     })
     .from(products);

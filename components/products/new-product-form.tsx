@@ -14,7 +14,8 @@ const labelClass = "block text-[11px] font-medium text-zinc-500 uppercase tracki
 export default function NewProductForm() {
   const [form, setForm] = useState({
     title: "", brand: "", model: "", category: "sacs", size: "", color: "",
-    condition: "tres_bon", purchasePrice: "", targetPrice: "", purchaseCurrency: "EUR", purchaseSource: "",
+    condition: "tres_bon", purchasePrice: "", purchaseFees: "", targetPrice: "",
+    purchaseCurrency: "EUR", purchaseSource: "vinted",
     purchaseDate: new Date().toISOString().split("T")[0],
     listedOn: [] as string[], serialNumber: "", notes: "",
   });
@@ -30,11 +31,11 @@ export default function NewProductForm() {
   }, [brandSearch]);
 
   const marginPreview = useMemo(() => {
-    const purchase = parseFloat(form.purchasePrice) || 0;
+    const purchase = (parseFloat(form.purchasePrice) || 0) + (parseFloat(form.purchaseFees) || 0);
     const target = parseFloat(form.targetPrice) || 0;
     if (purchase <= 0 || target <= 0) return null;
     return { margin: target - purchase, pct: ((target - purchase) / purchase) * 100 };
-  }, [form.purchasePrice, form.targetPrice]);
+  }, [form.purchasePrice, form.purchaseFees, form.targetPrice]);
 
   function updateField(field: string, value: string | string[]) { setForm((prev) => ({ ...prev, [field]: value })); }
   function toggleListedOn(channel: string) {
@@ -49,9 +50,14 @@ export default function NewProductForm() {
     formData.append("brand", form.brand); formData.append("model", form.model);
     formData.append("category", form.category); formData.append("size", form.size);
     formData.append("color", form.color); formData.append("condition", form.condition);
-    formData.append("purchasePrice", form.purchasePrice); formData.append("targetPrice", form.targetPrice);
+    // purchasePrice = article price + fees (total cost)
+    const totalCost = (parseFloat(form.purchasePrice) || 0) + (parseFloat(form.purchaseFees) || 0);
+    formData.append("purchasePrice", String(totalCost));
+    formData.append("targetPrice", form.targetPrice);
     formData.append("purchaseCurrency", form.purchaseCurrency);
-    formData.append("purchaseSource", form.purchaseSource); formData.append("purchaseDate", form.purchaseDate);
+    const sourceLabels: Record<string, string> = { vinted: "Vinted", vente_privee: "Vente privée", outlet: "Outlet", revendeur: "Revendeur réseau", autre: "Autre" };
+    formData.append("purchaseSource", sourceLabels[form.purchaseSource] ?? form.purchaseSource);
+    formData.append("purchaseDate", form.purchaseDate);
     form.listedOn.forEach((ch) => formData.append("listedOn", ch));
     formData.append("serialNumber", form.serialNumber); formData.append("notes", form.notes);
     startTransition(async () => { const result = await createProductAction(formData); if (result?.error) setError(result.error); });
@@ -97,11 +103,58 @@ export default function NewProductForm() {
         <div><label className={labelClass}>État</label><select value={form.condition} onChange={(e) => updateField("condition", e.target.value)} className={inputClass}>{CONDITIONS.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}</select></div>
 
         <div className="border-t border-[var(--color-border)] pt-5">
-          <h3 className="text-sm font-semibold text-zinc-300 mb-4">Prix</h3>
+          <h3 className="text-sm font-semibold text-zinc-300 mb-4">Achat</h3>
+
+          {/* Source selector */}
+          <div className="mb-4">
+            <label className={labelClass}>Source d'achat</label>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { v: "vinted", l: "Vinted" },
+                { v: "vente_privee", l: "Vente privée" },
+                { v: "outlet", l: "Outlet" },
+                { v: "revendeur", l: "Revendeur réseau" },
+                { v: "autre", l: "Autre" },
+              ].map((s) => (
+                <button key={s.v} type="button" onClick={() => updateField("purchaseSource", s.v)}
+                  className={`px-3 py-1.5 text-[13px] rounded-lg border transition-colors ${form.purchaseSource === s.v ? "bg-indigo-600 text-white border-indigo-600" : "bg-transparent text-zinc-400 border-[var(--color-border)] hover:border-zinc-600"}`}>{s.l}</button>
+              ))}
+            </div>
+          </div>
+
+          {/* Price fields adapt to source */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div><label className={labelClass}>Prix d'achat *</label><div className="relative"><input type="number" step="0.01" required value={form.purchasePrice} onChange={(e) => updateField("purchasePrice", e.target.value)} placeholder="0.00" className={`${inputClass} pr-8`} /><span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zinc-600">{CURRENCIES.find(c => c.code === form.purchaseCurrency)?.symbol ?? "€"}</span></div></div>
-            <div><label className={labelClass}>Devise</label><select value={form.purchaseCurrency} onChange={(e) => updateField("purchaseCurrency", e.target.value)} className={inputClass}>{CURRENCIES.map((c) => <option key={c.code} value={c.code}>{c.code} - {c.label}</option>)}</select>{form.purchaseCurrency !== "EUR" && form.purchasePrice && <p className="text-[10px] text-indigo-400 mt-1">≈ {formatCurrency(convertToEur(parseFloat(form.purchasePrice) || 0, form.purchaseCurrency))} EUR</p>}</div>
-            <div><label className={labelClass}>Prix de vente visé</label><div className="relative"><input type="number" step="0.01" value={form.targetPrice} onChange={(e) => updateField("targetPrice", e.target.value)} placeholder="0.00" className={`${inputClass} pr-8`} /><span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zinc-600">€</span></div></div>
+            <div>
+              <label className={labelClass}>Prix article *</label>
+              <div className="relative"><input type="number" step="0.01" required value={form.purchasePrice} onChange={(e) => updateField("purchasePrice", e.target.value)} placeholder="0.00" className={`${inputClass} pr-8`} /><span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zinc-600">{CURRENCIES.find(c => c.code === form.purchaseCurrency)?.symbol ?? "€"}</span></div>
+            </div>
+            <div>
+              <label className={labelClass}>
+                {form.purchaseSource === "vinted" ? "Frais protection" : form.purchaseSource === "vente_privee" ? "Frais port + taxe" : "Frais additionnels"}
+              </label>
+              <div className="relative"><input type="number" step="0.01" value={form.purchaseFees} onChange={(e) => updateField("purchaseFees", e.target.value)} placeholder="0.00" className={`${inputClass} pr-8`} /><span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zinc-600">€</span></div>
+            </div>
+            <div>
+              <label className={labelClass}>Devise</label>
+              <select value={form.purchaseCurrency} onChange={(e) => updateField("purchaseCurrency", e.target.value)} className={inputClass}>{CURRENCIES.map((c) => <option key={c.code} value={c.code}>{c.code} - {c.label}</option>)}</select>
+              {form.purchaseCurrency !== "EUR" && form.purchasePrice && <p className="text-[10px] text-indigo-400 mt-1">≈ {formatCurrency(convertToEur(parseFloat(form.purchasePrice) || 0, form.purchaseCurrency))} EUR</p>}
+            </div>
+          </div>
+
+          {/* Total cost preview */}
+          {(parseFloat(form.purchasePrice) > 0) && (
+            <div className="mt-3 p-3 bg-zinc-800/50 rounded-lg">
+              <div className="flex justify-between text-sm">
+                <span className="text-zinc-500">Coût total TTC</span>
+                <span className="text-white font-semibold tabular-nums">{formatCurrency((parseFloat(form.purchasePrice) || 0) + (parseFloat(form.purchaseFees) || 0))}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Target price */}
+          <div className="mt-4">
+            <label className={labelClass}>Prix de vente visé</label>
+            <div className="relative"><input type="number" step="0.01" value={form.targetPrice} onChange={(e) => updateField("targetPrice", e.target.value)} placeholder="0.00" className={`${inputClass} pr-8`} /><span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zinc-600">€</span></div>
           </div>
           {marginPreview && (
             <div className="mt-3 flex items-center gap-4 p-3 bg-emerald-500/[0.08] border border-emerald-500/20 rounded-lg">
@@ -112,7 +165,6 @@ export default function NewProductForm() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div><label className={labelClass}>Source d'achat</label><input type="text" value={form.purchaseSource} onChange={(e) => updateField("purchaseSource", e.target.value)} placeholder="Ex: Vinted, Friperie..." className={inputClass} /></div>
           <div><label className={labelClass}>Date d'achat</label><input type="date" value={form.purchaseDate} onChange={(e) => updateField("purchaseDate", e.target.value)} className={inputClass} /></div>
         </div>
 

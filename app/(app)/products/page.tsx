@@ -1,13 +1,23 @@
 import Link from "next/link";
 import { Plus, Upload, Package, FileDown } from "lucide-react";
-import { getAllProducts, getStockStats } from "@/lib/db/queries/products";
-import { daysSince } from "@/lib/utils";
+import { getInStockProducts, getAllProducts, getStockStats } from "@/lib/db/queries/products";
+import { daysSince, formatCurrency } from "@/lib/utils";
 import ProductsList from "@/components/products/products-list";
 
 export const dynamic = "force-dynamic";
 
-export default async function ProductsPage() {
-  const [products, stats] = await Promise.all([getAllProducts(), getStockStats()]);
+export default async function ProductsPage({ searchParams }: { searchParams: Promise<{ show?: string }> }) {
+  const sp = await searchParams;
+  const showAll = sp.show === "all";
+  const [products, stats] = await Promise.all([
+    showAll ? getAllProducts() : getInStockProducts(),
+    getStockStats(),
+  ]);
+
+  const stockValue = Number(stats?.totalValue ?? 0);
+  const targetValue = Number(stats?.targetValue ?? 0);
+  const potentialMargin = targetValue - stockValue;
+  const inStockCount = stats?.inStock ?? 0;
 
   return (
     <div className="space-y-6">
@@ -15,8 +25,8 @@ export default async function ProductsPage() {
         <div>
           <h1 className="text-2xl lg:text-3xl text-white">Stock</h1>
           <p className="text-zinc-500 mt-1 text-sm">
-            {stats.inStock} article{stats.inStock > 1 ? "s" : ""} en stock
-            {stats.dormant > 0 && (
+            {inStockCount} article{inStockCount > 1 ? "s" : ""} en stock
+            {stats?.dormant && stats.dormant > 0 && (
               <span className="text-amber-400 ml-2">
                 · {stats.dormant} dormant{stats.dormant > 1 ? "s" : ""}
               </span>
@@ -48,16 +58,58 @@ export default async function ProductsPage() {
         </div>
       </div>
 
+      {/* Stock value KPIs */}
+      {inStockCount > 0 && (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-4">
+            <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Articles en stock</p>
+            <p className="text-xl font-semibold text-white">{inStockCount}</p>
+          </div>
+          <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-4">
+            <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Valeur d'achat</p>
+            <p className="text-xl font-semibold text-white tabular-nums">{formatCurrency(stockValue)}</p>
+          </div>
+          <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-4">
+            <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Valeur visée</p>
+            <p className="text-xl font-semibold text-white tabular-nums">{formatCurrency(targetValue)}</p>
+          </div>
+          <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-4">
+            <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Marge potentielle</p>
+            <p className={`text-xl font-semibold tabular-nums ${potentialMargin >= 0 ? "text-emerald-400" : "text-red-400"}`}>{formatCurrency(potentialMargin)}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Toggle in-stock / all */}
+      <div className="flex items-center justify-between">
+        <div className="flex bg-zinc-800/60 rounded-lg p-0.5 w-fit">
+          <Link
+            href="/products"
+            className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-all ${!showAll ? "bg-indigo-600 text-white shadow-sm" : "text-zinc-500 hover:text-zinc-300"}`}
+          >
+            En stock ({inStockCount})
+          </Link>
+          <Link
+            href="/products?show=all"
+            className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-all ${showAll ? "bg-indigo-600 text-white shadow-sm" : "text-zinc-500 hover:text-zinc-300"}`}
+          >
+            Tout ({stats?.total ?? 0})
+          </Link>
+        </div>
+      </div>
+
       {products.length === 0 ? (
         <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-12 text-center">
           <Package size={40} className="mx-auto text-zinc-700 mb-3" />
-          <p className="text-zinc-500 mb-4 text-sm">Aucun article dans ton stock</p>
+          <p className="text-zinc-500 mb-4 text-sm">
+            {showAll ? "Aucun article" : "Aucun article en stock"}
+          </p>
           <Link
             href="/products/new"
             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-500 transition-colors"
           >
             <Plus size={14} />
-            Ajouter mon premier article
+            Ajouter
           </Link>
         </div>
       ) : (
@@ -67,14 +119,11 @@ export default async function ProductsPage() {
             sku: p.sku,
             title: p.title,
             brand: p.brand,
-            size: p.size,
+            category: p.category,
+            purchasePrice: p.purchasePrice,
+            targetPrice: p.targetPrice,
             status: p.status,
-            listedOn: p.listedOn || [],
-            purchasePrice: Number(p.purchasePrice),
-            targetPrice: p.targetPrice ? Number(p.targetPrice) : null,
             daysInStock: daysSince(p.createdAt),
-            isDormant: !["vendu", "livre", "retourne"].includes(p.status) && daysSince(p.createdAt) > 30,
-            thumbnail: p.images && p.images.length > 0 ? p.images[0] : null,
           }))}
         />
       )}

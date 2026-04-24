@@ -11,14 +11,11 @@ export type ProductListItem = {
   sku: string;
   title: string;
   brand: string;
-  size: string | null;
+  category: string;
   status: string;
-  listedOn: string[];
-  purchasePrice: number;
-  targetPrice: number | null;
+  purchasePrice: string | number;
+  targetPrice: string | number | null;
   daysInStock: number;
-  isDormant: boolean;
-  thumbnail: string | null;
 };
 
 function StatusBadge({ status }: { status: string }) {
@@ -103,10 +100,9 @@ export default function ProductsList({ products }: { products: ProductListItem[]
         ) : (
           <div className="divide-y divide-[var(--color-border)]">
             {filtered.map((product) => {
-              const expectedMargin =
-                product.targetPrice && product.purchasePrice > 0
-                  ? ((product.targetPrice - product.purchasePrice) / product.purchasePrice) * 100
-                  : 0;
+              const pp = Number(product.purchasePrice) || 0;
+              const tp = Number(product.targetPrice) || 0;
+              const expectedMargin = tp > 0 && pp > 0 ? ((tp - pp) / pp) * 100 : 0;
 
               return (
                 <Link
@@ -115,17 +111,13 @@ export default function ProductsList({ products }: { products: ProductListItem[]
                   className="flex items-center gap-4 px-5 py-3.5 hover:bg-[var(--color-bg-hover)] transition-colors group"
                 >
                   <div className="w-12 h-12 rounded-lg bg-zinc-800/50 flex items-center justify-center flex-shrink-0 border border-[var(--color-border)] overflow-hidden">
-                    {product.thumbnail ? (
-                      <img src={product.thumbnail} alt={product.title} className="w-full h-full object-cover" />
-                    ) : (
-                      <Package size={18} className="text-zinc-700" />
-                    )}
+                    <Package size={18} className="text-zinc-700" />
                   </div>
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="text-[13px] font-medium text-zinc-200 truncate group-hover:text-white">{product.title}</p>
-                      {product.isDormant && (
+                      {product.daysInStock > 30 && !["vendu", "livre", "retourne"].includes(product.status) && (
                         <span className="flex items-center gap-1 text-[10px] text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded">
                           <AlertTriangle size={9} />
                           {product.daysInStock}j
@@ -136,18 +128,7 @@ export default function ProductsList({ products }: { products: ProductListItem[]
                       <span className="text-[11px] text-zinc-600 font-mono">{product.sku}</span>
                       <span className="text-zinc-700">·</span>
                       <span className="text-[11px] text-zinc-500">{product.brand}</span>
-                      {product.size && (
-                        <>
-                          <span className="text-zinc-700">·</span>
-                          <span className="text-[11px] text-zinc-500">{product.size}</span>
-                        </>
-                      )}
                     </div>
-                    {product.listedOn && product.listedOn.length > 0 && (
-                      <div className="flex gap-1 mt-1.5">
-                        {product.listedOn.map((ch) => <ChannelTag key={ch} channel={ch} />)}
-                      </div>
-                    )}
                   </div>
 
                   <div className="text-right flex-shrink-0 hidden sm:block">
