@@ -1,3 +1,4 @@
+import { requireAuth } from "@/lib/auth/require-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { parseSaleEmail } from "@/lib/email-parser";
 import { db } from "@/lib/db/client";
@@ -7,6 +8,9 @@ import { eq, sql, and, inArray } from "drizzle-orm";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const body = await req.json();
     const { subject, emailBody } = body;

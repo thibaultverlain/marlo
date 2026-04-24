@@ -71,7 +71,7 @@ export async function getUpcomingSourcingDeadlines(daysAhead: number = 7): Promi
     .where(
       and(
         inArray(sourcingRequests.status, ["ouvert", "en_recherche"]),
-        sql`deadline IS NOT NULL AND deadline <= NOW() + INTERVAL '${sql.raw(String(daysAhead))} days'`
+        sql`deadline IS NOT NULL AND deadline <= NOW() + make_interval(days => ${daysAhead})`
       )
     );
   return rows[0]?.count ?? 0;

@@ -4,10 +4,14 @@ import { getInvoiceWithSale } from "@/lib/db/queries/invoices";
 import { getProductById } from "@/lib/db/queries/products";
 import { getMissionItems } from "@/lib/db/queries/personal-shopping";
 import { generateInvoicePDF, type InvoiceLine } from "@/lib/invoice/pdf-generator";
+import { requireAuth } from "@/lib/auth/require-auth";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   const { id } = await params;
 
   try {

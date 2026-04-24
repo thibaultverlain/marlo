@@ -1,3 +1,4 @@
+import { requireAuth } from "@/lib/auth/require-auth";
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
 import { products, sourcingRequests } from "@/lib/db/schema";
@@ -6,6 +7,9 @@ import { sql, and, inArray } from "drizzle-orm";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const [dormantRows, deadlineRows, shippingRows] = await Promise.all([
       // Dormant products (> 30 days in stock)

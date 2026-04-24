@@ -28,7 +28,7 @@ export async function getDormantProducts(thresholdDays: number = 30): Promise<Pr
     .where(
       and(
         inArray(products.status, ["en_stock", "en_vente"]),
-        sql`${products.createdAt} < NOW() - INTERVAL '${sql.raw(String(thresholdDays))} days'`
+        sql`${products.createdAt} < NOW() - make_interval(days => ${thresholdDays})`
       )
     )
     .orderBy(products.createdAt);

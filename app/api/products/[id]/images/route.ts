@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { updateProduct } from "@/lib/db/queries/products";
+import { requireAuth } from "@/lib/auth/require-auth";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   const { id } = await params;
 
   try {

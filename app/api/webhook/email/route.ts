@@ -9,13 +9,14 @@ export const dynamic = "force-dynamic";
 // Mailgun sends POST with multipart/form-data or application/x-www-form-urlencoded
 export async function POST(req: NextRequest) {
   try {
-    // Verify webhook secret (optional but recommended)
-    const authHeader = req.headers.get("authorization");
+    // Verify webhook secret via header or query param
     const webhookSecret = process.env.WEBHOOK_EMAIL_SECRET;
-    if (webhookSecret && authHeader !== `Bearer ${webhookSecret}`) {
-      // Also check Mailgun's format (no auth header, but we can check a token in body)
-      // For now, we accept all requests but log a warning
-      console.warn("Webhook called without matching auth header");
+    if (webhookSecret) {
+      const authHeader = req.headers.get("authorization");
+      const querySecret = req.nextUrl.searchParams.get("secret");
+      if (authHeader !== `Bearer ${webhookSecret}` && querySecret !== webhookSecret) {
+        return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+      }
     }
 
     let subject = "";

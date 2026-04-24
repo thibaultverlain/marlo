@@ -2,10 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
 import { sales } from "@/lib/db/schema";
 import { sql, gte, lte, and } from "drizzle-orm";
+import { requireAuth } from "@/lib/auth/require-auth";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   const period = req.nextUrl.searchParams.get("period") ?? "month";
   const now = new Date();
 

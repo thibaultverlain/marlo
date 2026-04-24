@@ -2,10 +2,14 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
 import { products, sales } from "@/lib/db/schema";
 import { eq, desc, sql, and, inArray } from "drizzle-orm";
+import { requireAuth } from "@/lib/auth/require-auth";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     // 1. Velocity: avg days between purchase and sale per product
     const velocityRows = await db
