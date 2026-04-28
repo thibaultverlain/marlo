@@ -1,3 +1,4 @@
+import { getCurrentUserId } from "@/lib/auth/get-user";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { getInStockProducts } from "@/lib/db/queries/products";
@@ -7,7 +8,8 @@ import NewSaleForm from "@/components/sales/new-sale-form";
 export const dynamic = "force-dynamic";
 
 export default async function NewSalePage({ searchParams }: { searchParams: Promise<{ productId?: string }> }) {
-  const [products, customers, sp] = await Promise.all([getInStockProducts(), getAllCustomers(), searchParams]);
+  const userId = await getCurrentUserId();
+  const [products, customers, sp] = await Promise.all([getInStockProducts(userId), getAllCustomers(userId), searchParams]);
   return (
     <div className="max-w-2xl space-y-6">
       <div className="flex items-center gap-4">

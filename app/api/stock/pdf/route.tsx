@@ -25,7 +25,8 @@ export async function GET(req: NextRequest) {
       .from(products)
       .where(inArray(products.status, [...statuses]));
 
-    const settings = await getShopSettings();
+    const userId = (auth as any).user.id;
+    const settings = await getShopSettings(userId);
 
     const pdfProducts = rows.map((p) => ({
       sku: p.sku,

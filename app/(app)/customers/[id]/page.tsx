@@ -1,3 +1,4 @@
+import { getCurrentUserId } from "@/lib/auth/get-user";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Star, Mail, Phone, MapPin, AtSign, ShoppingCart, TrendingUp, Clock, Package } from "lucide-react";

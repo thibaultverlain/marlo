@@ -1,3 +1,4 @@
+import { getCurrentUserId } from "@/lib/auth/get-user";
 import Link from "next/link";
 import { Plus, Search, Clock, CheckCircle, XCircle, Package } from "lucide-react";
 import { getAllSourcing, getSourcingStats } from "@/lib/db/queries/sourcing";
@@ -10,7 +11,8 @@ const SM: Record<string, { label: string; cl: string; icon: React.ElementType }>
   annule: { label: "Annulé", cl: "bg-red-500/15 text-red-400", icon: XCircle },
 };
 export default async function SourcingPage() {
-  const [requests, stats] = await Promise.all([getAllSourcing(), getSourcingStats()]);
+  const userId = await getCurrentUserId();
+  const [requests, stats] = await Promise.all([getAllSourcing(userId), getSourcingStats(userId)]);
   return (
     <div className="space-y-6">
       <div className="flex items-start sm:items-center justify-between gap-3">

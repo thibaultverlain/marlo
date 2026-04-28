@@ -1,3 +1,4 @@
+import { getCurrentUserId } from "@/lib/auth/get-user";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Search, Clock, CheckCircle, XCircle, Package, User } from "lucide-react";
@@ -9,7 +10,8 @@ export const dynamic = "force-dynamic";
 
 export default async function SourcingDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [req, availableProducts] = await Promise.all([getSourcingById(id), getInStockProducts()]);
+  const userId = await getCurrentUserId();
+  const [req, availableProducts] = await Promise.all([getSourcingById(id), getInStockProducts(userId)]);
   if (!req) notFound();
   const commissionPct = req.commissionRate ? Number(req.commissionRate) * 100 : 0;
   return (

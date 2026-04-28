@@ -1,4 +1,5 @@
 "use server";
+import { getCurrentUserId } from "@/lib/auth/get-user";
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -61,7 +62,8 @@ export async function saveShopSettingsAction(formData: FormData) {
   }
 
   try {
-    await upsertShopSettings({
+    const userId = await getCurrentUserId();
+    await upsertShopSettings(userId, {
       legalName: parsed.data.legalName,
       commercialName: parsed.data.commercialName ?? null,
       legalStatus: parsed.data.legalStatus ?? null,

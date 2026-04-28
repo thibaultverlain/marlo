@@ -1,3 +1,4 @@
+import { getCurrentUserId } from "@/lib/auth/get-user";
 import Link from "next/link";
 import { Plus, Users, Star } from "lucide-react";
 import { getAllCustomers, getCustomerStats } from "@/lib/db/queries/customers";
@@ -6,7 +7,8 @@ import { formatCurrency, formatDate } from "@/lib/utils";
 export const dynamic = "force-dynamic";
 
 export default async function CustomersPage() {
-  const [customers, stats] = await Promise.all([getAllCustomers(), getCustomerStats()]);
+  const userId = await getCurrentUserId();
+  const [customers, stats] = await Promise.all([getAllCustomers(userId), getCustomerStats(userId)]);
 
   return (
     <div className="space-y-6">

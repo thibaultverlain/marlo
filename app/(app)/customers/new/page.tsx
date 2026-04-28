@@ -1,3 +1,4 @@
+import { getCurrentUserId } from "@/lib/auth/get-user";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import NewCustomerForm from "@/components/customers/new-customer-form";

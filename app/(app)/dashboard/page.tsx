@@ -16,10 +16,11 @@ import {
 } from "@/lib/db/queries/sourcing";
 import { CHANNELS } from "@/lib/data";
 import RevenueChart from "@/components/dashboard/revenue-chart";
+import { getCurrentUserId } from "@/lib/auth/get-user";
 
 export const dynamic = "force-dynamic";
 
-async function getTodayStats() {
+async function getTodayStats(userId: string) {
   const now = new Date();
   const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
@@ -32,7 +33,7 @@ async function getTodayStats() {
       avgMarginPct: sql<number>`coalesce(avg(margin_pct), 0)::numeric`,
     })
     .from(sales)
-    .where(and(gte(sales.soldAt, startOfDay), lte(sales.soldAt, endOfDay)));
+    .where(and(eq(sales.userId, userId), gte(sales.soldAt, startOfDay), lte(sales.soldAt, endOfDay)));
 
   return {
     revenue: Number(rows[0]?.revenue ?? 0),
@@ -42,14 +43,15 @@ async function getTodayStats() {
   };
 }
 
-async function getAllTimeStats() {
+async function getAllTimeStats(userId: string) {
   const rows = await db
     .select({
       revenue: sql<number>`coalesce(sum(sale_price), 0)::numeric`,
       margin: sql<number>`coalesce(sum(margin), 0)::numeric`,
       count: sql<number>`count(*)::int`,
     })
-    .from(sales);
+    .from(sales)
+    .where(eq(sales.userId, userId));
 
   return {
     revenue: Number(rows[0]?.revenue ?? 0),
@@ -92,13 +94,14 @@ function EmptyState() {
 }
 
 export default async function DashboardPage() {
+  const userId = await getCurrentUserId();
   const [
     todayStats, allTimeStats, stockStats, marginByChannel,
     recentSales, pendingShipments, activeSourcing, upcomingDeadlines,
   ] = await Promise.all([
-    getTodayStats(), getAllTimeStats(), getStockStats(),
-    getMarginByChannel(), getRecentSales(5), getPendingShipments(),
-    getActiveSourcingCount(), getUpcomingSourcingDeadlines(7),
+    getTodayStats(userId), getAllTimeStats(userId), getStockStats(userId),
+    getMarginByChannel(userId), getRecentSales(userId, 5), getPendingShipments(userId),
+    getActiveSourcingCount(userId), getUpcomingSourcingDeadlines(userId, 7),
   ]);
 
   const hasAnyData = stockStats.total > 0 || allTimeStats.count > 0;

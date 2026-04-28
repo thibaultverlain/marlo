@@ -1,4 +1,5 @@
 "use server";
+import { getCurrentUserId } from "@/lib/auth/get-user";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -49,7 +50,8 @@ export async function createSourcingAction(formData: FormData) {
       ? String(parseFloat(parsed.data.commissionRate) / 100)
       : null;
 
-    await createSourcingRequest({
+    const userId = await getCurrentUserId();
+    await createSourcingRequest({ userId,
       customerId: parsed.data.customerId,
       description: parsed.data.description,
       brand: parsed.data.brand || null,

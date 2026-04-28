@@ -5,59 +5,49 @@ import { pgTable, uuid, text, timestamp, decimal, integer, boolean, pgEnum, date
 export const productCategoryEnum = pgEnum("product_category", [
   "sacs", "chaussures", "vetements", "accessoires", "montres", "bijoux", "autre"
 ]);
-
 export const productConditionEnum = pgEnum("product_condition", [
   "neuf_avec_etiquettes", "neuf_sans_etiquettes", "comme_neuf", "tres_bon", "bon", "correct"
 ]);
-
 export const productStatusEnum = pgEnum("product_status", [
   "en_stock", "en_vente", "reserve", "vendu", "expedie", "livre", "retourne"
 ]);
-
 export const saleChannelEnum = pgEnum("sale_channel", [
   "vinted", "vestiaire", "stockx", "prive", "autre"
 ]);
-
 export const paymentMethodEnum = pgEnum("payment_method", [
   "virement", "especes", "cb", "paypal", "plateforme", "autre"
 ]);
-
 export const paymentStatusEnum = pgEnum("payment_status", [
   "en_attente", "recu", "rembourse"
 ]);
-
 export const shippingStatusEnum = pgEnum("shipping_status", [
   "a_expedier", "expedie", "livre", "retourne"
 ]);
-
 export const invoiceTypeEnum = pgEnum("invoice_type", [
   "vente", "sourcing", "personal_shopping"
 ]);
-
 export const invoiceStatusEnum = pgEnum("invoice_status", [
   "brouillon", "envoyee", "payee", "annulee"
 ]);
-
 export const sourcingStatusEnum = pgEnum("sourcing_status", [
   "ouvert", "en_recherche", "trouve", "achete", "livre", "facture", "annule"
 ]);
-
 export const psStatusEnum = pgEnum("ps_status", [
   "planifie", "en_cours", "termine", "facture", "annule"
 ]);
-
 export const purchaseCategoryEnum = pgEnum("purchase_category", [
   "stock", "transport", "emballage", "outils", "autre"
 ]);
-
 export const shippingPaidByEnum = pgEnum("shipping_paid_by", [
   "vendeur", "acheteur", "offert"
 ]);
 
 // ── Tables ─────────────────────────────────────────────
+// Every table has a user_id column referencing auth.users for multi-tenant isolation.
 
 export const products = pgTable("products", {
   id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull(),
   sku: text("sku").notNull(),
   title: text("title").notNull(),
   brand: text("brand").notNull(),
@@ -85,6 +75,7 @@ export const products = pgTable("products", {
 
 export const sales = pgTable("sales", {
   id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull(),
   productId: uuid("product_id").references(() => products.id),
   customerId: uuid("customer_id").references(() => customers.id),
   channel: saleChannelEnum("channel").notNull(),
@@ -107,6 +98,7 @@ export const sales = pgTable("sales", {
 
 export const customers = pgTable("customers", {
   id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull(),
   firstName: text("first_name").notNull(),
   lastName: text("last_name").notNull(),
   email: text("email"),
@@ -128,6 +120,7 @@ export const customers = pgTable("customers", {
 
 export const invoices = pgTable("invoices", {
   id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull(),
   invoiceNumber: text("invoice_number").notNull().unique(),
   type: invoiceTypeEnum("type").notNull(),
   customerId: uuid("customer_id").references(() => customers.id),
@@ -148,6 +141,7 @@ export const invoices = pgTable("invoices", {
 
 export const sourcingRequests = pgTable("sourcing_requests", {
   id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull(),
   customerId: uuid("customer_id").references(() => customers.id),
   description: text("description").notNull(),
   brand: text("brand"),
@@ -167,6 +161,7 @@ export const sourcingRequests = pgTable("sourcing_requests", {
 
 export const personalShoppingMissions = pgTable("personal_shopping_missions", {
   id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull(),
   name: text("name").notNull(),
   eventDate: date("event_date"),
   location: text("location"),
@@ -179,6 +174,7 @@ export const personalShoppingMissions = pgTable("personal_shopping_missions", {
 
 export const psItems = pgTable("ps_items", {
   id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull(),
   missionId: uuid("mission_id").references(() => personalShoppingMissions.id).notNull(),
   customerId: uuid("customer_id").references(() => customers.id).notNull(),
   description: text("description").notNull(),
@@ -193,6 +189,7 @@ export const psItems = pgTable("ps_items", {
 
 export const purchases = pgTable("purchases", {
   id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull(),
   productId: uuid("product_id").references(() => products.id),
   description: text("description").notNull(),
   supplier: text("supplier"),
@@ -204,9 +201,9 @@ export const purchases = pgTable("purchases", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-// ── Shop settings (single row, holds issuer info for invoices) ──
 export const shopSettings = pgTable("shop_settings", {
   id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull(),
   legalName: text("legal_name").notNull(),
   commercialName: text("commercial_name"),
   legalStatus: text("legal_status"),
@@ -235,7 +232,7 @@ export const shopSettings = pgTable("shop_settings", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-// ── Types inférés ──────────────────────────────────────
+// ── Types ──────────────────────────────────────────────
 
 export type Product = typeof products.$inferSelect;
 export type NewProduct = typeof products.$inferInsert;

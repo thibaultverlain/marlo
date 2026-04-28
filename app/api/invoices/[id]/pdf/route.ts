@@ -15,7 +15,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const { id } = await params;
 
   try {
-    const settings = await getShopSettings();
+    const auth = await requireAuth(); if (auth instanceof NextResponse) return auth;
+  const userId = (auth as any).user.id;
+  const settings = await getShopSettings(userId);
     if (!settings) {
       return NextResponse.json({ error: "Paramètres de facturation manquants" }, { status: 400 });
     }

@@ -1,14 +1,17 @@
 import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { NextResponse } from "next/server";
+import { rateLimit } from "@/lib/rate-limit";
 
-/**
- * Verify that the request is from an authenticated user.
- * Use in API routes that need protection.
- * Returns the user if authenticated, or a 401 response.
- */
 export async function requireAuth(): Promise<{ user: any } | NextResponse> {
   try {
+    const headerStore = await headers();
+    const ip = headerStore.get("x-forwarded-for") ?? headerStore.get("x-real-ip") ?? "unknown";
+    const { allowed } = rateLimit(ip);
+    if (!allowed) {
+      return NextResponse.json({ error: "Trop de requêtes" }, { status: 429 });
+    }
+
     const cookieStore = await cookies();
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,

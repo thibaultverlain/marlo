@@ -1,3 +1,4 @@
+import { getCurrentUserId } from "@/lib/auth/get-user";
 import Link from "next/link";
 import { Plus, ShoppingCart } from "lucide-react";
 import { db } from "@/lib/db/client";
@@ -19,7 +20,7 @@ function ChannelBadge({ channel }: { channel: string }) {
   return <span className={`inline-flex px-2 py-0.5 rounded-md text-[11px] font-medium ${colors[channel] || colors.autre}`}>{ch?.label ?? channel}</span>;
 }
 
-async function getSalesForPeriod(period: string) {
+async function getSalesForPeriod(userId: string, period: string) {
   const now = new Date();
   let startDate: Date | null = null;
 
@@ -33,7 +34,9 @@ async function getSalesForPeriod(period: string) {
     startDate = new Date(now.getFullYear(), 0, 1);
   }
 
-  const conditions = startDate ? and(gte(sales.soldAt, startDate)) : undefined;
+  const conditions = startDate 
+    ? and(eq(sales.userId, userId), gte(sales.soldAt, startDate)) 
+    : eq(sales.userId, userId);
 
   const rows = await db
     .select({
@@ -59,7 +62,8 @@ async function getSalesForPeriod(period: string) {
 export default async function SalesPage({ searchParams }: { searchParams: Promise<{ period?: string }> }) {
   const sp = await searchParams;
   const period = sp.period ?? "all";
-  const salesData = await getSalesForPeriod(period);
+  const userId = await getCurrentUserId();
+  const salesData = await getSalesForPeriod(userId, period);
 
   const totalRevenue = salesData.reduce((s, v) => s + (Number(v.salePrice) || 0), 0);
   const totalMargin = salesData.reduce((s, v) => s + (Number(v.margin) || 0), 0);

@@ -1,3 +1,4 @@
+import { getCurrentUserId } from "@/lib/auth/get-user";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Package, AlertTriangle } from "lucide-react";

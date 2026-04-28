@@ -1,4 +1,5 @@
 "use server";
+import { getCurrentUserId } from "@/lib/auth/get-user";
 
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db/client";
@@ -30,7 +31,8 @@ export async function bulkImportProducts(rows: ImportRow[]): Promise<
   if (rows.length === 0) return { error: "Aucune donnée à importer" };
 
   try {
-    const firstSku = await getNextSku();
+    const userId = await getCurrentUserId();
+    const firstSku = await getNextSku(userId);
     const firstSkuNum = parseInt(firstSku.split("-")[1], 10);
 
     const valuesToInsert = rows

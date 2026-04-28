@@ -2,13 +2,24 @@ import { db } from "../client";
 import { customers, type NewCustomer, type Customer } from "../schema";
 import { eq, desc, sql } from "drizzle-orm";
 
-export async function getAllCustomers(): Promise<Customer[]> {
-  return db.select().from(customers).orderBy(desc(customers.totalSpent));
+export async function getAllCustomers(userId: string): Promise<Customer[]> {
+  return db.select().from(customers).where(eq(customers.userId, userId)).orderBy(desc(customers.createdAt));
 }
 
 export async function getCustomerById(id: string): Promise<Customer | undefined> {
   const rows = await db.select().from(customers).where(eq(customers.id, id)).limit(1);
   return rows[0];
+}
+
+export async function getCustomerStats(userId: string) {
+  const rows = await db
+    .select({
+      total: sql<number>`count(*)::int`,
+      vipCount: sql<number>`count(*) filter (where vip = true)::int`,
+    })
+    .from(customers)
+    .where(eq(customers.userId, userId));
+  return rows[0] ?? { total: 0, vipCount: 0 };
 }
 
 export async function createCustomer(data: NewCustomer): Promise<Customer> {
@@ -23,15 +34,4 @@ export async function updateCustomer(id: string, data: Partial<NewCustomer>): Pr
 
 export async function deleteCustomer(id: string): Promise<void> {
   await db.delete(customers).where(eq(customers.id, id));
-}
-
-export async function getCustomerStats() {
-  const stats = await db
-    .select({
-      total: sql<number>`count(*)::int`,
-      vipCount: sql<number>`count(*) filter (where vip = true)::int`,
-    })
-    .from(customers);
-
-  return stats[0];
 }

@@ -1,4 +1,5 @@
 "use server";
+import { getCurrentUserId } from "@/lib/auth/get-user";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -73,7 +74,9 @@ export async function createSaleAction(formData: FormData) {
       parsed.data.shippingPaidBy === "vendeur"
     );
 
+    const userId = await getCurrentUserId();
     await createSale({
+      userId,
       productId: parsed.data.productId,
       customerId: parsed.data.customerId && parsed.data.customerId.length > 0 ? parsed.data.customerId : null,
       channel: parsed.data.channel,

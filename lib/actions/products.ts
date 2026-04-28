@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createProduct, updateProduct, deleteProduct } from "@/lib/db/queries/products";
 import { convertToEur } from "@/lib/currency";
+import { getCurrentUserId } from "@/lib/auth/get-user";
 
 function cleanPrice(s: string | null | undefined): string {
   if (!s || s.trim() === "") return "0";
@@ -59,10 +60,12 @@ export async function createProductAction(formData: FormData) {
   }
 
   try {
+    const userId = await getCurrentUserId();
     const priceNum = parseFloat(parsed.data.purchasePrice) || 0;
     const priceEur = purchaseCurrency !== "EUR" ? String(convertToEur(priceNum, purchaseCurrency)) : parsed.data.purchasePrice;
 
     await createProduct({
+      userId,
       title: parsed.data.title,
       brand: parsed.data.brand,
       model: parsed.data.model ?? null,

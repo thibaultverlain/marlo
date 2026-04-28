@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     const inStockProducts = await db
       .select()
       .from(products)
-      .where(inArray(products.status, ["en_stock", "en_vente", "reserve"]));
+      .where(inArray(products.status, ["en_stock", "en_vente", "reserve"] as any));
 
     let matchedProduct = inStockProducts.find((p) =>
       parsed.productTitle.toLowerCase().includes(p.brand.toLowerCase()) ||
@@ -47,8 +47,9 @@ export async function POST(req: NextRequest) {
     const [sale] = await db
       .insert(sales)
       .values({
+        userId: auth.user.id,
         productId: matchedProduct?.id ?? null,
-        channel,
+        channel: channel as any,
         salePrice: String(parsed.salePrice),
         platformFees: String(parsed.platformFees),
         shippingCost: "0",

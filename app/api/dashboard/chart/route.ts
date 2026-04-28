@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
 import { sales } from "@/lib/db/schema";
-import { sql, gte, lte, and } from "drizzle-orm";
+import { sql, gte, lte, and, eq } from "drizzle-orm";
 import { requireAuth } from "@/lib/auth/require-auth";
 
 export const dynamic = "force-dynamic";
@@ -9,6 +9,7 @@ export const dynamic = "force-dynamic";
 export async function GET(req: NextRequest) {
   const auth = await requireAuth();
   if (auth instanceof NextResponse) return auth;
+  const userId = (auth as any).user.id;
 
   const period = req.nextUrl.searchParams.get("period") ?? "month";
   const now = new Date();
@@ -27,6 +28,7 @@ export async function GET(req: NextRequest) {
         .from(sales)
         .where(
           and(
+            eq(sales.userId, userId),
             gte(sales.soldAt, new Date(year, 0, 1)),
             lte(sales.soldAt, new Date(year, 11, 31, 23, 59, 59))
           )
@@ -53,6 +55,7 @@ export async function GET(req: NextRequest) {
         .from(sales)
         .where(
           and(
+            eq(sales.userId, userId),
             gte(sales.soldAt, new Date(year, month, 1)),
             lte(sales.soldAt, new Date(year, month + 1, 0, 23, 59, 59))
           )
@@ -83,7 +86,7 @@ export async function GET(req: NextRequest) {
           revenue: sql<number>`coalesce(sum(sale_price), 0)::numeric`,
         })
         .from(sales)
-        .where(and(gte(sales.soldAt, monday), lte(sales.soldAt, sunday)))
+        .where(and(eq(sales.userId, userId), gte(sales.soldAt, monday), lte(sales.soldAt, sunday)))
         .groupBy(sql`extract(isodow from sold_at)`)
         .orderBy(sql`extract(isodow from sold_at)`);
 
@@ -103,7 +106,7 @@ export async function GET(req: NextRequest) {
           revenue: sql<number>`coalesce(sum(sale_price), 0)::numeric`,
         })
         .from(sales)
-        .where(and(gte(sales.soldAt, startOfDay), lte(sales.soldAt, endOfDay)))
+        .where(and(eq(sales.userId, userId), gte(sales.soldAt, startOfDay), lte(sales.soldAt, endOfDay)))
         .groupBy(sql`extract(hour from sold_at)`)
         .orderBy(sql`extract(hour from sold_at)`);
 

@@ -1,4 +1,5 @@
 "use server";
+import { getCurrentUserId } from "@/lib/auth/get-user";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -48,7 +49,8 @@ export async function createMissionAction(formData: FormData) {
 
   let missionId: string | undefined;
   try {
-    const mission = await createMission({
+    const userId = await getCurrentUserId();
+    const mission = await createMission({ userId,
       name: parsed.data.name,
       eventDate: parsed.data.eventDate || null,
       location: parsed.data.location || null,
@@ -111,7 +113,7 @@ export async function addPsItemAction(formData: FormData) {
     const purchasePrice = parseFloat(parsed.data.purchasePrice);
     const commissionAmount = purchasePrice * rate;
 
-    await createPsItem({
+    await createPsItem({ userId: (await getCurrentUserId()),
       missionId: parsed.data.missionId,
       customerId: parsed.data.customerId,
       description: parsed.data.description,

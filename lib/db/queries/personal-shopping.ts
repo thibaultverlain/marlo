@@ -19,13 +19,13 @@ export type PsItemWithCustomer = {
   notes: string | null;
 };
 
-export async function getAllMissions() {
+export async function getAllMissions(userId: string) {
   const rows = await db
     .select({
       mission: personalShoppingMissions,
       itemCount: sql<number>`count(${psItems.id})::int`,
     })
-    .from(personalShoppingMissions)
+    .from(personalShoppingMissions).where(eq(personalShoppingMissions.userId, userId))
     .leftJoin(psItems, eq(psItems.missionId, personalShoppingMissions.id))
     .groupBy(personalShoppingMissions.id)
     .orderBy(desc(personalShoppingMissions.eventDate));
@@ -128,7 +128,7 @@ async function recomputeMissionTotals(missionId: string) {
     .where(eq(personalShoppingMissions.id, missionId));
 }
 
-export async function getMissionStats() {
+export async function getMissionStats(userId: string) {
   const stats = await db
     .select({
       total: sql<number>`count(*)::int`,
@@ -136,7 +136,8 @@ export async function getMissionStats() {
       completed: sql<number>`count(*) filter (where status in ('termine', 'facture'))::int`,
       totalCommissions: sql<number>`coalesce(sum(total_commission), 0)::numeric`,
     })
-    .from(personalShoppingMissions);
+    .from(personalShoppingMissions)
+    .where(eq(personalShoppingMissions.userId, userId));
 
   return {
     total: stats[0]?.total ?? 0,
