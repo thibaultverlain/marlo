@@ -19,21 +19,24 @@ export type ProductListItem = {
 };
 
 function StatusBadge({ status }: { status: string }) {
-  const st = PRODUCT_STATUSES.find((s) => s.value === status);
-  if (!st) return null;
-  const darkColors: Record<string, string> = {
-    "bg-blue-600": "bg-blue-500/15 text-blue-400",
-    "bg-emerald-600": "bg-emerald-500/15 text-emerald-400",
-    "bg-amber-600": "bg-amber-500/15 text-amber-400",
-    "bg-green-700": "bg-green-500/15 text-green-400",
-    "bg-teal-600": "bg-teal-500/15 text-teal-400",
-    "bg-stone-500": "bg-zinc-500/15 text-zinc-400",
-    "bg-red-600": "bg-red-500/15 text-red-400",
+  const styles: Record<string, { bg: string; text: string; dot: string }> = {
+    en_stock: { bg: "bg-emerald-500/12 border-emerald-500/20", text: "text-emerald-400", dot: "bg-emerald-400" },
+    en_vente: { bg: "bg-cyan-500/12 border-cyan-500/20", text: "text-cyan-400", dot: "bg-cyan-400" },
+    reserve: { bg: "bg-amber-500/12 border-amber-500/20", text: "text-amber-400", dot: "bg-amber-400" },
+    vendu: { bg: "bg-violet-500/12 border-violet-500/20", text: "text-violet-400", dot: "bg-violet-400" },
+    expedie: { bg: "bg-orange-500/12 border-orange-500/20", text: "text-orange-400", dot: "bg-orange-400" },
+    livre: { bg: "bg-zinc-500/12 border-zinc-500/20", text: "text-zinc-400", dot: "bg-zinc-400" },
+    retourne: { bg: "bg-red-500/12 border-red-500/20", text: "text-red-400", dot: "bg-red-400" },
   };
-  const className = darkColors[st.color] ?? "bg-zinc-500/15 text-zinc-400";
+  const labels: Record<string, string> = {
+    en_stock: "En stock", en_vente: "En vente", reserve: "Réservé",
+    vendu: "Vendu", expedie: "Expédié", livre: "Livré", retourne: "Retourné",
+  };
+  const s = styles[status] ?? styles.en_stock;
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium ${className}`}>
-      {st.label}
+    <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-semibold border ${s.bg} ${s.text}`}>
+      <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${s.dot}`} />
+      {labels[status] ?? status}
     </span>
   );
 }

@@ -32,14 +32,14 @@ export default function MissionDetailClient({missionId,missionStatus,customerGro
 
   return (
     <>
-      {canAdd&&<div className="flex items-center justify-between bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-4">
+      {canAdd&&<div className="flex items-center justify-between bg-[var(--color-bg-card)] rounded-[14px] border border-[var(--color-border)] shadow-[var(--shadow-card)] p-4">
         <div><h3 className="text-sm font-semibold text-zinc-300">Articles</h3><p className="text-[11px] text-zinc-500 mt-0.5">Ajoute chaque article acheté.</p></div>
         <button onClick={()=>setShowAdd(true)} disabled={isPending||customers.length===0} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-cyan-500 rounded-lg hover:bg-cyan-400 transition-colors disabled:opacity-50"><Plus size={14}/>Ajouter</button>
       </div>}
 
-      {customerGroups.length===0?<div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-12 text-center"><Package size={40} className="mx-auto text-zinc-700 mb-3"/><p className="text-zinc-500 text-sm">Aucun article</p></div>:(
+      {customerGroups.length===0?<div className="bg-[var(--color-bg-card)] rounded-[14px] border border-[var(--color-border)] shadow-[var(--shadow-card)] p-12 text-center"><Package size={40} className="mx-auto text-zinc-700 mb-3"/><p className="text-zinc-500 text-sm">Aucun article</p></div>:(
         <div className="space-y-4">{customerGroups.map((g)=>(
-          <div key={g.customerId} className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] overflow-hidden">
+          <div key={g.customerId} className="bg-[var(--color-bg-card)] rounded-[14px] border border-[var(--color-border)] shadow-[var(--shadow-card)] overflow-hidden">
             <div className="flex items-center justify-between px-5 py-3 bg-zinc-800/30 border-b border-[var(--color-border)]"><p className="text-sm font-semibold text-zinc-200">{g.customerName}</p><div className="flex items-center gap-4 text-sm"><span className="text-zinc-400">Total : <span className="font-semibold text-zinc-200">{formatCurrency(g.total)}</span></span>{g.commission>0&&<span className="text-cyan-400">+{formatCurrency(g.commission)}</span>}</div></div>
             <div className="divide-y divide-[var(--color-border)]">{g.items.map((item)=>(
               <div key={item.id} className="flex items-center justify-between px-5 py-3">
@@ -51,7 +51,7 @@ export default function MissionDetailClient({missionId,missionStatus,customerGro
         ))}</div>
       )}
 
-      {nextActions.length>0&&<div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-5"><h3 className="text-sm font-semibold text-zinc-300 mb-3">Actions</h3><div className="flex flex-wrap gap-2">{nextActions.map((a)=><button key={a.next} onClick={()=>handleStatus(a.next)} disabled={isPending} className={`flex items-center gap-2 px-4 py-2 text-sm rounded-lg transition-colors disabled:opacity-50 ${a.next==="annule"?"text-red-400 hover:bg-red-500/10":a.next==="facture"?"text-white bg-cyan-500 hover:bg-cyan-400":a.next==="termine"?"text-white bg-emerald-600 hover:bg-emerald-500":"text-zinc-300 bg-[var(--color-bg-raised)] border border-[var(--color-border)] hover:bg-[var(--color-bg-hover)]"}`}>{a.next==="annule"?<X size={14}/>:a.next==="facture"?<FileText size={14}/>:a.next==="termine"?<CheckCircle size={14}/>:<ArrowRight size={14}/>}{a.label}</button>)}</div></div>}
+      {nextActions.length>0&&<div className="bg-[var(--color-bg-card)] rounded-[14px] border border-[var(--color-border)] shadow-[var(--shadow-card)] p-5"><h3 className="text-sm font-semibold text-zinc-300 mb-3">Actions</h3><div className="flex flex-wrap gap-2">{nextActions.map((a)=><button key={a.next} onClick={()=>handleStatus(a.next)} disabled={isPending} className={`flex items-center gap-2 px-4 py-2 text-sm rounded-lg transition-colors disabled:opacity-50 ${a.next==="annule"?"text-red-400 hover:bg-red-500/10":a.next==="facture"?"text-white bg-cyan-500 hover:bg-cyan-400":a.next==="termine"?"text-white bg-emerald-600 hover:bg-emerald-500":"text-zinc-300 bg-[var(--color-bg-raised)] border border-[var(--color-border)] hover:bg-[var(--color-bg-hover)]"}`}>{a.next==="annule"?<X size={14}/>:a.next==="facture"?<FileText size={14}/>:a.next==="termine"?<CheckCircle size={14}/>:<ArrowRight size={14}/>}{a.label}</button>)}</div></div>}
       <div className="flex items-center justify-end pt-2"><button onClick={handleDelete} disabled={isPending} className="flex items-center gap-2 px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded-lg transition-colors disabled:opacity-50"><Trash2 size={14}/>Supprimer</button></div>
 
       {showAdd&&<div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={()=>setShowAdd(false)}><div className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-xl max-w-lg w-full p-6" onClick={(e)=>e.stopPropagation()}>

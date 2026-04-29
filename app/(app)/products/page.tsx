@@ -52,7 +52,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           </Link>
           <Link
             href="/products/new"
-            className="flex items-center gap-2 px-4 py-2 text-[13px] font-medium text-white bg-cyan-500 rounded-lg hover:bg-cyan-400 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-[13px] font-medium text-[#0a0a0f] bg-cyan-500 font-semibold rounded-lg hover:bg-cyan-400 transition-colors"
           >
             <Plus size={14} />
             Ajouter
@@ -87,13 +87,13 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         <div className="flex bg-zinc-800/60 rounded-lg p-0.5 w-fit">
           <Link
             href="/products"
-            className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-all ${!showAll ? "bg-cyan-500 text-white shadow-sm" : "text-zinc-500 hover:text-zinc-300"}`}
+            className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-all ${!showAll ? "bg-[rgba(56,189,248,0.12)] text-cyan-400" : "text-zinc-500 hover:text-zinc-300"}`}
           >
             En stock ({inStockCount})
           </Link>
           <Link
             href="/products?show=all"
-            className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-all ${showAll ? "bg-cyan-500 text-white shadow-sm" : "text-zinc-500 hover:text-zinc-300"}`}
+            className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-all ${showAll ? "bg-[rgba(56,189,248,0.12)] text-cyan-400" : "text-zinc-500 hover:text-zinc-300"}`}
           >
             Tout ({stats?.total ?? 0})
           </Link>
@@ -108,7 +108,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           </p>
           <Link
             href="/products/new"
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-cyan-500 rounded-lg hover:bg-cyan-400 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[#0a0a0f] bg-cyan-500 font-semibold rounded-lg hover:bg-cyan-400 transition-colors"
           >
             <Plus size={14} />
             Ajouter

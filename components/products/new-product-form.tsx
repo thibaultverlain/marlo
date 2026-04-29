@@ -71,7 +71,7 @@ export default function NewProductForm() {
         </div>
       )}
 
-      <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6 space-y-5">
+      <div className="bg-[var(--color-bg-card)] rounded-[14px] border border-[var(--color-border)] shadow-[var(--shadow-card)] p-6 space-y-5">
         <div className="relative">
           <label className={labelClass}>Marque *</label>
           <input type="text" required value={brandSearch || form.brand}

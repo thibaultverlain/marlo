@@ -18,7 +18,7 @@ export default function NewMissionForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error&&<div className="flex items-start gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-sm text-red-400"><AlertCircle size={16} className="flex-shrink-0 mt-0.5"/><span>{error}</span></div>}
-      <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6 space-y-5">
+      <div className="bg-[var(--color-bg-card)] rounded-[14px] border border-[var(--color-border)] shadow-[var(--shadow-card)] p-6 space-y-5">
         <div><label className={labelClass}>Nom *</label><input type="text" required value={form.name} onChange={(e)=>updateField("name",e.target.value)} placeholder="Ex: Vente privée Dior avril" className={inputClass}/></div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label className={labelClass}>Date</label><input type="date" value={form.eventDate} onChange={(e)=>updateField("eventDate",e.target.value)} className={inputClass}/></div><div><label className={labelClass}>Lieu</label><input type="text" value={form.location} onChange={(e)=>updateField("location",e.target.value)} placeholder="Dior Avenue Montaigne" className={inputClass}/></div></div>
         <div><label className={labelClass}>Notes</label><textarea value={form.notes} onChange={(e)=>updateField("notes",e.target.value)} rows={3} placeholder="Précisions..." className={`${inputClass} resize-none`}/></div>

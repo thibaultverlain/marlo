@@ -21,7 +21,7 @@ export default function AccountingTabs({ year, activeTab, recipes, purchases }: 
   function exportPurchases() { downloadCSV(`registre-achats-${year}.csv`, [["Date","SKU","Description","Fournisseur","Catégorie","Paiement","Montant (€)"], ...purchases.map((p) => [p.date ? formatDate(p.date) : "", p.productSku ?? "", p.description, p.supplier ?? "", p.category ?? "", p.paymentMethod ?? "", p.amount.toFixed(2).replace(".",",")])]); }
 
   return (
-    <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] overflow-hidden">
+    <div className="bg-[var(--color-bg-card)] rounded-[14px] border border-[var(--color-border)] shadow-[var(--shadow-card)] overflow-hidden">
       <div className="flex items-center justify-between border-b border-[var(--color-border)] px-6">
         <div className="flex">
           {([["recipes", "Livre de recettes", BookOpen, recipes.length], ["purchases", "Registre des achats", Receipt, purchases.length]] as const).map(([key, label, Icon, count]) => (

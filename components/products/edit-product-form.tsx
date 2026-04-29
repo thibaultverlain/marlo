@@ -67,7 +67,7 @@ export default function EditProductForm({ product }: { product: ProductData }) {
       {error && <div className="flex items-start gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-sm text-red-400"><AlertCircle size={16} className="flex-shrink-0 mt-0.5" /><span>{error}</span></div>}
       {saved && <div className="flex items-center gap-2 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-sm text-emerald-400"><CheckCircle2 size={16} /><span>Modifications enregistrées.</span></div>}
 
-      <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6 space-y-5">
+      <div className="bg-[var(--color-bg-card)] rounded-[14px] border border-[var(--color-border)] shadow-[var(--shadow-card)] p-6 space-y-5">
         {/* Status */}
         <div>
           <label className={labelClass}>Statut</label>

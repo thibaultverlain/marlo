@@ -28,7 +28,7 @@ export default function NewSourcingForm({ customers }: { customers: { id: string
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && <div className="flex items-start gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-sm text-red-400"><AlertCircle size={16} className="flex-shrink-0 mt-0.5" /><span>{error}</span></div>}
-      <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6 space-y-5">
+      <div className="bg-[var(--color-bg-card)] rounded-[14px] border border-[var(--color-border)] shadow-[var(--shadow-card)] p-6 space-y-5">
         <div><label className={labelClass}>Client *</label><select required value={form.customerId} onChange={(e) => updateField("customerId", e.target.value)} className={inputClass}><option value="">Pour qui ?</option>{customers.map((c) => <option key={c.id} value={c.id}>{c.vip?"* ":""}{c.name}</option>)}</select></div>
         <div><label className={labelClass}>Description *</label><input type="text" required value={form.description} onChange={(e) => updateField("description", e.target.value)} placeholder="Ex: Birkin 25 Gold Togo" className={inputClass} /></div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

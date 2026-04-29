@@ -15,7 +15,7 @@ export default function ProductPhotos({ productId, images }: { productId: string
   }, [productId]);
 
   return (
-    <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6">
+    <div className="bg-[var(--color-bg-card)] rounded-[14px] border border-[var(--color-border)] shadow-[var(--shadow-card)] p-6">
       <h2 className="text-[15px] font-semibold text-white mb-4">Photos</h2>
       <ProductImageUpload productId={productId} existingImages={images} onImagesChange={handleImagesChange} />
     </div>

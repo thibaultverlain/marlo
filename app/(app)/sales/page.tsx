@@ -11,13 +11,21 @@ import SalesFilters from "@/components/sales/sales-filters";
 export const dynamic = "force-dynamic";
 
 function ChannelBadge({ channel }: { channel: string }) {
-  const ch = CHANNELS.find((c) => c.value === channel);
-  const colors: Record<string, string> = {
-    vinted: "bg-teal-500/10 text-teal-400", vestiaire: "bg-orange-500/10 text-orange-400",
-    stockx: "bg-emerald-500/10 text-emerald-400", prive: "bg-cyan-500/10 text-cyan-400",
-    autre: "bg-zinc-500/10 text-zinc-400",
+  const styles: Record<string, { bg: string; dot: string }> = {
+    vinted: { bg: "bg-teal-500/10 text-teal-400 border-teal-500/20", dot: "bg-teal-400" },
+    vestiaire: { bg: "bg-orange-500/10 text-orange-400 border-orange-500/20", dot: "bg-orange-400" },
+    stockx: { bg: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20", dot: "bg-emerald-400" },
+    prive: { bg: "bg-violet-500/10 text-violet-400 border-violet-500/20", dot: "bg-violet-400" },
+    autre: { bg: "bg-zinc-500/10 text-zinc-400 border-zinc-500/20", dot: "bg-zinc-400" },
   };
-  return <span className={`inline-flex px-2 py-0.5 rounded-md text-[11px] font-medium ${colors[channel] || colors.autre}`}>{ch?.label ?? channel}</span>;
+  const labels: Record<string, string> = { vinted: "Vinted", vestiaire: "Vestiaire", stockx: "StockX", prive: "Privé", autre: "Autre" };
+  const s = styles[channel] ?? styles.autre;
+  return (
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold border ${s.bg}`}>
+      <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${s.dot}`} />
+      {labels[channel] ?? channel}
+    </span>
+  );
 }
 
 async function getSalesForPeriod(userId: string, period: string) {
@@ -83,7 +91,7 @@ export default async function SalesPage({ searchParams }: { searchParams: Promis
             {salesData.length} vente{salesData.length > 1 ? "s" : ""} · CA {formatCurrency(totalRevenue)} · Marge {formatCurrency(totalMargin)}
           </p>
         </div>
-        <Link href="/sales/new" className="flex items-center gap-2 px-4 py-2 text-[13px] font-medium text-white bg-cyan-500 rounded-lg hover:bg-cyan-400 transition-colors">
+        <Link href="/sales/new" className="flex items-center gap-2 px-4 py-2 text-[13px] font-medium text-[#0a0a0f] bg-cyan-500 font-semibold rounded-lg hover:bg-cyan-400 transition-colors">
           <Plus size={14} />Enregistrer
         </Link>
       </div>

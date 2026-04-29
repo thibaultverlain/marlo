@@ -27,7 +27,7 @@ export default async function AccountingPage({ searchParams }: { searchParams: P
         <div className="card-static p-5"><p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Résultat brut</p><p className={`text-2xl font-semibold tabular-nums ${benefit>=0?"text-emerald-400":"text-red-400"}`}>{formatCurrency(benefit)}</p></div>
       </div>
       <AccountingTabs year={year} activeTab={tab} recipes={recipes.map((r)=>({date:r.date.toISOString(),invoiceNumber:r.invoiceNumber,customerName:r.customerName,productTitle:r.productTitle,channel:r.channel,channelLabel:CHANNELS.find((c)=>c.value===r.channel)?.label??r.channel,amount:r.amount,paymentMethod:r.paymentMethod}))} purchases={purchasesRows.map((p)=>({id:p.id,date:p.date?p.date.toISOString():null,description:p.description,supplier:p.supplier,amount:p.amount,category:p.category,paymentMethod:p.paymentMethod,productSku:p.productSku}))} />
-      <div className="p-4 bg-zinc-800/50 rounded-xl border border-[var(--color-border)]"><p className="text-[11px] text-zinc-500"><strong className="text-zinc-400">Rappel :</strong> Registres à conserver 10 ans. Export CSV pour tes déclarations. Consulte un expert-comptable.</p></div>
+      <div className="p-4 bg-zinc-800/50 rounded-[14px] border border-[var(--color-border)] shadow-[var(--shadow-card)]"><p className="text-[11px] text-zinc-500"><strong className="text-zinc-400">Rappel :</strong> Registres à conserver 10 ans. Export CSV pour tes déclarations. Consulte un expert-comptable.</p></div>
       <div className="pb-8" />
     </div>
   );

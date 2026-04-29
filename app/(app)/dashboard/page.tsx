@@ -67,17 +67,15 @@ function StatCard({ label, value, sub, icon, accent }: {
   icon?: React.ReactNode;
   accent?: "success" | "danger" | "default";
 }) {
-  const accentColor = accent === "success" ? "text-emerald-400" : accent === "danger" ? "text-red-400" : "text-white";
+  const valueColor = accent === "success" ? "text-emerald-400" : accent === "danger" ? "text-red-400" : "text-white";
   return (
-    <div className="kpi-card p-5 flex items-start gap-4">
-      {icon && (
-        <div className="icon-circle icon-circle-accent">
-          {icon}
-        </div>
-      )}
-      <div>
-        <p className="stat-label">{label}</p>
-        <p className={`stat-value ${accentColor}`}>{value}</p>
+    <div className="kpi-card p-5 flex flex-col justify-between min-h-[130px]">
+      <div className="flex items-start justify-between">
+        <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider leading-tight">{label}</p>
+        {icon && <div className="icon-circle icon-circle-accent">{icon}</div>}
+      </div>
+      <div className="mt-auto">
+        <p className={`text-[26px] font-bold tabular-nums tracking-tight leading-none ${valueColor}`}>{value}</p>
         {sub && <p className="text-[11px] text-zinc-600 mt-1.5">{sub}</p>}
       </div>
     </div>
@@ -91,17 +89,19 @@ function FeaturedStat({ label, value, sub, comparisons }: {
   comparisons?: { label: string; value: string; change: string; positive: boolean }[];
 }) {
   return (
-    <div className="kpi-featured p-6">
-      <p className="text-[13px] font-medium text-zinc-400 mb-1">{label}</p>
-      <p className="stat-value-lg gradient-text">{value}</p>
-      {sub && <p className="text-[11px] text-zinc-600 mt-2">{sub}</p>}
+    <div className="kpi-featured p-6 flex flex-col justify-between min-h-[130px]">
+      <p className="text-[13px] font-medium text-zinc-400 mb-2">{label}</p>
+      <div>
+        <p className="text-[38px] font-bold tabular-nums tracking-tight leading-none gradient-text">{value}</p>
+        {sub && <p className="text-[12px] text-zinc-500 mt-2">{sub}</p>}
+      </div>
       {comparisons && comparisons.length > 0 && (
-        <div className="flex gap-6 mt-4 pt-4 border-t border-[var(--color-border-subtle)]">
+        <div className="flex gap-6 mt-4 pt-3 border-t border-white/[0.04]">
           {comparisons.map((c, i) => (
             <div key={i}>
               <p className="text-[10px] text-zinc-600 uppercase tracking-wider">{c.label}</p>
               <div className="flex items-baseline gap-2 mt-1">
-                <span className="text-sm text-zinc-400 tabular-nums">{c.value}</span>
+                <span className="text-sm text-zinc-400 tabular-nums font-medium">{c.value}</span>
                 <span className={c.positive ? "change-positive" : "change-negative"}>{c.change}</span>
               </div>
             </div>

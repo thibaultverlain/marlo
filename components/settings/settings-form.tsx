@@ -40,7 +40,7 @@ export default function SettingsForm({ initialData }: { initialData: ShopSetting
       {error && <div className="flex items-start gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-sm text-red-400"><AlertCircle size={16} className="flex-shrink-0 mt-0.5" /><span>{error}</span></div>}
       {saved && <div className="flex items-center gap-2 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-sm text-emerald-400"><CheckCircle2 size={16} /><span>Enregistré.</span></div>}
 
-      <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6 space-y-5">
+      <div className="bg-[var(--color-bg-card)] rounded-[14px] border border-[var(--color-border)] shadow-[var(--shadow-card)] p-6 space-y-5">
         <h2 className="text-[15px] font-semibold text-white">Identité légale</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div><label className={labelClass}>Raison sociale *</label><input type="text" required value={form.legalName} onChange={(e) => updateField("legalName", e.target.value)} placeholder="Dupont Thibault" className={inputClass} /></div>
@@ -53,7 +53,7 @@ export default function SettingsForm({ initialData }: { initialData: ShopSetting
         </div>
       </div>
 
-      <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6 space-y-5">
+      <div className="bg-[var(--color-bg-card)] rounded-[14px] border border-[var(--color-border)] shadow-[var(--shadow-card)] p-6 space-y-5">
         <h2 className="text-[15px] font-semibold text-white">Adresse</h2>
         <div><label className={labelClass}>Adresse *</label><input type="text" required value={form.address} onChange={(e) => updateField("address", e.target.value)} placeholder="12 rue de Rivoli" className={inputClass} /></div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -63,7 +63,7 @@ export default function SettingsForm({ initialData }: { initialData: ShopSetting
         </div>
       </div>
 
-      <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6 space-y-5">
+      <div className="bg-[var(--color-bg-card)] rounded-[14px] border border-[var(--color-border)] shadow-[var(--shadow-card)] p-6 space-y-5">
         <h2 className="text-[15px] font-semibold text-white">Régime TVA</h2>
         <label className="flex items-start gap-3 cursor-pointer"><input type="checkbox" checked={form.vatSubject} onChange={(e) => updateField("vatSubject", e.target.checked)} className="mt-1 rounded border-zinc-600 bg-zinc-800 text-indigo-500 focus:ring-indigo-500" /><div><p className="text-sm text-zinc-200">Je suis assujetti à la TVA</p><p className="text-[11px] text-zinc-500 mt-0.5">Si décoché : mention "TVA non applicable, art. 293 B du CGI" automatique sur les factures.</p></div></label>
         {form.vatSubject && <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
@@ -72,7 +72,7 @@ export default function SettingsForm({ initialData }: { initialData: ShopSetting
         </div>}
       </div>
 
-      <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6 space-y-5">
+      <div className="bg-[var(--color-bg-card)] rounded-[14px] border border-[var(--color-border)] shadow-[var(--shadow-card)] p-6 space-y-5">
         <h2 className="text-[15px] font-semibold text-white">Banque</h2>
         <div><label className={labelClass}>IBAN</label><input type="text" value={form.iban} onChange={(e) => updateField("iban", e.target.value.toUpperCase())} placeholder="FR76 3000..." className={`${inputClass} font-mono`} /></div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -81,7 +81,7 @@ export default function SettingsForm({ initialData }: { initialData: ShopSetting
         </div>
       </div>
 
-      <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6 space-y-5">
+      <div className="bg-[var(--color-bg-card)] rounded-[14px] border border-[var(--color-border)] shadow-[var(--shadow-card)] p-6 space-y-5">
         <h2 className="text-[15px] font-semibold text-white">Facturation</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div><label className={labelClass}>Préfixe facture</label><input type="text" value={form.invoicePrefix} onChange={(e) => updateField("invoicePrefix", e.target.value.toUpperCase().slice(0,5))} className={inputClass} /><p className="text-[10px] text-zinc-600 mt-1">Format : {form.invoicePrefix||"F"}-2026-0001</p></div>
