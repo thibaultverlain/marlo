@@ -91,15 +91,15 @@ export default async function SalesPage({ searchParams }: { searchParams: Promis
       <SalesFilters currentPeriod={period} />
 
       {salesData.length === 0 ? (
-        <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-12 text-center">
+        <div className="card-static p-12 text-center">
           <ShoppingCart size={40} className="mx-auto text-zinc-700 mb-3" />
           <p className="text-zinc-500 mb-4 text-sm">Aucune vente sur cette période</p>
         </div>
       ) : (
-        <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] overflow-hidden">
+        <div className="card-static overflow-hidden">
           <div className="divide-y divide-[var(--color-border)]">
             {salesData.map((sale) => (
-              <Link key={sale.id} href={`/sales/${sale.id}`} className="flex items-start sm:items-center justify-between gap-3 px-5 py-3.5 hover:bg-[var(--color-bg-hover)] transition-colors">
+              <Link key={sale.id} href={`/sales/${sale.id}`} className="flex items-start sm:items-center justify-between gap-3 px-5 py-3.5 row-hover transition-colors">
                 <div>
                   <p className="text-[13px] font-medium text-zinc-200">{sale.productTitle ?? sale.notes ?? "Article"}</p>
                   <div className="flex items-center gap-2 mt-1">

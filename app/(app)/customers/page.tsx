@@ -21,16 +21,16 @@ export default async function CustomersPage() {
       </div>
 
       {customers.length === 0 ? (
-        <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-12 text-center">
+        <div className="card-static p-12 text-center">
           <Users size={40} className="mx-auto text-zinc-700 mb-3" />
           <p className="text-zinc-500 mb-4 text-sm">Aucun client</p>
           <Link href="/customers/new" className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-500 transition-colors"><Plus size={14} />Ajouter</Link>
         </div>
       ) : (
-        <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] overflow-hidden">
+        <div className="card-static overflow-hidden">
           <div className="divide-y divide-[var(--color-border)]">
             {customers.map((c) => (
-              <Link key={c.id} href={`/customers/${c.id}`} className="flex items-start sm:items-center justify-between gap-3 px-5 py-3.5 hover:bg-[var(--color-bg-hover)] transition-colors">
+              <Link key={c.id} href={`/customers/${c.id}`} className="flex items-start sm:items-center justify-between gap-3 px-5 py-3.5 row-hover transition-colors">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-sm font-semibold text-zinc-400">{c.firstName[0]}{c.lastName[0]}</div>
                   <div>

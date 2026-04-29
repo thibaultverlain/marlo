@@ -33,7 +33,6 @@ export default function Sidebar() {
   const [open, setOpen] = useState(false);
   const [alertCount, setAlertCount] = useState(0);
 
-  // Fetch alert count
   useEffect(() => {
     fetch("/api/alerts")
       .then((r) => r.json())
@@ -41,12 +40,8 @@ export default function Sidebar() {
       .catch(() => {});
   }, [pathname]);
 
-  // Close on route change
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
+  useEffect(() => { setOpen(false); }, [pathname]);
 
-  // Prevent body scroll when menu is open
   useEffect(() => {
     if (open) document.body.style.overflow = "hidden";
     else document.body.style.overflow = "";
@@ -56,14 +51,14 @@ export default function Sidebar() {
   return (
     <>
       {/* Mobile top bar */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-[var(--color-bg-sidebar)] border-b border-[var(--color-border)] flex items-center justify-between px-4 z-50">
+      <div className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-[var(--color-bg-sidebar)] border-b border-[var(--color-border)] flex items-center justify-between px-4 z-50 backdrop-blur-sm">
         <div className="flex items-center gap-1.5">
           <MarloIcon size={28} />
           <MarloWordmark />
         </div>
         <button
           onClick={() => setOpen(!open)}
-          className="w-9 h-9 flex items-center justify-center rounded-lg text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-colors"
+          className="w-9 h-9 flex items-center justify-center rounded-lg text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-all duration-150"
         >
           {open ? <X size={20} /> : <Menu size={20} />}
         </button>
@@ -72,7 +67,7 @@ export default function Sidebar() {
       {/* Mobile overlay */}
       {open && (
         <div
-          className="lg:hidden fixed inset-0 bg-black/60 z-40"
+          className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-[2px] z-40 transition-opacity duration-200"
           onClick={() => setOpen(false)}
         />
       )}
@@ -84,7 +79,7 @@ export default function Sidebar() {
           ${open ? "left-0 translate-x-0" : "-translate-x-full lg:translate-x-0"}
         `}
       >
-        {/* Logo - hidden on mobile (top bar has it) */}
+        {/* Logo */}
         <div className="px-5 py-5 hidden lg:block">
           <div className="flex items-center gap-1.5">
             <MarloIcon size={28} />
@@ -92,11 +87,10 @@ export default function Sidebar() {
           </div>
         </div>
 
-        {/* Mobile: spacer for top bar */}
         <div className="h-14 lg:hidden" />
 
         {/* Navigation */}
-        <nav className="flex-1 px-2.5 py-1 space-y-px overflow-y-auto">
+        <nav className="flex-1 px-2.5 py-1.5 space-y-[2px] overflow-y-auto">
           {NAV_ITEMS.map((item) => {
             const isActive = pathname.startsWith(item.href);
             const Icon = item.icon;
@@ -105,16 +99,24 @@ export default function Sidebar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-2.5 px-2.5 py-[9px] lg:py-[7px] rounded-md text-[13px] transition-all duration-100 ${
+                className={`relative flex items-center gap-2.5 px-2.5 py-[8px] lg:py-[7px] rounded-[8px] text-[13px] transition-all duration-150 group ${
                   isActive
-                    ? "bg-white/[0.08] text-white"
-                    : "text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.04]"
+                    ? "bg-white/[0.06] text-white"
+                    : "text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.03]"
                 }`}
               >
-                <Icon size={16} strokeWidth={isActive ? 1.8 : 1.5} />
+                {/* Active indicator line */}
+                {isActive && (
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[2px] h-4 bg-indigo-400 rounded-full" />
+                )}
+                <Icon
+                  size={16}
+                  strokeWidth={isActive ? 1.8 : 1.5}
+                  className={`transition-colors duration-150 ${isActive ? "text-indigo-400" : "group-hover:text-zinc-400"}`}
+                />
                 <span className={`flex-1 ${isActive ? "font-medium" : "font-normal"}`}>{item.label}</span>
                 {showBadge && (
-                  <span className="w-5 h-5 rounded-full bg-amber-500 text-[10px] font-bold text-black flex items-center justify-center">
+                  <span className="w-[18px] h-[18px] rounded-full bg-amber-500/90 text-[9px] font-bold text-black flex items-center justify-center">
                     {alertCount}
                   </span>
                 )}
@@ -123,8 +125,8 @@ export default function Sidebar() {
           })}
         </nav>
 
-        {/* Bottom nav */}
-        <div className="px-2.5 py-3 border-t border-[var(--color-border)] space-y-1">
+        {/* Bottom */}
+        <div className="px-2.5 py-3 border-t border-[var(--color-border-subtle)] space-y-1">
           <PushNotificationToggle />
           <ThemeToggle />
           {BOTTOM_ITEMS.map((item) => {
@@ -134,10 +136,10 @@ export default function Sidebar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-2.5 px-2.5 py-[9px] lg:py-[7px] rounded-md text-[13px] transition-all duration-100 ${
+                className={`flex items-center gap-2.5 px-2.5 py-[8px] lg:py-[7px] rounded-[8px] text-[13px] transition-all duration-150 ${
                   isActive
-                    ? "bg-white/[0.08] text-white"
-                    : "text-zinc-600 hover:text-zinc-400 hover:bg-white/[0.04]"
+                    ? "bg-white/[0.06] text-white"
+                    : "text-zinc-600 hover:text-zinc-400 hover:bg-white/[0.03]"
                 }`}
               >
                 <Icon size={16} strokeWidth={1.5} />

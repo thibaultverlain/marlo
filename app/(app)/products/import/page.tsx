@@ -73,7 +73,7 @@ export default function ImportPage() {
 
       <div className="bg-zinc-800/50 rounded-xl p-5 flex items-start justify-between gap-4">
         <div><h2 className="font-semibold text-white text-sm">Template CSV</h2><p className="text-[12px] text-zinc-500 mt-1">Télécharge le modèle avec les colonnes attendues.</p></div>
-        <button onClick={downloadTemplate} className="flex items-center gap-2 px-4 py-2 bg-[var(--color-bg-card)] border border-[var(--color-border)] text-zinc-300 rounded-lg text-sm font-medium hover:bg-[var(--color-bg-hover)] transition-colors flex-shrink-0"><Download size={14} />Télécharger</button>
+        <button onClick={downloadTemplate} className="flex items-center gap-2 px-4 py-2 bg-[var(--color-bg-card)] border border-[var(--color-border)] text-zinc-300 rounded-lg text-sm font-medium row-hover transition-colors flex-shrink-0"><Download size={14} />Télécharger</button>
       </div>
 
       <label className="block bg-[var(--color-bg-card)] rounded-xl border-2 border-dashed border-[var(--color-border)] p-8 text-center cursor-pointer hover:border-indigo-500/50 transition-all">
@@ -86,7 +86,7 @@ export default function ImportPage() {
       {parseError && <div className="flex items-start gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-sm text-red-400"><AlertCircle size={16} className="flex-shrink-0 mt-0.5" /><span>{parseError}</span></div>}
 
       {rows.length > 0 && !success && (
-        <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6">
+        <div className="card-static p-6">
           <div className="flex items-center justify-between mb-4"><h2 className="text-[15px] font-semibold text-white">Aperçu</h2><span className="text-sm text-emerald-400 font-medium">{validCount} valide{validCount>1?"s":""}</span></div>
           <div className="overflow-x-auto">
             <table className="w-full text-[13px]">

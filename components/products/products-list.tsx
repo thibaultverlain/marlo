@@ -91,7 +91,7 @@ export default function ProductsList({ products }: { products: ProductListItem[]
         </div>
       </div>
 
-      <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] overflow-hidden mt-6">
+      <div className="card-static overflow-hidden mt-6">
         {filtered.length === 0 ? (
           <div className="p-12 text-center">
             <Package size={40} className="mx-auto text-zinc-700 mb-3" />
@@ -108,7 +108,7 @@ export default function ProductsList({ products }: { products: ProductListItem[]
                 <Link
                   key={product.id}
                   href={`/products/${product.id}`}
-                  className="flex items-center gap-4 px-5 py-3.5 hover:bg-[var(--color-bg-hover)] transition-colors group"
+                  className="flex items-center gap-4 px-5 py-3.5 row-hover transition-colors group"
                 >
                   <div className="w-12 h-12 rounded-lg bg-zinc-800/50 flex items-center justify-center flex-shrink-0 border border-[var(--color-border)] overflow-hidden">
                     <Package size={18} className="text-zinc-700" />

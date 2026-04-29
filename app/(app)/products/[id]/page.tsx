@@ -51,11 +51,11 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
       <ProductPhotos productId={product.id} images={product.images ?? []} />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-5">
+        <div className="card-static p-5">
           <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Prix d'achat</p>
           <p className="text-2xl font-semibold text-white tabular-nums">{formatCurrency(purchasePrice)}</p>
         </div>
-        <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-5">
+        <div className="card-static p-5">
           <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Prix de vente visé</p>
           <div className="flex items-end gap-2">
             <p className="text-2xl font-semibold text-white tabular-nums">{formatCurrency(targetPrice)}</p>
@@ -64,7 +64,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
         </div>
       </div>
 
-      <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6 space-y-4">
+      <div className="card-static p-6 space-y-4">
         <h2 className="text-[15px] font-semibold text-white">Caractéristiques</h2>
         <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-sm">
           <Row label="Marque" value={product.brand} />
@@ -80,7 +80,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
       </div>
 
       {product.listedOn && product.listedOn.length > 0 && (
-        <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6">
+        <div className="card-static p-6">
           <h2 className="text-[15px] font-semibold text-white mb-4">En vente sur</h2>
           <div className="flex gap-2 flex-wrap">
             {product.listedOn.map((ch) => {
@@ -92,13 +92,13 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
       )}
 
       {product.notes && (
-        <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6">
+        <div className="card-static p-6">
           <h2 className="text-[15px] font-semibold text-white mb-3">Notes</h2>
           <p className="text-sm text-zinc-400 whitespace-pre-line">{product.notes}</p>
         </div>
       )}
 
-      <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6">
+      <div className="card-static p-6">
         <h2 className="text-[15px] font-semibold text-white mb-4">Traçabilité</h2>
         <div className="space-y-2 text-sm">
           <div className="flex justify-between"><span className="text-zinc-500">Ajouté le</span><span className="text-zinc-300">{formatDate(product.createdAt)}</span></div>

@@ -41,7 +41,7 @@ export default function AnalyticsPage() {
   if (!data || data.error) return (
     <div className="space-y-6">
       <h1 className="text-3xl text-white">Analytique</h1>
-      <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-12 text-center">
+      <div className="card-static p-12 text-center">
         <p className="text-zinc-500">Pas assez de données pour afficher les analytics.</p>
       </div>
     </div>
@@ -57,7 +57,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Brand performance table */}
-      <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6">
+      <div className="card-static p-6">
         <h2 className="text-[15px] font-semibold text-white mb-5 flex items-center gap-2">
           <BarChart3 size={16} className="text-indigo-400" />
           Performance par marque
@@ -74,7 +74,7 @@ export default function AnalyticsPage() {
               </thead>
               <tbody className="divide-y divide-[var(--color-border)]">
                 {data.brandPerf.map((b: any) => (
-                  <tr key={b.brand} className="hover:bg-[var(--color-bg-hover)] transition-colors">
+                  <tr key={b.brand} className="row-hover transition-colors">
                     <td className="py-3 px-3 text-zinc-200 font-medium">{b.brand}</td>
                     <td className="py-3 px-3 text-zinc-400">{b.count}</td>
                     <td className="py-3 px-3 text-right text-white tabular-nums">{formatCurrency(b.totalRevenue)}</td>
@@ -92,7 +92,7 @@ export default function AnalyticsPage() {
       {/* Two columns: Category perf + Channel margin */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Category performance */}
-        <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6">
+        <div className="card-static p-6">
           <h2 className="text-[15px] font-semibold text-white mb-5">Performance par catégorie</h2>
           {data.categoryPerf?.length > 0 ? (
             <div className="h-[250px]">
@@ -114,7 +114,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Channel margin prediction */}
-        <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6">
+        <div className="card-static p-6">
           <h2 className="text-[15px] font-semibold text-white mb-5 flex items-center gap-2">
             <Zap size={16} className="text-amber-400" />
             Prédiction de marge par canal
@@ -148,7 +148,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Top articles */}
-      <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6">
+      <div className="card-static p-6">
         <h2 className="text-[15px] font-semibold text-white mb-5 flex items-center gap-2">
           <TrendingUp size={16} className="text-emerald-400" />
           Meilleures ventes (par marge)
@@ -177,7 +177,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Velocity by brand */}
-      <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6">
+      <div className="card-static p-6">
         <h2 className="text-[15px] font-semibold text-white mb-2">Vélocité par marque</h2>
         <p className="text-[11px] text-zinc-500 mb-5">Nombre moyen de jours entre l'achat et la vente</p>
         {data.velocity?.length > 0 ? (

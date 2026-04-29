@@ -17,7 +17,7 @@ export default async function NewSalePage({ searchParams }: { searchParams: Prom
         <div><h1 className="text-2xl text-white">Nouvelle vente</h1><p className="text-sm text-zinc-500 mt-0.5">Enregistrer une vente</p></div>
       </div>
       {products.length === 0 ? (
-        <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-10 text-center"><p className="text-zinc-500 mb-4 text-sm">Aucun article en stock.</p><Link href="/products/new" className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-500 transition-colors">Ajouter un article</Link></div>
+        <div className="card-static p-10 text-center"><p className="text-zinc-500 mb-4 text-sm">Aucun article en stock.</p><Link href="/products/new" className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-500 transition-colors">Ajouter un article</Link></div>
       ) : (
         <NewSaleForm products={products.map((p) => ({ id: p.id, title: p.title, sku: p.sku, purchasePrice: Number(p.purchasePrice), targetPrice: p.targetPrice ? Number(p.targetPrice) : null }))} customers={customers.map((c) => ({ id: c.id, name: `${c.firstName} ${c.lastName}` }))} preselectedProductId={sp.productId} />
       )}

@@ -106,23 +106,23 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
 
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-        <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-4">
+        <div className="card-static p-4">
           <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Total dépensé</p>
           <p className="text-xl font-semibold text-white tabular-nums">{formatCurrency(metrics.totalSpent)}</p>
         </div>
-        <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-4">
+        <div className="card-static p-4">
           <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Commandes</p>
           <p className="text-xl font-semibold text-white">{metrics.count}</p>
         </div>
-        <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-4">
+        <div className="card-static p-4">
           <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Panier moyen</p>
           <p className="text-xl font-semibold text-white tabular-nums">{formatCurrency(metrics.avgBasket)}</p>
         </div>
-        <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-4">
+        <div className="card-static p-4">
           <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Marge moy.</p>
           <p className="text-xl font-semibold text-emerald-400 tabular-nums">{formatPercent(metrics.avgMarginPct)}</p>
         </div>
-        <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-4">
+        <div className="card-static p-4">
           <div className="flex items-center gap-1 mb-1">
             <Clock size={10} className="text-zinc-500" />
             <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider">Fréquence</p>
@@ -137,7 +137,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
       {/* Two columns: Contact + Top brands */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Contact */}
-        <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6">
+        <div className="card-static p-6">
           <h2 className="text-[15px] font-semibold text-white mb-4">Contact</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
             {customer.email && <div className="flex items-center gap-2"><Mail size={14} className="text-zinc-600" /><span className="text-zinc-300">{customer.email}</span></div>}
@@ -149,7 +149,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
 
         {/* Top brands */}
         {metrics.topBrands.length > 0 && (
-          <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6">
+          <div className="card-static p-6">
             <h2 className="text-[15px] font-semibold text-white mb-4 flex items-center gap-2">
               <TrendingUp size={15} className="text-indigo-400" />
               Marques préférées
@@ -171,7 +171,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
 
       {/* Preferences */}
       {(customer.preferredBrands?.length || customer.preferredSizes || customer.budgetRange) && (
-        <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6">
+        <div className="card-static p-6">
           <h2 className="text-[15px] font-semibold text-white mb-4">Préférences</h2>
           {customer.preferredBrands && customer.preferredBrands.length > 0 && (
             <div className="mb-4"><p className="text-[11px] font-medium text-zinc-600 uppercase tracking-wider mb-2">Marques favorites</p>
@@ -186,7 +186,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
       )}
 
       {/* Purchase history */}
-      <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] overflow-hidden">
+      <div className="card-static overflow-hidden">
         <div className="px-6 py-4 border-b border-[var(--color-border)]">
           <h2 className="text-[15px] font-semibold text-white flex items-center gap-2">
             <ShoppingCart size={15} className="text-zinc-500" />
@@ -205,7 +205,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             {salesHistory.map((sale) => {
               const channelLabel = CHANNELS.find((c) => c.value === sale.channel)?.label ?? sale.channel;
               return (
-                <Link key={sale.id} href={`/sales/${sale.id}`} className="flex items-center justify-between px-6 py-3.5 hover:bg-[var(--color-bg-hover)] transition-colors">
+                <Link key={sale.id} href={`/sales/${sale.id}`} className="flex items-center justify-between px-6 py-3.5 row-hover transition-colors">
                   <div>
                     <p className="text-[13px] text-zinc-200">{sale.productTitle ?? "Article"}</p>
                     <div className="flex items-center gap-2 mt-0.5">
@@ -233,7 +233,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
 
       {/* Notes */}
       {customer.notes && (
-        <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6">
+        <div className="card-static p-6">
           <h2 className="text-[15px] font-semibold text-white mb-3">Notes</h2>
           <p className="text-sm text-zinc-400 whitespace-pre-line">{customer.notes}</p>
         </div>

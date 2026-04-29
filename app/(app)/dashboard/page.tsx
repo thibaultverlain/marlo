@@ -60,16 +60,18 @@ async function getAllTimeStats(userId: string) {
   };
 }
 
-function StatCard({ label, value, sub }: {
+function StatCard({ label, value, sub, accent }: {
   label: string;
   value: string;
   sub?: string;
+  accent?: "success" | "danger" | "default";
 }) {
+  const accentColor = accent === "success" ? "text-emerald-400" : accent === "danger" ? "text-red-400" : "text-white";
   return (
-    <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-5 hover:border-[var(--color-border-hover)] transition-colors">
-      <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">{label}</p>
-      <p className="text-2xl font-semibold text-white tabular-nums mt-2">{value}</p>
-      {sub && <p className="text-[11px] text-zinc-600 mt-1">{sub}</p>}
+    <div className="kpi-card p-5">
+      <p className="stat-label">{label}</p>
+      <p className={`stat-value ${accentColor}`}>{value}</p>
+      {sub && <p className="text-[11px] text-zinc-600 mt-1.5">{sub}</p>}
     </div>
   );
 }
@@ -83,7 +85,7 @@ function EmptyState() {
           {new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date())}
         </p>
       </div>
-      <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-12 text-center">
+      <div className="card-static p-12 text-center">
         <Package size={40} className="mx-auto text-zinc-700 mb-3" />
         <h2 className="text-xl text-white mb-2">Bienvenue sur Marlo</h2>
         <p className="text-zinc-500 mb-6 max-w-md mx-auto text-sm">Commence par ajouter tes articles en stock.</p>
@@ -179,7 +181,7 @@ export default async function DashboardPage() {
       {/* Two columns: Marge par canal | Dernières ventes */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Margin by channel */}
-        <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6">
+        <div className="card-static p-6">
           <h2 className="text-[15px] font-semibold text-white mb-5">Marge par canal</h2>
           {marginByChannel.length === 0 ? (
             <p className="text-sm text-zinc-600">Aucune vente</p>
@@ -213,7 +215,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Recent sales */}
-        <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-6">
+        <div className="card-static p-6">
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-[15px] font-semibold text-white">Dernières ventes</h2>
             <Link href="/sales" className="text-xs text-indigo-400 hover:text-indigo-300 font-medium transition-colors">Voir tout</Link>

@@ -38,14 +38,14 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         <div className="flex gap-2 flex-shrink-0">
           <a
             href="/api/stock/pdf?download=1"
-            className="hidden sm:flex items-center gap-2 px-4 py-2 text-[13px] font-medium text-zinc-400 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg hover:bg-[var(--color-bg-hover)] hover:text-zinc-200 transition-colors"
+            className="hidden sm:flex items-center gap-2 px-4 py-2 text-[13px] font-medium text-zinc-400 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg row-hover hover:text-zinc-200 transition-colors"
           >
             <FileDown size={14} />
             PDF
           </a>
           <Link
             href="/products/import"
-            className="hidden sm:flex items-center gap-2 px-4 py-2 text-[13px] font-medium text-zinc-400 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg hover:bg-[var(--color-bg-hover)] hover:text-zinc-200 transition-colors"
+            className="hidden sm:flex items-center gap-2 px-4 py-2 text-[13px] font-medium text-zinc-400 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg row-hover hover:text-zinc-200 transition-colors"
           >
             <Upload size={14} />
             Importer
@@ -63,19 +63,19 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       {/* Stock value KPIs */}
       {inStockCount > 0 && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-4">
+          <div className="card-static p-4">
             <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Articles en stock</p>
             <p className="text-xl font-semibold text-white">{inStockCount}</p>
           </div>
-          <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-4">
+          <div className="card-static p-4">
             <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Valeur d'achat</p>
             <p className="text-xl font-semibold text-white tabular-nums">{formatCurrency(stockValue)}</p>
           </div>
-          <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-4">
+          <div className="card-static p-4">
             <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Valeur visée</p>
             <p className="text-xl font-semibold text-white tabular-nums">{formatCurrency(targetValue)}</p>
           </div>
-          <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-4">
+          <div className="card-static p-4">
             <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Marge potentielle</p>
             <p className={`text-xl font-semibold tabular-nums ${potentialMargin >= 0 ? "text-emerald-400" : "text-red-400"}`}>{formatCurrency(potentialMargin)}</p>
           </div>
@@ -101,7 +101,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       </div>
 
       {products.length === 0 ? (
-        <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-12 text-center">
+        <div className="card-static p-12 text-center">
           <Package size={40} className="mx-auto text-zinc-700 mb-3" />
           <p className="text-zinc-500 mb-4 text-sm">
             {showAll ? "Aucun article" : "Aucun article en stock"}
