@@ -30,6 +30,7 @@ const productSchema = z.object({
   purchaseSource: z.string().optional().nullable(),
   purchaseDate: z.string().optional().nullable(),
   listedOn: z.array(z.string()).optional(),
+  status: z.string().optional(),
   serialNumber: z.string().optional().nullable(),
   notes: z.string().optional().nullable(),
 });
@@ -48,6 +49,7 @@ export async function createProductAction(formData: FormData) {
     purchaseSource: formData.get("purchaseSource") as string | null,
     purchaseDate: formData.get("purchaseDate") as string | null,
     listedOn: formData.getAll("listedOn") as string[],
+    status: (formData.get("status") as string) || "en_stock",
     serialNumber: formData.get("serialNumber") as string | null,
     notes: formData.get("notes") as string | null,
   };
@@ -82,7 +84,7 @@ export async function createProductAction(formData: FormData) {
       listedOn: parsed.data.listedOn ?? [],
       serialNumber: parsed.data.serialNumber ?? null,
       notes: parsed.data.notes ?? null,
-      status: (parsed.data.listedOn && parsed.data.listedOn.length > 0) ? "en_vente" : "en_stock",
+      status: (parsed.data.status as any) ?? "en_stock",
     });
   } catch (err) {
     console.error("createProductAction error:", err);

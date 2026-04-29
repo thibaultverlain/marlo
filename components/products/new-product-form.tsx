@@ -17,7 +17,7 @@ export default function NewProductForm() {
     condition: "tres_bon", purchasePrice: "", purchaseFees: "", targetPrice: "",
     purchaseCurrency: "EUR", purchaseSource: "vinted",
     purchaseDate: new Date().toISOString().split("T")[0],
-    listedOn: [] as string[], serialNumber: "", notes: "",
+    status: "en_stock" as string, serialNumber: "", notes: "",
   });
   const [brandSearch, setBrandSearch] = useState("");
   const [showBrandDropdown, setShowBrandDropdown] = useState(false);
@@ -38,9 +38,6 @@ export default function NewProductForm() {
   }, [form.purchasePrice, form.purchaseFees, form.targetPrice]);
 
   function updateField(field: string, value: string | string[]) { setForm((prev) => ({ ...prev, [field]: value })); }
-  function toggleListedOn(channel: string) {
-    setForm((prev) => ({ ...prev, listedOn: prev.listedOn.includes(channel) ? prev.listedOn.filter((c) => c !== channel) : [...prev.listedOn, channel] }));
-  }
   function handleBrandSelect(brand: string) { updateField("brand", brand); setBrandSearch(brand); setShowBrandDropdown(false); }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -58,7 +55,7 @@ export default function NewProductForm() {
     const sourceLabels: Record<string, string> = { vinted: "Vinted", vente_privee: "Vente privée", outlet: "Outlet", revendeur: "Revendeur réseau", autre: "Autre" };
     formData.append("purchaseSource", sourceLabels[form.purchaseSource] ?? form.purchaseSource);
     formData.append("purchaseDate", form.purchaseDate);
-    form.listedOn.forEach((ch) => formData.append("listedOn", ch));
+    formData.append("status", form.status);
     formData.append("serialNumber", form.serialNumber); formData.append("notes", form.notes);
     startTransition(async () => { const result = await createProductAction(formData); if (result?.error) setError(result.error); });
   }
@@ -169,11 +166,19 @@ export default function NewProductForm() {
         </div>
 
         <div>
-          <label className={`${labelClass} mb-2`}>En vente sur</label>
+          <label className={`${labelClass} mb-2`}>Statut</label>
           <div className="flex flex-wrap gap-2">
-            {CHANNELS.filter(c => c.value !== "autre").map((ch) => (
-              <button key={ch.value} type="button" onClick={() => toggleListedOn(ch.value)}
-                className={`px-3 py-1.5 text-[13px] rounded-lg border transition-colors ${form.listedOn.includes(ch.value) ? "bg-rose-500 text-white border-indigo-600" : "bg-transparent text-zinc-400 border-[var(--color-border)] hover:border-zinc-600"}`}>{ch.label}</button>
+            {[
+              { value: "en_stock", label: "En stock", dot: "bg-emerald-400", active: "bg-emerald-500/12 text-emerald-400 border-emerald-500/30" },
+              { value: "en_vente", label: "En vente", dot: "bg-rose-400", active: "bg-rose-500/12 text-rose-400 border-rose-500/30" },
+              { value: "reserve", label: "Réservé", dot: "bg-amber-400", active: "bg-amber-500/12 text-amber-400 border-amber-500/30" },
+              { value: "expedie", label: "Expédié", dot: "bg-orange-400", active: "bg-orange-500/12 text-orange-400 border-orange-500/30" },
+            ].map((s) => (
+              <button key={s.value} type="button" onClick={() => updateField("status", s.value)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-medium rounded-lg border transition-all duration-200 ${form.status === s.value ? s.active : "bg-transparent text-zinc-500 border-[var(--color-border)] hover:border-zinc-600"}`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${form.status === s.value ? s.dot : "bg-zinc-600"}`} />
+                {s.label}
+              </button>
             ))}
           </div>
         </div>

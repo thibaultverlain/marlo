@@ -38,10 +38,6 @@ export default function EditProductForm({ product }: { product: ProductData }) {
   }, [form.purchasePrice, form.targetPrice]);
 
   function updateField(field: string, value: string | string[]) { setForm((prev) => ({ ...prev, [field]: value })); setSaved(false); }
-  function toggleListedOn(channel: string) {
-    setForm((prev) => ({ ...prev, listedOn: prev.listedOn.includes(channel) ? prev.listedOn.filter((c) => c !== channel) : [...prev.listedOn, channel] }));
-    setSaved(false);
-  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault(); setError(null); setSaved(false);
@@ -52,7 +48,6 @@ export default function EditProductForm({ product }: { product: ProductData }) {
     formData.append("condition", form.condition); formData.append("purchasePrice", form.purchasePrice);
     formData.append("targetPrice", form.targetPrice); formData.append("purchaseSource", form.purchaseSource);
     formData.append("purchaseDate", form.purchaseDate); formData.append("status", form.status);
-    form.listedOn.forEach((ch) => formData.append("listedOn", ch));
     formData.append("serialNumber", form.serialNumber); formData.append("notes", form.notes);
 
     startTransition(async () => {
@@ -124,11 +119,22 @@ export default function EditProductForm({ product }: { product: ProductData }) {
         </div>
 
         <div>
-          <label className={`${labelClass} mb-2`}>En vente sur</label>
+          <label className={`${labelClass} mb-2`}>Statut</label>
           <div className="flex flex-wrap gap-2">
-            {CHANNELS.filter(c => c.value !== "autre").map((ch) => (
-              <button key={ch.value} type="button" onClick={() => toggleListedOn(ch.value)}
-                className={`px-3 py-1.5 text-[13px] rounded-lg border transition-colors ${form.listedOn.includes(ch.value) ? "bg-rose-500 text-white border-indigo-600" : "bg-transparent text-zinc-400 border-[var(--color-border)] hover:border-zinc-600"}`}>{ch.label}</button>
+            {[
+              { value: "en_stock", label: "En stock", dot: "bg-emerald-400", active: "bg-emerald-500/12 text-emerald-400 border-emerald-500/30" },
+              { value: "en_vente", label: "En vente", dot: "bg-rose-400", active: "bg-rose-500/12 text-rose-400 border-rose-500/30" },
+              { value: "reserve", label: "Réservé", dot: "bg-amber-400", active: "bg-amber-500/12 text-amber-400 border-amber-500/30" },
+              { value: "vendu", label: "Vendu", dot: "bg-violet-400", active: "bg-violet-500/12 text-violet-400 border-violet-500/30" },
+              { value: "expedie", label: "Expédié", dot: "bg-orange-400", active: "bg-orange-500/12 text-orange-400 border-orange-500/30" },
+              { value: "livre", label: "Livré", dot: "bg-zinc-400", active: "bg-zinc-500/12 text-zinc-400 border-zinc-500/30" },
+              { value: "retourne", label: "Retourné", dot: "bg-red-400", active: "bg-red-500/12 text-red-400 border-red-500/30" },
+            ].map((s) => (
+              <button key={s.value} type="button" onClick={() => updateField("status", s.value)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-medium rounded-lg border transition-all duration-200 ${form.status === s.value ? s.active : "bg-transparent text-zinc-500 border-[var(--color-border)] hover:border-zinc-600"}`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${form.status === s.value ? s.dot : "bg-zinc-600"}`} />
+                {s.label}
+              </button>
             ))}
           </div>
         </div>
