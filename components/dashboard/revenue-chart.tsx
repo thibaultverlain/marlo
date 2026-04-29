@@ -29,9 +29,9 @@ function formatEur(value: number): string {
 function CustomTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 shadow-xl">
-      <p className="text-[11px] text-zinc-400 mb-0.5">{label}</p>
-      <p className="text-sm font-semibold text-white tabular-nums">
+    <div className="rounded-xl px-4 py-3 text-sm shadow-xl" style={{ background: "rgba(18, 18, 26, 0.95)", backdropFilter: "blur(8px)", border: "1px solid rgba(56, 189, 248, 0.15)" }}>
+      <p className="text-zinc-500 text-[11px] mb-0.5">{label}</p>
+      <p className="text-white font-bold text-[15px] tabular-nums">
         {new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(payload[0].value)}
       </p>
     </div>
@@ -57,25 +57,24 @@ export default function RevenueChart() {
   const total = data.reduce((s, d) => s + d.revenue, 0);
 
   return (
-    <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-4 lg:p-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+    <div className="chart-container">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-6 pt-5 pb-3">
         <div>
-          <h2 className="text-[15px] font-semibold text-white">Chiffre d'affaires</h2>
+          <h2 className="section-title">Vue d'ensemble</h2>
           <p className="text-xl lg:text-2xl font-bold text-white tabular-nums mt-1">
             {new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(total)}
           </p>
         </div>
 
-        {/* Period tabs */}
-        <div className="flex bg-zinc-800/60 rounded-lg p-0.5 self-start sm:self-auto">
+        <div className="flex bg-white/[0.03] rounded-lg p-0.5 self-start sm:self-auto">
           {PERIOD_LABELS.map(({ key, label }) => (
             <button
               key={key}
               onClick={() => setPeriod(key)}
-              className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-all ${
+              className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-all duration-200 ${
                 period === key
-                  ? "bg-indigo-600 text-white shadow-sm"
-                  : "text-zinc-500 hover:text-zinc-300"
+                  ? "bg-[rgba(56,189,248,0.12)] text-cyan-400"
+                  : "text-zinc-600 hover:text-zinc-400"
               }`}
             >
               {label}
@@ -94,43 +93,43 @@ export default function RevenueChart() {
             <AreaChart data={data} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#818cf8" stopOpacity={0.3} />
-                  <stop offset="50%" stopColor="#818cf8" stopOpacity={0.08} />
-                  <stop offset="100%" stopColor="#818cf8" stopOpacity={0} />
+                  <stop offset="0%" stopColor="#38bdf8" stopOpacity={0.25} />
+                  <stop offset="40%" stopColor="#38bdf8" stopOpacity={0.08} />
+                  <stop offset="100%" stopColor="#38bdf8" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid
                 strokeDasharray="3 3"
-                stroke="rgba(255,255,255,0.04)"
+                stroke="rgba(255,255,255,0.03)"
                 vertical={false}
               />
               <XAxis
                 dataKey="label"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "#52525b", fontSize: 11 }}
+                tick={{ fill: "#484855", fontSize: 11 }}
                 interval={period === "day" ? 3 : period === "month" ? 4 : 0}
               />
               <YAxis
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "#52525b", fontSize: 11 }}
+                tick={{ fill: "#484855", fontSize: 11 }}
                 tickFormatter={formatEur}
                 width={55}
               />
-              <Tooltip content={<CustomTooltip />} cursor={{ stroke: "rgba(129,140,248,0.2)", strokeWidth: 1 }} />
+              <Tooltip content={<CustomTooltip />} cursor={{ stroke: "rgba(56,189,248,0.15)", strokeWidth: 1 }} />
               <Area
                 type="monotone"
                 dataKey="revenue"
-                stroke="#818cf8"
-                strokeWidth={2}
+                stroke="#38bdf8"
+                strokeWidth={2.5}
                 fill="url(#revenueGradient)"
                 dot={false}
                 activeDot={{
-                  r: 4,
-                  fill: "#818cf8",
-                  stroke: "#1e1b4b",
-                  strokeWidth: 2,
+                  r: 5,
+                  fill: "#38bdf8",
+                  stroke: "#0a0a0f",
+                  strokeWidth: 3,
                 }}
               />
             </AreaChart>

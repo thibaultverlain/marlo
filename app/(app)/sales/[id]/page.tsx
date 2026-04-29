@@ -64,7 +64,7 @@ export default async function SaleDetailPage({ params }: { params: Promise<{ id:
         {invoice ? (
           <div className="flex items-center justify-between p-3 bg-zinc-800/50 rounded-lg">
             <div><p className="text-sm text-zinc-200">{invoice.invoiceNumber}</p><p className="text-[11px] text-zinc-500 mt-0.5">Émise le {formatDate(invoice.createdAt)} · {formatCurrency(invoice.amountTtc)}</p></div>
-            <Link href={`/invoices/${invoice.id}`} className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-colors"><Eye size={14} />Voir</Link>
+            <Link href={`/invoices/${invoice.id}`} className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-cyan-400 hover:bg-cyan-400/10 rounded-lg transition-colors"><Eye size={14} />Voir</Link>
           </div>
         ) : customer ? <><p className="text-sm text-zinc-500 mb-4">Aucune facture.</p><SaleActions saleId={sale.id} /></> : <p className="text-sm text-zinc-600">Ajoute un client pour facturer.</p>}
       </div>

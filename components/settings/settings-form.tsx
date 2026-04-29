@@ -91,7 +91,7 @@ export default function SettingsForm({ initialData }: { initialData: ShopSetting
       </div>
 
       <div className="flex items-center justify-end gap-3 pb-8">
-        <button type="submit" disabled={isPending} className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-500 transition-colors disabled:opacity-50"><Save size={16} />{isPending ? "..." : "Enregistrer"}</button>
+        <button type="submit" disabled={isPending} className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-cyan-500 rounded-lg hover:bg-cyan-400 transition-colors disabled:opacity-50"><Save size={16} />{isPending ? "..." : "Enregistrer"}</button>
       </div>
     </form>
   );

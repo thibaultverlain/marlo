@@ -27,7 +27,7 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
         <div className="card-static p-5"><p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-1">État</p><p className="text-lg font-semibold text-white">{st.label}</p>{invoice.paidAt && <p className="text-[11px] text-zinc-600 mt-0.5">Payée le {formatDate(invoice.paidAt)}</p>}</div>
       </div>
       <div className="card-static overflow-hidden">
-        <div className="px-6 py-3 border-b border-[var(--color-border)] flex items-center justify-between"><p className="text-sm font-medium text-zinc-300">Aperçu</p><a href={`/api/invoices/${invoice.id}/pdf`} target="_blank" rel="noopener noreferrer" className="text-xs text-indigo-400 hover:text-indigo-300 font-medium">Ouvrir en grand</a></div>
+        <div className="px-6 py-3 border-b border-[var(--color-border)] flex items-center justify-between"><p className="text-sm font-medium text-zinc-300">Aperçu</p><a href={`/api/invoices/${invoice.id}/pdf`} target="_blank" rel="noopener noreferrer" className="text-xs text-cyan-400 hover:text-cyan-300 font-medium">Ouvrir en grand</a></div>
         <iframe src={`/api/invoices/${invoice.id}/pdf`} className="w-full h-[500px] lg:h-[900px] border-0 bg-white" title="Aperçu facture" />
       </div>
       <InvoiceActions invoiceId={invoice.id} status={invoice.status ?? "brouillon"} />

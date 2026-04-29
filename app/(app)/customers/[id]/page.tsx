@@ -151,7 +151,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
         {metrics.topBrands.length > 0 && (
           <div className="card-static p-6">
             <h2 className="text-[15px] font-semibold text-white mb-4 flex items-center gap-2">
-              <TrendingUp size={15} className="text-indigo-400" />
+              <TrendingUp size={15} className="text-cyan-400" />
               Marques préférées
             </h2>
             <div className="space-y-3">

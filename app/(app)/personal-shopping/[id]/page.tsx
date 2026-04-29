@@ -24,7 +24,7 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 lg:gap-4">
         <div className="card-static p-5"><p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Articles</p><p className="text-2xl font-semibold text-white">{items.length}</p></div>
         <div className="card-static p-5"><p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Total</p><p className="text-2xl font-semibold text-white tabular-nums">{formatCurrency(mission.totalPurchased)}</p></div>
-        <div className="card-static p-5"><p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Commissions</p><p className="text-2xl font-semibold text-indigo-400 tabular-nums">{formatCurrency(mission.totalCommission)}</p></div>
+        <div className="card-static p-5"><p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Commissions</p><p className="text-2xl font-semibold text-cyan-400 tabular-nums">{formatCurrency(mission.totalCommission)}</p></div>
       </div>
       <MissionDetailClient missionId={mission.id} missionStatus={mission.status??"planifie"} customerGroups={Object.values(itemsByCustomer)} customers={customers.map((c)=>({id:c.id,name:`${c.firstName} ${c.lastName}`,vip:c.vip??false}))} />
       {mission.notes&&<div className="card-static p-6"><h2 className="text-[15px] font-semibold text-white mb-3">Notes</h2><p className="text-sm text-zinc-400 whitespace-pre-line">{mission.notes}</p></div>}

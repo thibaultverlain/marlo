@@ -60,18 +60,54 @@ async function getAllTimeStats(userId: string) {
   };
 }
 
-function StatCard({ label, value, sub, accent }: {
+function StatCard({ label, value, sub, icon, accent }: {
   label: string;
   value: string;
   sub?: string;
+  icon?: React.ReactNode;
   accent?: "success" | "danger" | "default";
 }) {
   const accentColor = accent === "success" ? "text-emerald-400" : accent === "danger" ? "text-red-400" : "text-white";
   return (
-    <div className="kpi-card p-5">
-      <p className="stat-label">{label}</p>
-      <p className={`stat-value ${accentColor}`}>{value}</p>
-      {sub && <p className="text-[11px] text-zinc-600 mt-1.5">{sub}</p>}
+    <div className="kpi-card p-5 flex items-start gap-4">
+      {icon && (
+        <div className="icon-circle icon-circle-accent">
+          {icon}
+        </div>
+      )}
+      <div>
+        <p className="stat-label">{label}</p>
+        <p className={`stat-value ${accentColor}`}>{value}</p>
+        {sub && <p className="text-[11px] text-zinc-600 mt-1.5">{sub}</p>}
+      </div>
+    </div>
+  );
+}
+
+function FeaturedStat({ label, value, sub, comparisons }: {
+  label: string;
+  value: string;
+  sub?: string;
+  comparisons?: { label: string; value: string; change: string; positive: boolean }[];
+}) {
+  return (
+    <div className="kpi-featured p-6">
+      <p className="text-[13px] font-medium text-zinc-400 mb-1">{label}</p>
+      <p className="stat-value-lg gradient-text">{value}</p>
+      {sub && <p className="text-[11px] text-zinc-600 mt-2">{sub}</p>}
+      {comparisons && comparisons.length > 0 && (
+        <div className="flex gap-6 mt-4 pt-4 border-t border-[var(--color-border-subtle)]">
+          {comparisons.map((c, i) => (
+            <div key={i}>
+              <p className="text-[10px] text-zinc-600 uppercase tracking-wider">{c.label}</p>
+              <div className="flex items-baseline gap-2 mt-1">
+                <span className="text-sm text-zinc-400 tabular-nums">{c.value}</span>
+                <span className={c.positive ? "change-positive" : "change-negative"}>{c.change}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -89,7 +125,7 @@ function EmptyState() {
         <Package size={40} className="mx-auto text-zinc-700 mb-3" />
         <h2 className="text-xl text-white mb-2">Bienvenue sur Marlo</h2>
         <p className="text-zinc-500 mb-6 max-w-md mx-auto text-sm">Commence par ajouter tes articles en stock.</p>
-        <Link href="/products/new" className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-500 transition-colors">Ajouter mon premier article</Link>
+        <Link href="/products/new" className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-cyan-500 rounded-lg hover:bg-cyan-400 transition-colors">Ajouter mon premier article</Link>
       </div>
     </div>
   );
@@ -121,25 +157,35 @@ export default async function DashboardPage() {
         </p>
       </div>
 
-      {/* KPIs du jour */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+      {/* KPIs */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 lg:gap-4">
+        <div className="lg:col-span-2">
+          <FeaturedStat
+            label="Chiffre d'affaires total"
+            value={formatCurrency(allTimeStats.revenue)}
+            sub={`${allTimeStats.count} vente${allTimeStats.count > 1 ? "s" : ""}`}
+            comparisons={[
+              { label: "Aujourd'hui", value: formatCurrency(todayStats.revenue), change: `${todayStats.count} vente${todayStats.count > 1 ? "s" : ""}`, positive: todayStats.count > 0 },
+            ]}
+          />
+        </div>
         <StatCard
-          label="CA aujourd'hui"
-          value={formatCurrency(todayStats.revenue)}
-          sub={`${todayStats.count} vente${todayStats.count > 1 ? "s" : ""}`}
+          label="Marge totale"
+          value={formatCurrency(allTimeStats.margin)}
+          icon={<TrendingUp size={18} />}
+          accent="success"
+        />
+        <StatCard
+          label="Articles en stock"
+          value={String(stockStats.inStock ?? 0)}
+          sub={formatCurrency(Number(stockStats.totalValue ?? 0))}
+          icon={<Package size={18} />}
         />
         <StatCard
           label="Marge aujourd'hui"
           value={formatCurrency(todayStats.margin)}
-        />
-        <StatCard
-          label="CA total"
-          value={formatCurrency(allTimeStats.revenue)}
-          sub={`${allTimeStats.count} vente${allTimeStats.count > 1 ? "s" : ""}`}
-        />
-        <StatCard
-          label="Marge totale"
-          value={formatCurrency(allTimeStats.margin)}
+          sub={`${todayStats.count} vente${todayStats.count > 1 ? "s" : ""}`}
+          icon={<TrendingUp size={18} />}
         />
       </div>
 
@@ -218,7 +264,7 @@ export default async function DashboardPage() {
         <div className="card-static p-6">
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-[15px] font-semibold text-white">Dernières ventes</h2>
-            <Link href="/sales" className="text-xs text-indigo-400 hover:text-indigo-300 font-medium transition-colors">Voir tout</Link>
+            <Link href="/sales" className="text-xs text-cyan-400 hover:text-cyan-300 font-medium transition-colors">Voir tout</Link>
           </div>
           {recentSales.length === 0 ? (
             <p className="text-sm text-zinc-600">Aucune vente</p>

@@ -21,7 +21,7 @@ export default function SaleActions({ saleId }: { saleId: string }) {
   return (
     <div>
       {error && <div className="flex items-start gap-2 p-3 mb-3 bg-red-500/10 border border-red-500/20 rounded-lg text-sm text-red-400"><AlertCircle size={16} className="flex-shrink-0 mt-0.5" /><span>{error}</span></div>}
-      <button onClick={handleGenerate} disabled={isPending} className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-500 transition-colors disabled:opacity-50"><FileText size={16} />{isPending ? "Génération..." : "Générer la facture"}</button>
+      <button onClick={handleGenerate} disabled={isPending} className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-cyan-500 rounded-lg hover:bg-cyan-400 transition-colors disabled:opacity-50"><FileText size={16} />{isPending ? "Génération..." : "Générer la facture"}</button>
     </div>
   );
 }

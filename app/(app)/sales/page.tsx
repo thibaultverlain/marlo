@@ -14,7 +14,7 @@ function ChannelBadge({ channel }: { channel: string }) {
   const ch = CHANNELS.find((c) => c.value === channel);
   const colors: Record<string, string> = {
     vinted: "bg-teal-500/10 text-teal-400", vestiaire: "bg-orange-500/10 text-orange-400",
-    stockx: "bg-emerald-500/10 text-emerald-400", prive: "bg-indigo-500/10 text-indigo-400",
+    stockx: "bg-emerald-500/10 text-emerald-400", prive: "bg-cyan-500/10 text-cyan-400",
     autre: "bg-zinc-500/10 text-zinc-400",
   };
   return <span className={`inline-flex px-2 py-0.5 rounded-md text-[11px] font-medium ${colors[channel] || colors.autre}`}>{ch?.label ?? channel}</span>;
@@ -83,7 +83,7 @@ export default async function SalesPage({ searchParams }: { searchParams: Promis
             {salesData.length} vente{salesData.length > 1 ? "s" : ""} · CA {formatCurrency(totalRevenue)} · Marge {formatCurrency(totalMargin)}
           </p>
         </div>
-        <Link href="/sales/new" className="flex items-center gap-2 px-4 py-2 text-[13px] font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-500 transition-colors">
+        <Link href="/sales/new" className="flex items-center gap-2 px-4 py-2 text-[13px] font-medium text-white bg-cyan-500 rounded-lg hover:bg-cyan-400 transition-colors">
           <Plus size={14} />Enregistrer
         </Link>
       </div>
