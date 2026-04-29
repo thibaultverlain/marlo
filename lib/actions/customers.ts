@@ -1,5 +1,5 @@
 "use server";
-import { getCurrentUserId } from "@/lib/auth/get-user";
+import { getAuthContext } from "@/lib/auth/require-role";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -43,8 +43,8 @@ export async function createCustomerAction(formData: FormData) {
   }
 
   try {
-    const userId = await getCurrentUserId();
-    await createCustomer({ userId,
+    const ctx = await getAuthContext();
+    await createCustomer({ userId: ctx.userId, shopId: ctx.shopId,
       firstName: parsed.data.firstName,
       lastName: parsed.data.lastName,
       email: parsed.data.email && parsed.data.email.length > 0 ? parsed.data.email : null,

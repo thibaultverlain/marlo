@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Plus, Upload, Package, FileDown } from "lucide-react";
 import { getInStockProducts, getAllProducts, getStockStats } from "@/lib/db/queries/products";
 import { daysSince, formatCurrency } from "@/lib/utils";
-import { getCurrentUserId } from "@/lib/auth/get-user";
+import { getAuthContext } from "@/lib/auth/require-role";
 import ProductsList from "@/components/products/products-list";
 
 export const dynamic = "force-dynamic";
@@ -10,10 +10,10 @@ export const dynamic = "force-dynamic";
 export default async function ProductsPage({ searchParams }: { searchParams: Promise<{ show?: string }> }) {
   const sp = await searchParams;
   const showAll = sp.show === "all";
-  const userId = await getCurrentUserId();
+  const { userId, shopId } = await getAuthContext();
   const [products, stats] = await Promise.all([
-    showAll ? getAllProducts(userId) : getInStockProducts(userId),
-    getStockStats(userId),
+    showAll ? getAllProducts(shopId) : getInStockProducts(shopId),
+    getStockStats(shopId),
   ]);
 
   const stockValue = Number(stats?.totalValue ?? 0);

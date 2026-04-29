@@ -1,4 +1,4 @@
-import { getCurrentUserId } from "@/lib/auth/get-user";
+import { getAuthContext } from "@/lib/auth/require-role";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { getRecipeBook, getPurchasesRegister, getAccountingStats } from "@/lib/db/queries/accounting";
 import { formatCurrency } from "@/lib/utils";
@@ -10,8 +10,8 @@ export default async function AccountingPage({ searchParams }: { searchParams: P
   const sp = await searchParams;
   const year = sp.year ? parseInt(sp.year, 10) : new Date().getFullYear();
   const tab = sp.tab ?? "recipes";
-  const userId = await getCurrentUserId();
-  const [recipes, purchasesRows, stats] = await Promise.all([getRecipeBook(userId, year), getPurchasesRegister(userId, year), getAccountingStats(userId, year)]);
+  const { userId, shopId } = await getAuthContext();
+  const [recipes, purchasesRows, stats] = await Promise.all([getRecipeBook(shopId, year), getPurchasesRegister(shopId, year), getAccountingStats(shopId, year)]);
   const benefit = stats.revenue - stats.expenses;
   const currentYear = new Date().getFullYear();
 

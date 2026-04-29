@@ -1,4 +1,4 @@
-import { getCurrentUserId } from "@/lib/auth/get-user";
+import { getAuthContext } from "@/lib/auth/require-role";
 import Link from "next/link";
 import { Plus, ShoppingCart } from "lucide-react";
 import { db } from "@/lib/db/client";
@@ -43,8 +43,8 @@ async function getSalesForPeriod(userId: string, period: string) {
   }
 
   const conditions = startDate 
-    ? and(eq(sales.userId, userId), gte(sales.soldAt, startDate)) 
-    : eq(sales.userId, userId);
+    ? and(eq(sales.shopId, shopId), gte(sales.soldAt, startDate)) 
+    : eq(sales.shopId, shopId);
 
   const rows = await db
     .select({
@@ -70,7 +70,7 @@ async function getSalesForPeriod(userId: string, period: string) {
 export default async function SalesPage({ searchParams }: { searchParams: Promise<{ period?: string }> }) {
   const sp = await searchParams;
   const period = sp.period ?? "all";
-  const userId = await getCurrentUserId();
+  const { userId, shopId } = await getAuthContext();
   const salesData = await getSalesForPeriod(userId, period);
 
   const totalRevenue = salesData.reduce((s, v) => s + (Number(v.salePrice) || 0), 0);

@@ -1,4 +1,4 @@
-import { getCurrentUserId } from "@/lib/auth/get-user";
+import { getAuthContext } from "@/lib/auth/require-role";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { getAllCustomers } from "@/lib/db/queries/customers";
@@ -6,8 +6,8 @@ import NewSourcingForm from "@/components/sourcing/new-sourcing-form";
 export const dynamic = "force-dynamic";
 
 export default async function NewSourcingPage() {
-  const userId = await getCurrentUserId();
-  const customers = await getAllCustomers(userId);
+  const { userId, shopId } = await getAuthContext();
+  const customers = await getAllCustomers(shopId);
   return (
     <div className="max-w-2xl space-y-6">
       <div className="flex items-center gap-4">

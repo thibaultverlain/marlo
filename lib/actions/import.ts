@@ -1,5 +1,5 @@
 "use server";
-import { getCurrentUserId } from "@/lib/auth/get-user";
+import { getAuthContext } from "@/lib/auth/require-role";
 
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db/client";
@@ -31,8 +31,8 @@ export async function bulkImportProducts(rows: ImportRow[]): Promise<
   if (rows.length === 0) return { error: "Aucune donnée à importer" };
 
   try {
-    const userId = await getCurrentUserId();
-    const firstSku = await getNextSku(userId);
+    const ctx = await getAuthContext();
+    const firstSku = await getNextSku(ctx.shopId);
     const firstSkuNum = parseInt(firstSku.split("-")[1], 10);
 
     const valuesToInsert = rows
@@ -45,6 +45,8 @@ export async function bulkImportProducts(rows: ImportRow[]): Promise<
 
         return {
           sku,
+          userId: ctx.userId,
+          shopId: ctx.shopId,
           title: row.title,
           brand: row.brand,
           model: row.model ?? null,

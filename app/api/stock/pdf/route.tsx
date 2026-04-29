@@ -1,18 +1,18 @@
-import { requireAuth } from "@/lib/auth/require-auth";
+import { getAuthContext } from "@/lib/auth/require-role";
 import { NextRequest, NextResponse } from "next/server";
 import { renderToBuffer } from "@react-pdf/renderer";
 import React from "react";
 import { db } from "@/lib/db/client";
 import { products } from "@/lib/db/schema";
-import { inArray } from "drizzle-orm";
+import { inArray, eq, and } from "drizzle-orm";
 import { getShopSettings } from "@/lib/db/queries/settings";
 import { StockCatalogPDF } from "@/lib/stock/pdf-catalog";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
-  const auth = await requireAuth();
-  if (auth instanceof NextResponse) return auth;
+  let ctx;
+  try { ctx = await getAuthContext(); } catch { return NextResponse.json({ error: "Non autorisé" }, { status: 401 }); }
 
   try {
     const includeAll = req.nextUrl.searchParams.get("all") === "1";
@@ -23,10 +23,9 @@ export async function GET(req: NextRequest) {
     const rows = await db
       .select()
       .from(products)
-      .where(inArray(products.status, [...statuses]));
+      .where(and(eq(products.shopId, ctx.shopId), inArray(products.status, [...statuses])));
 
-    const userId = (auth as any).user.id;
-    const settings = await getShopSettings(userId);
+    const settings = await getShopSettings(ctx.shopId);
 
     const pdfProducts = rows.map((p) => ({
       sku: p.sku,

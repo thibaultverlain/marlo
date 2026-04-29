@@ -1,49 +1,36 @@
-import { requireAuth } from "@/lib/auth/require-auth";
+import { getAuthContext } from "@/lib/auth/require-role";
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
 import { products, sourcingRequests } from "@/lib/db/schema";
-import { sql, and, inArray } from "drizzle-orm";
+import { sql, and, inArray, eq } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const auth = await requireAuth();
-  if (auth instanceof NextResponse) return auth;
+  let ctx;
+  try { ctx = await getAuthContext(); } catch { return NextResponse.json({ alerts: [], count: 0 }); }
 
   try {
-    const [dormantRows, deadlineRows, shippingRows] = await Promise.all([
-      // Dormant products (> 30 days in stock)
+    const [dormantRows, deadlineRows] = await Promise.all([
       db
-        .select({
-          count: sql<number>`count(*)::int`,
-        })
+        .select({ count: sql<number>`count(*)::int` })
         .from(products)
         .where(
           and(
+            eq(products.shopId, ctx.shopId),
             inArray(products.status, ["en_stock", "en_vente"]),
             sql`created_at < NOW() - INTERVAL '30 days'`
           )
         ),
-      // Sourcing deadlines within 7 days
       db
-        .select({
-          count: sql<number>`count(*)::int`,
-        })
+        .select({ count: sql<number>`count(*)::int` })
         .from(sourcingRequests)
         .where(
           and(
+            eq(sourcingRequests.shopId, ctx.shopId),
             inArray(sourcingRequests.status, ["ouvert", "en_recherche"]),
             sql`deadline IS NOT NULL AND deadline <= NOW() + INTERVAL '7 days'`
           )
-        ),
-      // Pending shipments
-      db
-        .select({
-          count: sql<number>`count(*)::int`,
-        })
-        .from(products)
-        .where(
-          sql`status = 'vendu'`
         ),
     ]);
 

@@ -7,12 +7,12 @@ import { sql, gte, lte, and, eq } from "drizzle-orm";
 import { getRecentSales, getPendingShipments, getCurrentMonthStats } from "@/lib/db/queries/sales";
 import { getStockStats } from "@/lib/db/queries/products";
 import { getActiveSourcingCount } from "@/lib/db/queries/sourcing";
-import { getCurrentUserId } from "@/lib/auth/get-user";
+import { getAuthContext } from "@/lib/auth/require-role";
 import RevenueChart from "@/components/dashboard/revenue-chart";
 
 export const dynamic = "force-dynamic";
 
-async function getTodayStats(userId: string) {
+async function getTodayStats(shopId: string) {
   const now = new Date();
   const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
@@ -23,11 +23,11 @@ async function getTodayStats(userId: string) {
       count: sql<number>`count(*)::int`,
     })
     .from(sales)
-    .where(and(eq(sales.userId, userId), gte(sales.soldAt, startOfDay), lte(sales.soldAt, endOfDay)));
+    .where(and(eq(sales.shopId, shopId), gte(sales.soldAt, startOfDay), lte(sales.soldAt, endOfDay)));
   return rows[0] ?? { revenue: 0, margin: 0, count: 0 };
 }
 
-async function getAllTimeStats(userId: string) {
+async function getAllTimeStats(shopId: string) {
   const rows = await db
     .select({
       revenue: sql<number>`coalesce(sum(sale_price), 0)::numeric`,
@@ -36,20 +36,20 @@ async function getAllTimeStats(userId: string) {
       avgMarginPct: sql<number>`coalesce(avg(margin_pct), 0)::numeric`,
     })
     .from(sales)
-    .where(eq(sales.userId, userId));
+    .where(eq(sales.shopId, shopId));
   return rows[0] ?? { revenue: 0, margin: 0, count: 0, avgMarginPct: 0 };
 }
 
 export default async function DashboardPage() {
-  const userId = await getCurrentUserId();
+  const { userId, shopId } = await getAuthContext();
   const [todayStats, allTimeStats, stockStats, monthStats, recentSales, pendingShipments, activeSourcing] = await Promise.all([
-    getTodayStats(userId),
-    getAllTimeStats(userId),
-    getStockStats(userId),
-    getCurrentMonthStats(userId),
-    getRecentSales(userId, 8),
-    getPendingShipments(userId),
-    getActiveSourcingCount(userId),
+    getTodayStats(shopId),
+    getAllTimeStats(shopId),
+    getStockStats(shopId),
+    getCurrentMonthStats(shopId),
+    getRecentSales(shopId, 8),
+    getPendingShipments(shopId),
+    getActiveSourcingCount(shopId),
   ]);
 
   const totalRevenue = Number(allTimeStats.revenue);

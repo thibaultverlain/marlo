@@ -2,8 +2,8 @@ import { db } from "../client";
 import { customers, type NewCustomer, type Customer } from "../schema";
 import { eq, desc, sql } from "drizzle-orm";
 
-export async function getAllCustomers(userId: string): Promise<Customer[]> {
-  return db.select().from(customers).where(eq(customers.userId, userId)).orderBy(desc(customers.createdAt));
+export async function getAllCustomers(shopId: string): Promise<Customer[]> {
+  return db.select().from(customers).where(eq(customers.shopId, shopId)).orderBy(desc(customers.createdAt));
 }
 
 export async function getCustomerById(id: string): Promise<Customer | undefined> {
@@ -11,14 +11,14 @@ export async function getCustomerById(id: string): Promise<Customer | undefined>
   return rows[0];
 }
 
-export async function getCustomerStats(userId: string) {
+export async function getCustomerStats(shopId: string) {
   const rows = await db
     .select({
       total: sql<number>`count(*)::int`,
       vipCount: sql<number>`count(*) filter (where vip = true)::int`,
     })
     .from(customers)
-    .where(eq(customers.userId, userId));
+    .where(eq(customers.shopId, shopId));
   return rows[0] ?? { total: 0, vipCount: 0 };
 }
 

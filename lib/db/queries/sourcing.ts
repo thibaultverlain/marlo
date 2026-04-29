@@ -11,13 +11,13 @@ export type SourcingWithCustomer = SourcingRequest & {
   foundProductSku: string | null;
 };
 
-export async function getAllSourcing(userId: string): Promise<SourcingWithCustomer[]> {
+export async function getAllSourcing(shopId: string): Promise<SourcingWithCustomer[]> {
   const rows = await db
     .select({ req: sourcingRequests, customer: customers, product: products })
     .from(sourcingRequests)
     .leftJoin(customers, eq(sourcingRequests.customerId, customers.id))
     .leftJoin(products, eq(sourcingRequests.foundProductId, products.id))
-    .where(eq(sourcingRequests.userId, userId))
+    .where(eq(sourcingRequests.shopId, shopId))
     .orderBy(desc(sourcingRequests.createdAt));
 
   return rows.map((r) => ({
@@ -49,20 +49,20 @@ export async function getSourcingById(id: string): Promise<SourcingWithCustomer 
   };
 }
 
-export async function getActiveSourcingCount(userId: string): Promise<number> {
+export async function getActiveSourcingCount(shopId: string): Promise<number> {
   const rows = await db
     .select({ count: sql<number>`count(*)::int` })
     .from(sourcingRequests)
-    .where(and(eq(sourcingRequests.userId, userId), inArray(sourcingRequests.status, ["ouvert", "en_recherche"])));
+    .where(and(eq(sourcingRequests.shopId, shopId), inArray(sourcingRequests.status, ["ouvert", "en_recherche"])));
   return rows[0]?.count ?? 0;
 }
 
-export async function getUpcomingSourcingDeadlines(userId: string, daysAhead: number = 7): Promise<number> {
+export async function getUpcomingSourcingDeadlines(shopId: string, daysAhead: number = 7): Promise<number> {
   const rows = await db
     .select({ count: sql<number>`count(*)::int` })
     .from(sourcingRequests)
     .where(and(
-      eq(sourcingRequests.userId, userId),
+      eq(sourcingRequests.shopId, shopId),
       inArray(sourcingRequests.status, ["ouvert", "en_recherche"]),
       sql`deadline IS NOT NULL AND deadline <= NOW() + make_interval(days => ${daysAhead})`
     ));
@@ -87,7 +87,7 @@ export async function deleteSourcingRequest(id: string): Promise<void> {
   await db.delete(sourcingRequests).where(eq(sourcingRequests.id, id));
 }
 
-export async function getSourcingStats(userId: string) {
+export async function getSourcingStats(shopId: string) {
   const stats = await db
     .select({
       active: sql<number>`count(*) filter (where status in ('ouvert', 'en_recherche'))::int`,
@@ -96,7 +96,7 @@ export async function getSourcingStats(userId: string) {
       totalCommissions: sql<number>`coalesce(sum(commission_amount), 0)::numeric`,
     })
     .from(sourcingRequests)
-    .where(eq(sourcingRequests.userId, userId));
+    .where(eq(sourcingRequests.shopId, shopId));
 
   return {
     active: stats[0]?.active ?? 0, found: stats[0]?.found ?? 0,

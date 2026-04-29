@@ -1,6 +1,13 @@
-import { pgTable, uuid, text, timestamp, decimal, integer, boolean, pgEnum, date } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, timestamp, decimal, integer, boolean, pgEnum, date, uniqueIndex } from "drizzle-orm/pg-core";
 
 // ── Enums ──────────────────────────────────────────────
+
+export const teamRoleEnum = pgEnum("team_role", [
+  "owner", "manager", "seller"
+]);
+export const invitationStatusEnum = pgEnum("invitation_status", [
+  "pending", "accepted", "expired", "revoked"
+]);
 
 export const productCategoryEnum = pgEnum("product_category", [
   "sacs", "chaussures", "vetements", "accessoires", "montres", "bijoux", "autre"
@@ -48,6 +55,7 @@ export const shippingPaidByEnum = pgEnum("shipping_paid_by", [
 export const products = pgTable("products", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").notNull(),
+  shopId: uuid("shop_id").references(() => shops.id),
   sku: text("sku").notNull(),
   title: text("title").notNull(),
   brand: text("brand").notNull(),
@@ -76,6 +84,7 @@ export const products = pgTable("products", {
 export const sales = pgTable("sales", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").notNull(),
+  shopId: uuid("shop_id").references(() => shops.id),
   productId: uuid("product_id").references(() => products.id),
   customerId: uuid("customer_id").references(() => customers.id),
   channel: saleChannelEnum("channel").notNull(),
@@ -99,6 +108,7 @@ export const sales = pgTable("sales", {
 export const customers = pgTable("customers", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").notNull(),
+  shopId: uuid("shop_id").references(() => shops.id),
   firstName: text("first_name").notNull(),
   lastName: text("last_name").notNull(),
   email: text("email"),
@@ -121,6 +131,7 @@ export const customers = pgTable("customers", {
 export const invoices = pgTable("invoices", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").notNull(),
+  shopId: uuid("shop_id").references(() => shops.id),
   invoiceNumber: text("invoice_number").notNull().unique(),
   type: invoiceTypeEnum("type").notNull(),
   customerId: uuid("customer_id").references(() => customers.id),
@@ -142,6 +153,7 @@ export const invoices = pgTable("invoices", {
 export const sourcingRequests = pgTable("sourcing_requests", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").notNull(),
+  shopId: uuid("shop_id").references(() => shops.id),
   customerId: uuid("customer_id").references(() => customers.id),
   description: text("description").notNull(),
   brand: text("brand"),
@@ -162,6 +174,7 @@ export const sourcingRequests = pgTable("sourcing_requests", {
 export const personalShoppingMissions = pgTable("personal_shopping_missions", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").notNull(),
+  shopId: uuid("shop_id").references(() => shops.id),
   name: text("name").notNull(),
   eventDate: date("event_date"),
   location: text("location"),
@@ -175,6 +188,7 @@ export const personalShoppingMissions = pgTable("personal_shopping_missions", {
 export const psItems = pgTable("ps_items", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").notNull(),
+  shopId: uuid("shop_id").references(() => shops.id),
   missionId: uuid("mission_id").references(() => personalShoppingMissions.id).notNull(),
   customerId: uuid("customer_id").references(() => customers.id).notNull(),
   description: text("description").notNull(),
@@ -190,6 +204,7 @@ export const psItems = pgTable("ps_items", {
 export const purchases = pgTable("purchases", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").notNull(),
+  shopId: uuid("shop_id").references(() => shops.id),
   productId: uuid("product_id").references(() => products.id),
   description: text("description").notNull(),
   supplier: text("supplier"),
@@ -204,6 +219,7 @@ export const purchases = pgTable("purchases", {
 export const shopSettings = pgTable("shop_settings", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").notNull(),
+  shopId: uuid("shop_id").references(() => shops.id),
   legalName: text("legal_name").notNull(),
   commercialName: text("commercial_name"),
   legalStatus: text("legal_status"),
@@ -232,6 +248,48 @@ export const shopSettings = pgTable("shop_settings", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// ── Shops & Team ──────────────────────────────────────
+
+export const shops = pgTable("shops", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  name: text("name").notNull(),
+  ownerId: uuid("owner_id").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const teamMembers = pgTable("team_members", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  shopId: uuid("shop_id").references(() => shops.id).notNull(),
+  userId: uuid("user_id").notNull(),
+  role: teamRoleEnum("role").notNull().default("seller"),
+  joinedAt: timestamp("joined_at").defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex("team_members_shop_user_idx").on(table.shopId, table.userId),
+]);
+
+export const teamInvitations = pgTable("team_invitations", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  shopId: uuid("shop_id").references(() => shops.id).notNull(),
+  email: text("email").notNull(),
+  role: teamRoleEnum("role").notNull().default("seller"),
+  invitedBy: uuid("invited_by").notNull(),
+  status: invitationStatusEnum("status").notNull().default("pending"),
+  token: text("token").notNull().unique(),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const activityLog = pgTable("activity_log", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  shopId: uuid("shop_id").references(() => shops.id).notNull(),
+  userId: uuid("user_id").notNull(),
+  action: text("action").notNull(),
+  entity: text("entity"),
+  entityId: uuid("entity_id"),
+  details: text("details"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // ── Types ──────────────────────────────────────────────
 
 export type Product = typeof products.$inferSelect;
@@ -248,3 +306,8 @@ export type PsItem = typeof psItems.$inferSelect;
 export type Purchase = typeof purchases.$inferSelect;
 export type ShopSettings = typeof shopSettings.$inferSelect;
 export type NewShopSettings = typeof shopSettings.$inferInsert;
+export type Shop = typeof shops.$inferSelect;
+export type TeamMember = typeof teamMembers.$inferSelect;
+export type TeamInvitation = typeof teamInvitations.$inferSelect;
+export type ActivityLogEntry = typeof activityLog.$inferSelect;
+export type TeamRole = "owner" | "manager" | "seller";

@@ -2,14 +2,14 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
 import { products, sales } from "@/lib/db/schema";
 import { eq, desc, sql, and, inArray } from "drizzle-orm";
-import { requireAuth } from "@/lib/auth/require-auth";
+import { getAuthContext } from "@/lib/auth/require-role";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const auth = await requireAuth();
-  if (auth instanceof NextResponse) return auth;
-  const userId = (auth as any).user.id;
+  let ctx;
+  try { ctx = await getAuthContext(); } catch { return NextResponse.json({ error: "Non autorisé" }, { status: 401 }); }
+  const shopId = ctx.shopId;
 
   try {
     const velocityRows = await db
@@ -17,7 +17,7 @@ export async function GET() {
         avgDays: sql<number>`coalesce(avg(extract(epoch from (s.sold_at - p.created_at)) / 86400), 0)::numeric`, count: sql<number>`count(*)::int` })
       .from(sales)
       .innerJoin(products, eq(sales.productId, products.id))
-      .where(eq(sales.userId, userId))
+      .where(eq(sales.shopId, shopId))
       .groupBy(products.brand, products.category)
       .orderBy(sql`avg(extract(epoch from (s.sold_at - p.created_at)) / 86400)`)
       .limit(15);
@@ -26,7 +26,7 @@ export async function GET() {
       .select({ month: sql<number>`extract(month from sold_at)::int`, year: sql<number>`extract(year from sold_at)::int`,
         revenue: sql<number>`coalesce(sum(sale_price), 0)::numeric`, margin: sql<number>`coalesce(sum(margin), 0)::numeric`, count: sql<number>`count(*)::int` })
       .from(sales)
-      .where(eq(sales.userId, userId))
+      .where(eq(sales.shopId, shopId))
       .groupBy(sql`extract(year from sold_at)`, sql`extract(month from sold_at)`)
       .orderBy(sql`extract(year from sold_at)`, sql`extract(month from sold_at)`);
 
@@ -34,7 +34,7 @@ export async function GET() {
       .select({ title: products.title, brand: products.brand, salePrice: sales.salePrice, margin: sales.margin, marginPct: sales.marginPct, purchasePrice: products.purchasePrice })
       .from(sales)
       .innerJoin(products, eq(sales.productId, products.id))
-      .where(eq(sales.userId, userId))
+      .where(eq(sales.shopId, shopId))
       .orderBy(desc(sales.margin))
       .limit(10);
 
@@ -44,7 +44,7 @@ export async function GET() {
         avgVelocity: sql<number>`coalesce(avg(extract(epoch from (s.sold_at - p.created_at)) / 86400), 0)::numeric` })
       .from(sales)
       .innerJoin(products, eq(sales.productId, products.id))
-      .where(eq(sales.userId, userId))
+      .where(eq(sales.shopId, shopId))
       .groupBy(products.brand)
       .orderBy(desc(sql`sum(margin)`))
       .limit(10);
@@ -54,7 +54,7 @@ export async function GET() {
         avgMarginPct: sql<number>`coalesce(avg(margin_pct), 0)::numeric`, count: sql<number>`count(*)::int` })
       .from(sales)
       .innerJoin(products, eq(sales.productId, products.id))
-      .where(eq(sales.userId, userId))
+      .where(eq(sales.shopId, shopId))
       .groupBy(products.category)
       .orderBy(desc(sql`sum(margin)`));
 
@@ -62,7 +62,7 @@ export async function GET() {
       .select({ channel: sales.channel, avgMarginPct: sql<number>`coalesce(avg(margin_pct), 0)::numeric`,
         avgMargin: sql<number>`coalesce(avg(margin), 0)::numeric`, count: sql<number>`count(*)::int` })
       .from(sales)
-      .where(eq(sales.userId, userId))
+      .where(eq(sales.shopId, shopId))
       .groupBy(sales.channel)
       .orderBy(desc(sql`avg(margin_pct)`));
 
@@ -70,7 +70,7 @@ export async function GET() {
       .select({ id: products.id, title: products.title, brand: products.brand, purchasePrice: products.purchasePrice,
         targetPrice: products.targetPrice, daysInStock: sql<number>`extract(day from NOW() - created_at)::int` })
       .from(products)
-      .where(and(eq(products.userId, userId), inArray(products.status, ["en_stock", "en_vente"]), sql`created_at < NOW() - INTERVAL '30 days'`))
+      .where(and(eq(products.shopId, shopId), inArray(products.status, ["en_stock", "en_vente"]), sql`created_at < NOW() - INTERVAL '30 days'`))
       .orderBy(products.createdAt);
 
     return NextResponse.json({

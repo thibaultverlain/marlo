@@ -1,4 +1,4 @@
-import { getCurrentUserId } from "@/lib/auth/get-user";
+import { getAuthContext } from "@/lib/auth/require-role";
 import Link from "next/link";
 import { Plus, ShoppingBag, Calendar, MapPin } from "lucide-react";
 import { getAllMissions, getMissionStats } from "@/lib/db/queries/personal-shopping";
@@ -7,8 +7,8 @@ export const dynamic = "force-dynamic";
 const SM: Record<string, { label: string; cl: string }> = { planifie: { label: "Planifiée", cl: "bg-blue-500/15 text-blue-400" }, en_cours: { label: "En cours", cl: "bg-amber-500/15 text-amber-400" }, termine: { label: "Terminée", cl: "bg-emerald-500/15 text-emerald-400" }, facture: { label: "Facturée", cl: "bg-zinc-500/15 text-zinc-400" }, annule: { label: "Annulée", cl: "bg-red-500/15 text-red-400" } };
 
 export default async function PersonalShoppingPage() {
-  const userId = await getCurrentUserId();
-  const [missions, stats] = await Promise.all([getAllMissions(userId), getMissionStats(userId)]);
+  const { userId, shopId } = await getAuthContext();
+  const [missions, stats] = await Promise.all([getAllMissions(shopId), getMissionStats(shopId)]);
   return (
     <div className="space-y-6">
       <div className="flex items-start sm:items-center justify-between gap-3">

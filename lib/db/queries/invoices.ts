@@ -4,12 +4,12 @@ import { eq, desc, sql } from "drizzle-orm";
 
 export type InvoiceWithDetails = Invoice & { customerName: string | null; customerEmail: string | null };
 
-export async function getAllInvoices(userId: string): Promise<InvoiceWithDetails[]> {
+export async function getAllInvoices(shopId: string): Promise<InvoiceWithDetails[]> {
   const rows = await db
     .select({ inv: invoices, customer: customers })
     .from(invoices)
     .leftJoin(customers, eq(invoices.customerId, customers.id))
-    .where(eq(invoices.userId, userId))
+    .where(eq(invoices.shopId, shopId))
     .orderBy(desc(invoices.createdAt));
   return rows.map((r) => ({ ...r.inv, customerName: r.customer ? `${r.customer.firstName} ${r.customer.lastName}` : null, customerEmail: r.customer?.email ?? null }));
 }
@@ -41,7 +41,7 @@ export async function updateInvoice(id: string, data: Partial<NewInvoice>): Prom
   return rows[0];
 }
 
-export async function getInvoiceStats(userId: string) {
+export async function getInvoiceStats(shopId: string) {
   const stats = await db
     .select({
       total: sql<number>`count(*)::int`, totalAmount: sql<number>`coalesce(sum(amount_ttc), 0)::numeric`,
@@ -50,6 +50,6 @@ export async function getInvoiceStats(userId: string) {
       draft: sql<number>`count(*) filter (where status = 'brouillon')::int`,
     })
     .from(invoices)
-    .where(eq(invoices.userId, userId));
+    .where(eq(invoices.shopId, shopId));
   return { total: stats[0]?.total ?? 0, totalAmount: Number(stats[0]?.totalAmount ?? 0), paid: stats[0]?.paid ?? 0, sent: stats[0]?.sent ?? 0, draft: stats[0]?.draft ?? 0 };
 }

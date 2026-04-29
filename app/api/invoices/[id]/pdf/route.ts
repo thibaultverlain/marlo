@@ -4,20 +4,18 @@ import { getInvoiceWithSale } from "@/lib/db/queries/invoices";
 import { getProductById } from "@/lib/db/queries/products";
 import { getMissionItems } from "@/lib/db/queries/personal-shopping";
 import { generateInvoicePDF, type InvoiceLine } from "@/lib/invoice/pdf-generator";
-import { requireAuth } from "@/lib/auth/require-auth";
+import { getAuthContext } from "@/lib/auth/require-role";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const auth = await requireAuth();
-  if (auth instanceof NextResponse) return auth;
+  let ctx;
+  try { ctx = await getAuthContext(); } catch { return NextResponse.json({ error: "Non autorisé" }, { status: 401 }); }
 
   const { id } = await params;
 
   try {
-    const auth = await requireAuth(); if (auth instanceof NextResponse) return auth;
-  const userId = (auth as any).user.id;
-  const settings = await getShopSettings(userId);
+  const settings = await getShopSettings(ctx.shopId);
     if (!settings) {
       return NextResponse.json({ error: "Paramètres de facturation manquants" }, { status: 400 });
     }

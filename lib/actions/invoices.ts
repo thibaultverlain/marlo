@@ -1,5 +1,5 @@
 "use server";
-import { getCurrentUserId } from "@/lib/auth/get-user";
+import { getAuthContext } from "@/lib/auth/require-role";
 
 import { revalidatePath } from "next/cache";
 import { getSaleById } from "@/lib/db/queries/sales";
@@ -23,9 +23,9 @@ function computeVAT(settings: { vatSubject: boolean | null; vatRate: string | nu
 
 export async function generateInvoiceFromSaleAction(saleId: string) {
   try {
-    const userId = await getCurrentUserId();
+    const ctx = await getAuthContext();
     const [settings, sale] = await Promise.all([
-      getShopSettings(userId),
+      getShopSettings(ctx.shopId),
       getSaleById(saleId),
     ]);
 
@@ -38,10 +38,10 @@ export async function generateInvoiceFromSaleAction(saleId: string) {
     const customer = await getCustomerById(sale.customerId);
     if (!customer) return { error: "Client introuvable" };
 
-    const invoiceNumber = await getNextInvoiceNumber(userId);
+    const invoiceNumber = await getNextInvoiceNumber(ctx.shopId);
     const { vatRate, amountHT, vatAmount, amountTTC, vatMention } = computeVAT(settings, Number(sale.salePrice));
 
-    const invoice = await createInvoice({ userId: (await getCurrentUserId()),
+    const invoice = await createInvoice({ userId: ctx.userId, shopId: ctx.shopId,
       invoiceNumber,
       type: "vente",
       customerId: sale.customerId,
@@ -68,9 +68,9 @@ export async function generateInvoiceFromSaleAction(saleId: string) {
 
 export async function generateInvoiceFromSourcingAction(sourcingId: string) {
   try {
-    const userId = await getCurrentUserId();
+    const ctx = await getAuthContext();
     const [settings, sourcing] = await Promise.all([
-      getShopSettings(userId),
+      getShopSettings(ctx.shopId),
       getSourcingById(sourcingId),
     ]);
 
@@ -88,10 +88,10 @@ export async function generateInvoiceFromSourcingAction(sourcingId: string) {
     const customer = await getCustomerById(sourcing.customerId);
     if (!customer) return { error: "Client introuvable" };
 
-    const invoiceNumber = await getNextInvoiceNumber(userId);
+    const invoiceNumber = await getNextInvoiceNumber(ctx.shopId);
     const { vatRate, amountHT, vatAmount, amountTTC, vatMention } = computeVAT(settings, commissionAmount);
 
-    const invoice = await createInvoice({ userId: (await getCurrentUserId()),
+    const invoice = await createInvoice({ userId: ctx.userId, shopId: ctx.shopId,
       invoiceNumber,
       type: "sourcing",
       customerId: sourcing.customerId,
@@ -122,9 +122,9 @@ export async function generateInvoiceFromSourcingAction(sourcingId: string) {
 
 export async function generateInvoiceFromMissionAction(missionId: string) {
   try {
-    const userId = await getCurrentUserId();
+    const ctx = await getAuthContext();
     const [settings, mission, items] = await Promise.all([
-      getShopSettings(userId),
+      getShopSettings(ctx.shopId),
       getMissionById(missionId),
       getMissionItems(missionId),
     ]);
@@ -156,10 +156,10 @@ export async function generateInvoiceFromMissionAction(missionId: string) {
       const customerCommission = customerItems.reduce((s, i) => s + (i.commissionAmount ?? 0), 0);
       if (customerCommission <= 0) continue;
 
-      const invoiceNumber = await getNextInvoiceNumber(userId);
+      const invoiceNumber = await getNextInvoiceNumber(ctx.shopId);
       const { vatRate, amountHT, vatAmount, amountTTC, vatMention } = computeVAT(settings, customerCommission);
 
-      const invoice = await createInvoice({ userId: (await getCurrentUserId()),
+      const invoice = await createInvoice({ userId: ctx.userId, shopId: ctx.shopId,
         invoiceNumber,
         type: "personal_shopping",
         customerId: custId,

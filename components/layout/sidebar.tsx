@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Package, ShoppingCart, Users, Search,
-  ShoppingBag, FileText, Calculator, Settings, Menu, X, BarChart3,
+  ShoppingBag, FileText, Calculator, Settings, Menu, X, BarChart3, Users2,
 } from "lucide-react";
 import PushNotificationToggle from "./push-toggle";
 import ThemeToggle from "./theme-toggle";
@@ -13,25 +13,32 @@ import LogoutButton from "./logout-button";
 import { MarloIcon, MarloWordmark } from "./marlo-logo";
 
 const NAV_ITEMS = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, alertKey: "dashboard" },
-  { href: "/products", label: "Stock", icon: Package, alertKey: "products" },
-  { href: "/sales", label: "Ventes", icon: ShoppingCart },
-  { href: "/customers", label: "Clients", icon: Users },
-  { href: "/analytics", label: "Analytique", icon: BarChart3 },
-  { href: "/sourcing", label: "Sourcing", icon: Search, alertKey: "sourcing" },
-  { href: "/personal-shopping", label: "Personal Shop", icon: ShoppingBag },
-  { href: "/invoices", label: "Factures", icon: FileText },
-  { href: "/accounting", label: "Comptabilité", icon: Calculator },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, alertKey: "dashboard", minRole: "seller" },
+  { href: "/products", label: "Stock", icon: Package, alertKey: "products", minRole: "seller" },
+  { href: "/sales", label: "Ventes", icon: ShoppingCart, minRole: "seller" },
+  { href: "/customers", label: "Clients", icon: Users, minRole: "manager" },
+  { href: "/analytics", label: "Analytique", icon: BarChart3, minRole: "manager" },
+  { href: "/sourcing", label: "Sourcing", icon: Search, alertKey: "sourcing", minRole: "manager" },
+  { href: "/personal-shopping", label: "Personal Shop", icon: ShoppingBag, minRole: "manager" },
+  { href: "/invoices", label: "Factures", icon: FileText, minRole: "owner" },
+  { href: "/accounting", label: "Comptabilité", icon: Calculator, minRole: "owner" },
 ];
 
 const BOTTOM_ITEMS = [
-  { href: "/settings", label: "Réglages", icon: Settings },
+  { href: "/team", label: "Équipe", icon: Users2, minRole: "owner" },
+  { href: "/settings", label: "Réglages", icon: Settings, minRole: "owner" },
 ];
 
-export default function Sidebar() {
+const ROLE_LEVEL: Record<string, number> = { owner: 3, manager: 2, seller: 1 };
+
+export default function Sidebar({ role = "owner" }: { role?: string }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [alertCount, setAlertCount] = useState(0);
+  const userLevel = ROLE_LEVEL[role] ?? 1;
+
+  const visibleNav = NAV_ITEMS.filter((item) => userLevel >= (ROLE_LEVEL[item.minRole] ?? 3));
+  const visibleBottom = BOTTOM_ITEMS.filter((item) => userLevel >= (ROLE_LEVEL[item.minRole] ?? 3));
 
   useEffect(() => {
     fetch("/api/alerts").then((r) => r.json()).then((d) => setAlertCount(d.count ?? 0)).catch(() => {});
@@ -71,7 +78,7 @@ export default function Sidebar() {
         <div className="h-14 lg:hidden" />
 
         <nav className="flex-1 px-3 py-2 space-y-[2px] overflow-y-auto">
-          {NAV_ITEMS.map((item) => {
+          {visibleNav.map((item) => {
             const isActive = pathname.startsWith(item.href);
             const Icon = item.icon;
             const showBadge = item.alertKey === "dashboard" && alertCount > 0;
@@ -101,7 +108,7 @@ export default function Sidebar() {
         <div className="px-3 py-3 border-t border-[var(--color-border-subtle)] space-y-1">
           <PushNotificationToggle />
           <ThemeToggle />
-          {BOTTOM_ITEMS.map((item) => {
+          {visibleBottom.map((item) => {
             const Icon = item.icon;
             const isActive = pathname.startsWith(item.href);
             return (

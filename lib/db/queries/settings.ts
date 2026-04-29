@@ -2,13 +2,13 @@ import { db } from "../client";
 import { shopSettings, type ShopSettings, type NewShopSettings } from "../schema";
 import { eq, sql } from "drizzle-orm";
 
-export async function getShopSettings(userId: string): Promise<ShopSettings | undefined> {
-  const rows = await db.select().from(shopSettings).where(eq(shopSettings.userId, userId)).limit(1);
+export async function getShopSettings(shopId: string): Promise<ShopSettings | undefined> {
+  const rows = await db.select().from(shopSettings).where(eq(shopSettings.shopId, shopId)).limit(1);
   return rows[0];
 }
 
-export async function upsertShopSettings(userId: string, data: Omit<NewShopSettings, "userId">): Promise<ShopSettings> {
-  const existing = await getShopSettings(userId);
+export async function upsertShopSettings(shopId: string, userId: string, data: Omit<NewShopSettings, "userId" | "shopId">): Promise<ShopSettings> {
+  const existing = await getShopSettings(shopId);
 
   if (existing) {
     const rows = await db
@@ -19,12 +19,12 @@ export async function upsertShopSettings(userId: string, data: Omit<NewShopSetti
     return rows[0];
   }
 
-  const rows = await db.insert(shopSettings).values({ ...data, userId }).returning();
+  const rows = await db.insert(shopSettings).values({ ...data, userId, shopId }).returning();
   return rows[0];
 }
 
-export async function getNextInvoiceNumber(userId: string): Promise<string> {
-  const settings = await getShopSettings(userId);
+export async function getNextInvoiceNumber(shopId: string): Promise<string> {
+  const settings = await getShopSettings(shopId);
   if (!settings) {
     throw new Error("Paramètres de facturation manquants. Configure d'abord tes informations légales dans Réglages.");
   }

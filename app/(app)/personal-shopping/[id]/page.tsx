@@ -1,4 +1,4 @@
-import { getCurrentUserId } from "@/lib/auth/get-user";
+import { getAuthContext } from "@/lib/auth/require-role";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Calendar, MapPin, ShoppingBag } from "lucide-react";
@@ -10,8 +10,8 @@ export const dynamic = "force-dynamic";
 
 export default async function MissionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const userId = await getCurrentUserId();
-  const [mission, items, customers] = await Promise.all([getMissionById(id), getMissionItems(id), getAllCustomers(userId)]);
+  const { userId, shopId } = await getAuthContext();
+  const [mission, items, customers] = await Promise.all([getMissionById(id), getMissionItems(id), getAllCustomers(shopId)]);
   if (!mission) notFound();
   const itemsByCustomer = items.reduce((acc, item) => { const k = item.customerId; if (!acc[k]) acc[k] = { customerId: item.customerId, customerName: item.customerName ?? "Supprimé", items: [], total: 0, commission: 0 }; acc[k].items.push(item); acc[k].total += item.purchasePrice; acc[k].commission += item.commissionAmount ?? 0; return acc; }, {} as Record<string, any>);
 

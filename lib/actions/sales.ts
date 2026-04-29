@@ -1,5 +1,5 @@
 "use server";
-import { getCurrentUserId } from "@/lib/auth/get-user";
+import { getAuthContext } from "@/lib/auth/require-role";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -74,9 +74,10 @@ export async function createSaleAction(formData: FormData) {
       parsed.data.shippingPaidBy === "vendeur"
     );
 
-    const userId = await getCurrentUserId();
+    const ctx = await getAuthContext();
     await createSale({
-      userId,
+      userId: ctx.userId,
+      shopId: ctx.shopId,
       productId: parsed.data.productId,
       customerId: parsed.data.customerId && parsed.data.customerId.length > 0 ? parsed.data.customerId : null,
       channel: parsed.data.channel,

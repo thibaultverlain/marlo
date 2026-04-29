@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { updateProduct } from "@/lib/db/queries/products";
-import { requireAuth } from "@/lib/auth/require-auth";
+import { getAuthContext } from "@/lib/auth/require-role";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const auth = await requireAuth();
-  if (auth instanceof NextResponse) return auth;
+  let ctx; try { ctx = await getAuthContext(); } catch { return NextResponse.json({ error: "Non autorisé" }, { status: 401 }); }
+  
 
   const { id } = await params;
 

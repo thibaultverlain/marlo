@@ -5,7 +5,7 @@ import { eq, desc, sql, and, gte, lte } from "drizzle-orm";
 export type RecipeEntry = { date: Date; invoiceNumber: string | null; customerName: string | null; productTitle: string | null; channel: string; amount: number; paymentMethod: string | null };
 export type PurchaseEntry = { id: string; date: Date | null; description: string; supplier: string | null; amount: number; paymentMethod: string | null; category: string | null; productSku: string | null; productTitle?: string | null };
 
-export async function getRecipeBook(userId: string, year?: number): Promise<RecipeEntry[]> {
+export async function getRecipeBook(shopId: string, year?: number): Promise<RecipeEntry[]> {
   const y = year ?? new Date().getFullYear();
   const startOfYear = new Date(y, 0, 1);
   const endOfYear = new Date(y, 11, 31, 23, 59, 59);
@@ -19,7 +19,7 @@ export async function getRecipeBook(userId: string, year?: number): Promise<Reci
     .from(sales)
     .leftJoin(products, eq(sales.productId, products.id))
     .leftJoin(customers, eq(sales.customerId, customers.id))
-    .where(and(eq(sales.userId, userId), gte(sales.soldAt, startOfYear), lte(sales.soldAt, endOfYear)))
+    .where(and(eq(sales.shopId, shopId), gte(sales.soldAt, startOfYear), lte(sales.soldAt, endOfYear)))
     .orderBy(sales.soldAt);
 
   return rows.map((r) => ({
@@ -29,7 +29,7 @@ export async function getRecipeBook(userId: string, year?: number): Promise<Reci
   }));
 }
 
-export async function getPurchasesRegister(userId: string, year?: number): Promise<PurchaseEntry[]> {
+export async function getPurchasesRegister(shopId: string, year?: number): Promise<PurchaseEntry[]> {
   const y = year ?? new Date().getFullYear();
   const startOfYear = new Date(y, 0, 1);
   const endOfYear = new Date(y, 11, 31, 23, 59, 59);
@@ -42,7 +42,7 @@ export async function getPurchasesRegister(userId: string, year?: number): Promi
     })
     .from(purchases)
     .leftJoin(products, eq(purchases.productId, products.id))
-    .where(eq(purchases.userId, userId))
+    .where(eq(purchases.shopId, shopId))
     .orderBy(desc(purchases.createdAt));
 
   const productPurchases = await db
@@ -52,7 +52,7 @@ export async function getPurchasesRegister(userId: string, year?: number): Promi
     })
     .from(products)
     .where(and(
-      eq(products.userId, userId),
+      eq(products.shopId, shopId),
       gte(products.purchaseDate, startOfYear.toISOString().split("T")[0]),
       lte(products.purchaseDate, endOfYear.toISOString().split("T")[0])
     ))
@@ -70,19 +70,19 @@ export async function getPurchasesRegister(userId: string, year?: number): Promi
   return [...explicit, ...implicit].sort((a, b) => { if (!a.date) return 1; if (!b.date) return -1; return a.date.getTime() - b.date.getTime(); });
 }
 
-export async function getAccountingStats(userId: string, year?: number) {
+export async function getAccountingStats(shopId: string, year?: number) {
   const y = year ?? new Date().getFullYear();
   const startOfYear = new Date(y, 0, 1);
   const endOfYear = new Date(y, 11, 31, 23, 59, 59);
 
   const [recipesStats, purchasesStats, productsStats] = await Promise.all([
     db.select({ totalRevenue: sql<number>`coalesce(sum(sale_price), 0)::numeric`, count: sql<number>`count(*)::int` })
-      .from(sales).where(and(eq(sales.userId, userId), gte(sales.soldAt, startOfYear), lte(sales.soldAt, endOfYear))),
+      .from(sales).where(and(eq(sales.shopId, shopId), gte(sales.soldAt, startOfYear), lte(sales.soldAt, endOfYear))),
     db.select({ totalExpenses: sql<number>`coalesce(sum(amount), 0)::numeric`, count: sql<number>`count(*)::int` })
-      .from(purchases).where(eq(purchases.userId, userId)),
+      .from(purchases).where(eq(purchases.shopId, shopId)),
     db.select({ totalPurchases: sql<number>`coalesce(sum(purchase_price), 0)::numeric`, count: sql<number>`count(*)::int` })
       .from(products).where(and(
-        eq(products.userId, userId),
+        eq(products.shopId, shopId),
         gte(products.purchaseDate, startOfYear.toISOString().split("T")[0]),
         lte(products.purchaseDate, endOfYear.toISOString().split("T")[0])
       )),

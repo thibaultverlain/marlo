@@ -1,4 +1,4 @@
-import { requireAuth } from "@/lib/auth/require-auth";
+import { getAuthContext } from "@/lib/auth/require-role";
 import { NextRequest, NextResponse } from "next/server";
 import { parseSaleEmail } from "@/lib/email-parser";
 import { db } from "@/lib/db/client";
@@ -8,8 +8,8 @@ import { eq, sql, and, inArray } from "drizzle-orm";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
-  const auth = await requireAuth();
-  if (auth instanceof NextResponse) return auth;
+  let ctx; try { ctx = await getAuthContext(); } catch { return NextResponse.json({ error: "Non autorisé" }, { status: 401 }); }
+  
 
   try {
     const body = await req.json();

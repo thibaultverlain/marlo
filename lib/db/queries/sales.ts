@@ -7,7 +7,7 @@ export type SaleWithDetails = Sale & {
   customerName: string | null;
 };
 
-export async function getAllSales(userId: string): Promise<SaleWithDetails[]> {
+export async function getAllSales(shopId: string): Promise<SaleWithDetails[]> {
   const rows = await db
     .select({
       id: sales.id, userId: sales.userId, productId: sales.productId, customerId: sales.customerId,
@@ -23,7 +23,7 @@ export async function getAllSales(userId: string): Promise<SaleWithDetails[]> {
     .from(sales)
     .leftJoin(products, eq(sales.productId, products.id))
     .leftJoin(customers, eq(sales.customerId, customers.id))
-    .where(eq(sales.userId, userId))
+    .where(eq(sales.shopId, shopId))
     .orderBy(desc(sales.soldAt));
 
   return rows.map((r) => ({
@@ -43,7 +43,7 @@ export async function createSale(data: NewSale): Promise<Sale> {
   return rows[0];
 }
 
-export async function getRecentSales(userId: string, limit: number = 5) {
+export async function getRecentSales(shopId: string, limit: number = 5) {
   const rows = await db
     .select({
       id: sales.id, salePrice: sales.salePrice, margin: sales.margin,
@@ -52,14 +52,14 @@ export async function getRecentSales(userId: string, limit: number = 5) {
     })
     .from(sales)
     .leftJoin(products, eq(sales.productId, products.id))
-    .where(eq(sales.userId, userId))
+    .where(eq(sales.shopId, shopId))
     .orderBy(desc(sales.soldAt))
     .limit(limit);
 
   return rows;
 }
 
-export async function getCurrentMonthStats(userId: string) {
+export async function getCurrentMonthStats(shopId: string) {
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const startOfPrevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
@@ -73,7 +73,7 @@ export async function getCurrentMonthStats(userId: string) {
       avgMargin: sql<number>`coalesce(avg(margin_pct), 0)::numeric`,
     })
     .from(sales)
-    .where(and(eq(sales.userId, userId), gte(sales.soldAt, startOfMonth)));
+    .where(and(eq(sales.shopId, shopId), gte(sales.soldAt, startOfMonth)));
 
   const previousMonth = await db
     .select({
@@ -82,12 +82,12 @@ export async function getCurrentMonthStats(userId: string) {
       count: sql<number>`count(*)::int`,
     })
     .from(sales)
-    .where(and(eq(sales.userId, userId), gte(sales.soldAt, startOfPrevMonth), lte(sales.soldAt, endOfPrevMonth)));
+    .where(and(eq(sales.shopId, shopId), gte(sales.soldAt, startOfPrevMonth), lte(sales.soldAt, endOfPrevMonth)));
 
   return { current: currentMonth[0], previous: previousMonth[0] };
 }
 
-export async function getMarginByChannel(userId: string) {
+export async function getMarginByChannel(shopId: string) {
   const rows = await db
     .select({
       channel: sales.channel,
@@ -96,18 +96,18 @@ export async function getMarginByChannel(userId: string) {
       count: sql<number>`count(*)::int`,
     })
     .from(sales)
-    .where(eq(sales.userId, userId))
+    .where(eq(sales.shopId, shopId))
     .groupBy(sales.channel)
     .orderBy(desc(sql`avg(margin_pct)`));
 
   return rows;
 }
 
-export async function getPendingShipments(userId: string) {
+export async function getPendingShipments(shopId: string) {
   const rows = await db
     .select({ count: sql<number>`count(*)::int` })
     .from(sales)
-    .where(and(eq(sales.userId, userId), eq(sales.shippingStatus, "a_expedier")));
+    .where(and(eq(sales.shopId, shopId), eq(sales.shippingStatus, "a_expedier")));
   return rows[0]?.count ?? 0;
 }
 
