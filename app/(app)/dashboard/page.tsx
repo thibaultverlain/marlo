@@ -1,22 +1,14 @@
-import { TrendingUp, TrendingDown, Package, AlertTriangle, Search, Truck } from "lucide-react";
+import { TrendingUp, Package, AlertTriangle, Truck, ShoppingCart, Percent, BarChart3 } from "lucide-react";
 import Link from "next/link";
 import { formatCurrency, formatPercent } from "@/lib/utils";
 import { db } from "@/lib/db/client";
 import { sales, products } from "@/lib/db/schema";
 import { sql, gte, lte, and, eq } from "drizzle-orm";
-import {
-  getMarginByChannel,
-  getRecentSales,
-  getPendingShipments,
-} from "@/lib/db/queries/sales";
+import { getRecentSales, getPendingShipments, getCurrentMonthStats } from "@/lib/db/queries/sales";
 import { getStockStats } from "@/lib/db/queries/products";
-import {
-  getActiveSourcingCount,
-  getUpcomingSourcingDeadlines,
-} from "@/lib/db/queries/sourcing";
-import { CHANNELS } from "@/lib/data";
-import RevenueChart from "@/components/dashboard/revenue-chart";
+import { getActiveSourcingCount } from "@/lib/db/queries/sourcing";
 import { getCurrentUserId } from "@/lib/auth/get-user";
+import RevenueChart from "@/components/dashboard/revenue-chart";
 
 export const dynamic = "force-dynamic";
 
@@ -24,23 +16,15 @@ async function getTodayStats(userId: string) {
   const now = new Date();
   const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
-
   const rows = await db
     .select({
       revenue: sql<number>`coalesce(sum(sale_price), 0)::numeric`,
       margin: sql<number>`coalesce(sum(margin), 0)::numeric`,
       count: sql<number>`count(*)::int`,
-      avgMarginPct: sql<number>`coalesce(avg(margin_pct), 0)::numeric`,
     })
     .from(sales)
     .where(and(eq(sales.userId, userId), gte(sales.soldAt, startOfDay), lte(sales.soldAt, endOfDay)));
-
-  return {
-    revenue: Number(rows[0]?.revenue ?? 0),
-    margin: Number(rows[0]?.margin ?? 0),
-    count: rows[0]?.count ?? 0,
-    avgMarginPct: Number(rows[0]?.avgMarginPct ?? 0),
-  };
+  return rows[0] ?? { revenue: 0, margin: 0, count: 0 };
 }
 
 async function getAllTimeStats(userId: string) {
@@ -49,249 +33,181 @@ async function getAllTimeStats(userId: string) {
       revenue: sql<number>`coalesce(sum(sale_price), 0)::numeric`,
       margin: sql<number>`coalesce(sum(margin), 0)::numeric`,
       count: sql<number>`count(*)::int`,
+      avgMarginPct: sql<number>`coalesce(avg(margin_pct), 0)::numeric`,
     })
     .from(sales)
     .where(eq(sales.userId, userId));
-
-  return {
-    revenue: Number(rows[0]?.revenue ?? 0),
-    margin: Number(rows[0]?.margin ?? 0),
-    count: rows[0]?.count ?? 0,
-  };
-}
-
-function StatCard({ label, value, sub, icon, accent }: {
-  label: string;
-  value: string;
-  sub?: string;
-  icon?: React.ReactNode;
-  accent?: "success" | "danger" | "default";
-}) {
-  const valueColor = accent === "success" ? "text-emerald-400" : accent === "danger" ? "text-red-400" : "text-white";
-  return (
-    <div className="kpi-card p-5 flex flex-col justify-between min-h-[130px]">
-      <div className="flex items-start justify-between">
-        <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider leading-tight">{label}</p>
-        {icon && <div className="icon-circle icon-circle-accent">{icon}</div>}
-      </div>
-      <div className="mt-auto">
-        <p className={`text-[26px] font-bold tabular-nums tracking-tight leading-none ${valueColor}`}>{value}</p>
-        {sub && <p className="text-[11px] text-zinc-600 mt-1.5">{sub}</p>}
-      </div>
-    </div>
-  );
-}
-
-function FeaturedStat({ label, value, sub, comparisons }: {
-  label: string;
-  value: string;
-  sub?: string;
-  comparisons?: { label: string; value: string; change: string; positive: boolean }[];
-}) {
-  return (
-    <div className="kpi-featured p-6 flex flex-col justify-between min-h-[130px]">
-      <p className="text-[13px] font-medium text-zinc-400 mb-2">{label}</p>
-      <div>
-        <p className="text-[38px] font-bold tabular-nums tracking-tight leading-none gradient-text">{value}</p>
-        {sub && <p className="text-[12px] text-zinc-500 mt-2">{sub}</p>}
-      </div>
-      {comparisons && comparisons.length > 0 && (
-        <div className="flex gap-6 mt-4 pt-3 border-t border-white/[0.04]">
-          {comparisons.map((c, i) => (
-            <div key={i}>
-              <p className="text-[10px] text-zinc-600 uppercase tracking-wider">{c.label}</p>
-              <div className="flex items-baseline gap-2 mt-1">
-                <span className="text-sm text-zinc-400 tabular-nums font-medium">{c.value}</span>
-                <span className={c.positive ? "change-positive" : "change-negative"}>{c.change}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function EmptyState() {
-  return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl lg:text-3xl text-white">Dashboard</h1>
-        <p className="text-zinc-500 mt-1 text-sm">
-          {new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date())}
-        </p>
-      </div>
-      <div className="card-static p-12 text-center">
-        <Package size={40} className="mx-auto text-zinc-700 mb-3" />
-        <h2 className="text-xl text-white mb-2">Bienvenue sur Marlo</h2>
-        <p className="text-zinc-500 mb-6 max-w-md mx-auto text-sm">Commence par ajouter tes articles en stock.</p>
-        <Link href="/products/new" className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors">Ajouter mon premier article</Link>
-      </div>
-    </div>
-  );
+  return rows[0] ?? { revenue: 0, margin: 0, count: 0, avgMarginPct: 0 };
 }
 
 export default async function DashboardPage() {
   const userId = await getCurrentUserId();
-  const [
-    todayStats, allTimeStats, stockStats, marginByChannel,
-    recentSales, pendingShipments, activeSourcing, upcomingDeadlines,
-  ] = await Promise.all([
-    getTodayStats(userId), getAllTimeStats(userId), getStockStats(userId),
-    getMarginByChannel(userId), getRecentSales(userId, 5), getPendingShipments(userId),
-    getActiveSourcingCount(userId), getUpcomingSourcingDeadlines(userId, 7),
+  const [todayStats, allTimeStats, stockStats, monthStats, recentSales, pendingShipments, activeSourcing] = await Promise.all([
+    getTodayStats(userId),
+    getAllTimeStats(userId),
+    getStockStats(userId),
+    getCurrentMonthStats(userId),
+    getRecentSales(userId, 8),
+    getPendingShipments(userId),
+    getActiveSourcingCount(userId),
   ]);
 
-  const hasAnyData = stockStats.total > 0 || allTimeStats.count > 0;
-  if (!hasAnyData) return <EmptyState />;
+  const totalRevenue = Number(allTimeStats.revenue);
+  const totalMargin = Number(allTimeStats.margin);
+  const avgMarginPct = Number(allTimeStats.avgMarginPct);
+  const inStock = stockStats?.inStock ?? 0;
+  const stockValue = Number(stockStats?.totalValue ?? 0);
+  const dormant = stockStats?.dormant ?? 0;
 
-  const dormant = stockStats.dormant;
-  const totalAlerts = dormant + pendingShipments + upcomingDeadlines;
+  const currentMonthRevenue = Number(monthStats.current?.revenue ?? 0);
+  const prevMonthRevenue = Number(monthStats.previous?.revenue ?? 0);
+  const monthChange = prevMonthRevenue > 0 ? ((currentMonthRevenue - prevMonthRevenue) / prevMonthRevenue) * 100 : 0;
+
+  const alertCount = dormant + pendingShipments + activeSourcing;
+
+  const today = new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date());
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl lg:text-3xl text-white">Dashboard</h1>
-        <p className="text-zinc-500 mt-1 text-sm">
-          {new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date())}
-        </p>
+    <div className="space-y-5 page-enter">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">Dashboard</h1>
+          <p className="text-zinc-500 text-sm mt-1">{today}</p>
+        </div>
       </div>
 
-      {/* KPIs */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 lg:gap-4">
-        <div className="lg:col-span-2">
-          <FeaturedStat
-            label="Chiffre d'affaires total"
-            value={formatCurrency(allTimeStats.revenue)}
-            sub={`${allTimeStats.count} vente${allTimeStats.count > 1 ? "s" : ""}`}
-            comparisons={[
-              { label: "Aujourd'hui", value: formatCurrency(todayStats.revenue), change: `${todayStats.count} vente${todayStats.count > 1 ? "s" : ""}`, positive: todayStats.count > 0 },
-            ]}
-          />
+      {/* Row 1: Featured + 3 KPIs */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
+        {/* Featured CA total */}
+        <div className="lg:col-span-5 kpi-featured p-6">
+          <div className="flex items-start justify-between">
+            <p className="text-[13px] font-medium text-zinc-400">Chiffre d'affaires total</p>
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+              <TrendingUp size={20} className="text-emerald-400" />
+            </div>
+          </div>
+          <p className="text-[40px] font-bold tabular-nums tracking-tight leading-none gradient-text mt-3">{formatCurrency(totalRevenue)}</p>
+          <p className="text-[12px] text-zinc-500 mt-2">{allTimeStats.count} vente{Number(allTimeStats.count) > 1 ? "s" : ""}</p>
+          <div className="flex gap-8 mt-5 pt-4 border-t border-white/[0.04]">
+            <div>
+              <p className="text-[10px] text-zinc-600 uppercase tracking-wider">Ce mois</p>
+              <div className="flex items-baseline gap-2 mt-1">
+                <span className="text-[14px] text-zinc-300 tabular-nums font-medium">{formatCurrency(currentMonthRevenue)}</span>
+                {prevMonthRevenue > 0 && (
+                  <span className={monthChange >= 0 ? "text-emerald-400 text-[12px] font-semibold" : "text-red-400 text-[12px] font-semibold"}>
+                    {monthChange >= 0 ? "+" : ""}{monthChange.toFixed(0)}%
+                  </span>
+                )}
+              </div>
+            </div>
+            <div>
+              <p className="text-[10px] text-zinc-600 uppercase tracking-wider">Aujourd'hui</p>
+              <div className="flex items-baseline gap-2 mt-1">
+                <span className="text-[14px] text-zinc-300 tabular-nums font-medium">{formatCurrency(todayStats.revenue)}</span>
+                <span className="text-zinc-600 text-[12px]">{todayStats.count} vente{Number(todayStats.count) > 1 ? "s" : ""}</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <StatCard
-          label="Marge totale"
-          value={formatCurrency(allTimeStats.margin)}
-          icon={<TrendingUp size={18} />}
-          accent="success"
-        />
-        <StatCard
-          label="Articles en stock"
-          value={String(stockStats.inStock ?? 0)}
-          sub={formatCurrency(Number(stockStats.totalValue ?? 0))}
-          icon={<Package size={18} />}
-        />
-        <StatCard
-          label="Marge aujourd'hui"
-          value={formatCurrency(todayStats.margin)}
-          sub={`${todayStats.count} vente${todayStats.count > 1 ? "s" : ""}`}
-          icon={<TrendingUp size={18} />}
-        />
+
+        {/* 3 KPI cards */}
+        <div className="lg:col-span-7 grid grid-cols-2 lg:grid-cols-3 gap-3">
+          <KpiCard icon={<TrendingUp size={18} />} iconClass="bg-rose-500/10 text-rose-400" label="Marge totale" value={formatCurrency(totalMargin)} sub={`~${avgMarginPct.toFixed(0)}% moy.`} />
+          <KpiCard icon={<Package size={18} />} iconClass="bg-violet-500/10 text-violet-400" label="Stock" value={`${inStock} articles`} sub={formatCurrency(stockValue)} />
+          <KpiCard icon={<ShoppingCart size={18} />} iconClass="bg-cyan-500/10 text-cyan-400" label="Ventes ce mois" value={String(Number(monthStats.current?.count ?? 0))} sub={formatCurrency(currentMonthRevenue)} />
+          <KpiCard icon={<Percent size={18} />} iconClass="bg-emerald-500/10 text-emerald-400" label="Marge aujourd'hui" value={formatCurrency(todayStats.margin)} sub={`${todayStats.count} vente${Number(todayStats.count) > 1 ? "s" : ""}`} />
+          <KpiCard icon={<AlertTriangle size={18} />} iconClass="bg-amber-500/10 text-amber-400" label="Dormants" value={String(dormant)} sub={dormant > 0 ? "> 30 jours" : "Aucun"} warning={dormant > 0} />
+          <KpiCard icon={<Truck size={18} />} iconClass="bg-orange-500/10 text-orange-400" label="A expédier" value={String(pendingShipments)} sub={pendingShipments > 0 ? "En attente" : "Tout envoyé"} warning={pendingShipments > 0} />
+        </div>
       </div>
 
       {/* Alerts */}
-      {totalAlerts > 0 && (
-        <div className="bg-amber-500/[0.08] border border-amber-500/20 rounded-xl p-5">
-          <div className="flex items-center gap-2 mb-3">
+      {alertCount > 0 && (
+        <div className="card-static p-4" style={{ borderColor: "rgba(245, 158, 11, 0.15)", background: "rgba(245, 158, 11, 0.04)" }}>
+          <div className="flex items-center gap-2 mb-2">
             <AlertTriangle size={15} className="text-amber-400" />
-            <p className="text-sm font-medium text-amber-300">
-              {totalAlerts} action{totalAlerts > 1 ? "s" : ""} en attente
-            </p>
+            <span className="text-[13px] font-semibold text-amber-400">{alertCount} action{alertCount > 1 ? "s" : ""} en attente</span>
           </div>
-          <div className="space-y-2">
-            {dormant > 0 && (
-              <Link href="/products" className="flex items-center gap-3 text-sm text-amber-400/80 hover:text-amber-300 transition-colors">
-                <Package size={14} />
-                <span>{dormant} article{dormant > 1 ? "s" : ""} dormant{dormant > 1 ? "s" : ""}</span>
-              </Link>
-            )}
-            {pendingShipments > 0 && (
-              <Link href="/sales" className="flex items-center gap-3 text-sm text-amber-400/80 hover:text-amber-300 transition-colors">
-                <Truck size={14} />
-                <span>{pendingShipments} colis à expédier</span>
-              </Link>
-            )}
-            {upcomingDeadlines > 0 && (
-              <Link href="/sourcing" className="flex items-center gap-3 text-sm text-amber-400/80 hover:text-amber-300 transition-colors">
-                <Search size={14} />
-                <span>{upcomingDeadlines} sourcing deadline &lt; 7 jours</span>
-              </Link>
-            )}
+          <div className="flex flex-wrap gap-4 text-[12px]">
+            {dormant > 0 && <Link href="/products" className="flex items-center gap-1.5 text-amber-400/80 hover:text-amber-300 transition-colors"><Package size={12} />{dormant} article{dormant > 1 ? "s" : ""} dormant{dormant > 1 ? "s" : ""}</Link>}
+            {pendingShipments > 0 && <Link href="/sales" className="flex items-center gap-1.5 text-amber-400/80 hover:text-amber-300 transition-colors"><Truck size={12} />{pendingShipments} colis à expédier</Link>}
+            {activeSourcing > 0 && <Link href="/sourcing" className="flex items-center gap-1.5 text-amber-400/80 hover:text-amber-300 transition-colors"><BarChart3 size={12} />{activeSourcing} sourcing actif{activeSourcing > 1 ? "s" : ""}</Link>}
           </div>
         </div>
       )}
 
-      {/* Revenue chart - full width */}
+      {/* Chart */}
       <RevenueChart />
 
-      {/* Two columns: Marge par canal | Dernières ventes */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Margin by channel */}
-        <div className="card-static p-6">
-          <h2 className="text-[15px] font-semibold text-white mb-5">Marge par canal</h2>
-          {marginByChannel.length === 0 ? (
-            <p className="text-sm text-zinc-600">Aucune vente</p>
-          ) : (
-            <div className="space-y-4">
-              {marginByChannel.map((item) => {
-                const channelLabel = CHANNELS.find((c) => c.value === item.channel)?.label ?? item.channel;
-                const pct = Math.max(0, Math.min(Math.round(item.avgMarginPct), 100));
-                return (
-                  <div key={item.channel}>
-                    <div className="flex justify-between items-center mb-1.5">
-                      <span className="text-sm text-zinc-400">{channelLabel}</span>
-                      <div className="flex items-center gap-3">
-                        <span className="text-[11px] text-zinc-600">{item.count} vente{item.count > 1 ? "s" : ""}</span>
-                        <span className="text-sm font-medium text-white tabular-nums w-12 text-right">
-                          {formatPercent(item.avgMarginPct)}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                      <div
-                        className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 transition-all duration-700"
-                        style={{ width: `${pct}%` }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
+      {/* Recent sales table */}
+      <div className="card-static overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--color-border)]">
+          <h2 className="text-[15px] font-semibold text-white">Dernières ventes</h2>
+          <Link href="/sales" className="text-[12px] font-medium text-rose-400 hover:text-rose-300 transition-colors">Voir tout</Link>
         </div>
 
-        {/* Recent sales */}
-        <div className="card-static p-6">
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="text-[15px] font-semibold text-white">Dernières ventes</h2>
-            <Link href="/sales" className="text-xs text-rose-400 hover:text-rose-300 font-medium transition-colors">Voir tout</Link>
+        {recentSales.length === 0 ? (
+          <div className="px-5 py-10 text-center">
+            <p className="text-zinc-600 text-sm">Aucune vente enregistrée</p>
           </div>
-          {recentSales.length === 0 ? (
-            <p className="text-sm text-zinc-600">Aucune vente</p>
-          ) : (
-            <div>
-              {recentSales.map((sale) => (
-                <div key={sale.id} className="flex items-center justify-between py-3 border-b border-[var(--color-border)] last:border-0">
-                  <div>
-                    <p className="text-[13px] text-zinc-200">{sale.productTitle ?? "Supprimé"}</p>
-                    <p className="text-[11px] text-zinc-600 mt-0.5">
-                      {CHANNELS.find((c) => c.value === sale.channel)?.label ?? sale.channel}
-                      {sale.soldAt && ` · ${new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short" }).format(new Date(sale.soldAt))}`}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[13px] font-medium text-white tabular-nums">{formatCurrency(sale.salePrice)}</p>
-                    {sale.margin && (
-                      <p className={`text-[11px] tabular-nums ${Number(sale.margin) >= 0 ? "text-emerald-400" : "text-red-400"}`}>
-                        {Number(sale.margin) >= 0 ? "+" : ""}{formatCurrency(sale.margin)}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-[13px]">
+              <thead>
+                <tr className="text-[11px] text-zinc-600 uppercase tracking-wider border-b border-[var(--color-border)]">
+                  <th className="text-left px-5 py-3 font-medium">Article</th>
+                  <th className="text-left px-4 py-3 font-medium hidden sm:table-cell">Canal</th>
+                  <th className="text-right px-4 py-3 font-medium">Prix</th>
+                  <th className="text-right px-5 py-3 font-medium">Marge</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentSales.map((sale: any, i: number) => {
+                  const margin = Number(sale.margin);
+                  const channelColors: Record<string, string> = {
+                    vinted: "text-teal-400", vestiaire: "text-orange-400", stockx: "text-emerald-400", prive: "text-violet-400", autre: "text-zinc-500"
+                  };
+                  const channelLabels: Record<string, string> = {
+                    vinted: "Vinted", vestiaire: "Vestiaire", stockx: "StockX", prive: "Privé", autre: "Autre"
+                  };
+                  return (
+                    <tr key={sale.id} className="border-b border-[var(--color-border)] last:border-0 row-hover">
+                      <td className="px-5 py-3">
+                        <p className="text-zinc-200 font-medium truncate max-w-[200px]">{sale.productTitle ?? sale.notes ?? "Article"}</p>
+                        <p className="text-[11px] text-zinc-600 mt-0.5">{new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short" }).format(new Date(sale.soldAt))}</p>
+                      </td>
+                      <td className={`px-4 py-3 hidden sm:table-cell font-medium ${channelColors[sale.channel] ?? "text-zinc-500"}`}>
+                        {channelLabels[sale.channel] ?? sale.channel}
+                      </td>
+                      <td className="px-4 py-3 text-right tabular-nums text-zinc-200 font-medium">{formatCurrency(sale.salePrice)}</td>
+                      <td className={`px-5 py-3 text-right tabular-nums font-semibold ${margin >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                        {margin >= 0 ? "+" : ""}{formatCurrency(margin)}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function KpiCard({ icon, iconClass, label, value, sub, warning }: {
+  icon: React.ReactNode; iconClass: string; label: string; value: string; sub?: string; warning?: boolean;
+}) {
+  return (
+    <div className="kpi-card p-4 flex flex-col justify-between min-h-[120px]">
+      <div className="flex items-start justify-between">
+        <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider leading-tight">{label}</p>
+        <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${iconClass}`}>{icon}</div>
+      </div>
+      <div className="mt-auto">
+        <p className={`text-[22px] font-bold tabular-nums tracking-tight leading-none ${warning ? "text-amber-400" : "text-white"}`}>{value}</p>
+        {sub && <p className="text-[11px] text-zinc-600 mt-1">{sub}</p>}
       </div>
     </div>
   );
