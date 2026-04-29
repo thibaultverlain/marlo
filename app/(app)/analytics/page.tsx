@@ -59,7 +59,7 @@ export default function AnalyticsPage() {
       {/* Brand performance table */}
       <div className="card-static p-6">
         <h2 className="text-[15px] font-semibold text-white mb-5 flex items-center gap-2">
-          <BarChart3 size={16} className="text-cyan-400" />
+          <BarChart3 size={16} className="text-rose-400" />
           Performance par marque
         </h2>
         {data.brandPerf?.length > 0 ? (

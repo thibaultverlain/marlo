@@ -125,7 +125,7 @@ function EmptyState() {
         <Package size={40} className="mx-auto text-zinc-700 mb-3" />
         <h2 className="text-xl text-white mb-2">Bienvenue sur Marlo</h2>
         <p className="text-zinc-500 mb-6 max-w-md mx-auto text-sm">Commence par ajouter tes articles en stock.</p>
-        <Link href="/products/new" className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-cyan-500 rounded-lg hover:bg-cyan-400 transition-colors">Ajouter mon premier article</Link>
+        <Link href="/products/new" className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors">Ajouter mon premier article</Link>
       </div>
     </div>
   );
@@ -264,7 +264,7 @@ export default async function DashboardPage() {
         <div className="card-static p-6">
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-[15px] font-semibold text-white">Dernières ventes</h2>
-            <Link href="/sales" className="text-xs text-cyan-400 hover:text-cyan-300 font-medium transition-colors">Voir tout</Link>
+            <Link href="/sales" className="text-xs text-rose-400 hover:text-rose-300 font-medium transition-colors">Voir tout</Link>
           </div>
           {recentSales.length === 0 ? (
             <p className="text-sm text-zinc-600">Aucune vente</p>

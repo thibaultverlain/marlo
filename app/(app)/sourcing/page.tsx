@@ -17,9 +17,9 @@ export default async function SourcingPage() {
     <div className="space-y-6">
       <div className="flex items-start sm:items-center justify-between gap-3">
         <div><h1 className="text-2xl lg:text-3xl text-white">Sourcing</h1><p className="text-zinc-500 mt-1 text-sm">{stats.active} en cours{stats.totalCommissions > 0 && ` · ${formatCurrency(stats.totalCommissions)} commissions`}</p></div>
-        <Link href="/sourcing/new" className="flex items-center gap-2 px-4 py-2 text-[13px] font-medium text-white bg-cyan-500 rounded-lg hover:bg-cyan-400 transition-colors"><Plus size={14} />Nouvelle demande</Link>
+        <Link href="/sourcing/new" className="flex items-center gap-2 px-4 py-2 text-[13px] font-medium text-white bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors"><Plus size={14} />Nouvelle demande</Link>
       </div>
-      {requests.length === 0 ? <div className="card-static p-12 text-center"><Search size={40} className="mx-auto text-zinc-700 mb-3" /><p className="text-zinc-500 mb-4 text-sm">Aucune demande</p><Link href="/sourcing/new" className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-cyan-500 rounded-lg hover:bg-cyan-400 transition-colors"><Plus size={14} />Créer</Link></div> : (
+      {requests.length === 0 ? <div className="card-static p-12 text-center"><Search size={40} className="mx-auto text-zinc-700 mb-3" /><p className="text-zinc-500 mb-4 text-sm">Aucune demande</p><Link href="/sourcing/new" className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors"><Plus size={14} />Créer</Link></div> : (
         <div className="card-static overflow-hidden"><div className="divide-y divide-[var(--color-border)]">{requests.map((req) => {
           const st = SM[req.status ?? "ouvert"] || SM.ouvert; const Icon = st.icon;
           return <Link key={req.id} href={`/sourcing/${req.id}`} className="flex items-start sm:items-center justify-between gap-3 px-5 py-3.5 row-hover transition-colors">

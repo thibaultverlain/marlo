@@ -101,11 +101,11 @@ export default function PushNotificationToggle() {
       disabled={loading}
       className={`flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg text-sm transition-colors ${
         subscribed
-          ? "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-400/15"
+          ? "bg-rose-500/10 text-rose-400 hover:bg-rose-400/15"
           : "bg-[var(--color-bg-raised)] border border-[var(--color-border)] text-zinc-400 hover:text-zinc-200 hover:bg-[var(--color-bg-hover)]"
       }`}
     >
-      {subscribed ? <Bell size={16} className="text-cyan-400" /> : <BellOff size={16} />}
+      {subscribed ? <Bell size={16} className="text-rose-400" /> : <BellOff size={16} />}
       <span className="flex-1 text-left">
         {loading ? "..." : subscribed ? "Notifications activées" : "Activer les notifications"}
       </span>

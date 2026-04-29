@@ -21,7 +21,7 @@ export type ProductListItem = {
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, { bg: string; text: string; dot: string }> = {
     en_stock: { bg: "bg-emerald-500/12 border-emerald-500/20", text: "text-emerald-400", dot: "bg-emerald-400" },
-    en_vente: { bg: "bg-cyan-500/12 border-cyan-500/20", text: "text-cyan-400", dot: "bg-cyan-400" },
+    en_vente: { bg: "bg-rose-500/12 border-rose-500/20", text: "text-rose-400", dot: "bg-rose-400" },
     reserve: { bg: "bg-amber-500/12 border-amber-500/20", text: "text-amber-400", dot: "bg-amber-400" },
     vendu: { bg: "bg-violet-500/12 border-violet-500/20", text: "text-violet-400", dot: "bg-violet-400" },
     expedie: { bg: "bg-orange-500/12 border-orange-500/20", text: "text-orange-400", dot: "bg-orange-400" },

@@ -117,7 +117,7 @@ export default function NewProductForm() {
                 { v: "autre", l: "Autre" },
               ].map((s) => (
                 <button key={s.v} type="button" onClick={() => updateField("purchaseSource", s.v)}
-                  className={`px-3 py-1.5 text-[13px] rounded-lg border transition-colors ${form.purchaseSource === s.v ? "bg-cyan-500 text-white border-indigo-600" : "bg-transparent text-zinc-400 border-[var(--color-border)] hover:border-zinc-600"}`}>{s.l}</button>
+                  className={`px-3 py-1.5 text-[13px] rounded-lg border transition-colors ${form.purchaseSource === s.v ? "bg-rose-500 text-white border-indigo-600" : "bg-transparent text-zinc-400 border-[var(--color-border)] hover:border-zinc-600"}`}>{s.l}</button>
               ))}
             </div>
           </div>
@@ -137,7 +137,7 @@ export default function NewProductForm() {
             <div>
               <label className={labelClass}>Devise</label>
               <select value={form.purchaseCurrency} onChange={(e) => updateField("purchaseCurrency", e.target.value)} className={inputClass}>{CURRENCIES.map((c) => <option key={c.code} value={c.code}>{c.code} - {c.label}</option>)}</select>
-              {form.purchaseCurrency !== "EUR" && form.purchasePrice && <p className="text-[10px] text-cyan-400 mt-1">≈ {formatCurrency(convertToEur(parseFloat(form.purchasePrice) || 0, form.purchaseCurrency))} EUR</p>}
+              {form.purchaseCurrency !== "EUR" && form.purchasePrice && <p className="text-[10px] text-rose-400 mt-1">≈ {formatCurrency(convertToEur(parseFloat(form.purchasePrice) || 0, form.purchaseCurrency))} EUR</p>}
             </div>
           </div>
 
@@ -173,7 +173,7 @@ export default function NewProductForm() {
           <div className="flex flex-wrap gap-2">
             {CHANNELS.filter(c => c.value !== "autre").map((ch) => (
               <button key={ch.value} type="button" onClick={() => toggleListedOn(ch.value)}
-                className={`px-3 py-1.5 text-[13px] rounded-lg border transition-colors ${form.listedOn.includes(ch.value) ? "bg-cyan-500 text-white border-indigo-600" : "bg-transparent text-zinc-400 border-[var(--color-border)] hover:border-zinc-600"}`}>{ch.label}</button>
+                className={`px-3 py-1.5 text-[13px] rounded-lg border transition-colors ${form.listedOn.includes(ch.value) ? "bg-rose-500 text-white border-indigo-600" : "bg-transparent text-zinc-400 border-[var(--color-border)] hover:border-zinc-600"}`}>{ch.label}</button>
             ))}
           </div>
         </div>
@@ -184,7 +184,7 @@ export default function NewProductForm() {
 
       <div className="flex items-center justify-end gap-3 pb-8">
         <Link href="/products" className="px-4 py-2.5 text-sm font-medium text-zinc-500 hover:text-zinc-300 transition-colors">Annuler</Link>
-        <button type="submit" disabled={isPending} className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-cyan-500 rounded-lg hover:bg-cyan-400 transition-colors disabled:opacity-50">
+        <button type="submit" disabled={isPending} className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors disabled:opacity-50">
           <Save size={16} />{isPending ? "Enregistrement..." : "Enregistrer"}
         </button>
       </div>

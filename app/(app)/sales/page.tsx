@@ -91,7 +91,7 @@ export default async function SalesPage({ searchParams }: { searchParams: Promis
             {salesData.length} vente{salesData.length > 1 ? "s" : ""} · CA {formatCurrency(totalRevenue)} · Marge {formatCurrency(totalMargin)}
           </p>
         </div>
-        <Link href="/sales/new" className="flex items-center gap-2 px-4 py-2 text-[13px] font-medium text-[#0a0a0f] bg-cyan-500 font-semibold rounded-lg hover:bg-cyan-400 transition-colors">
+        <Link href="/sales/new" className="flex items-center gap-2 px-4 py-2 text-[13px] font-medium text-[#0a0a0f] bg-rose-500 font-semibold rounded-lg hover:bg-rose-400 transition-colors">
           <Plus size={14} />Enregistrer
         </Link>
       </div>

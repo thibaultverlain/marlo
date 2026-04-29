@@ -10,7 +10,7 @@ const SL: Record<string, { label: string; cl: string }> = { brouillon: { label: 
 export default async function InvoicesPage() {
   const userId = await getCurrentUserId();
   const [invoices, stats, settings] = await Promise.all([getAllInvoices(userId), getInvoiceStats(userId), getShopSettings(userId)]);
-  if (!settings) return (<div className="space-y-6"><div><h1 className="text-2xl lg:text-3xl text-white">Factures</h1></div><div className="bg-amber-500/[0.08] border border-amber-500/20 rounded-xl p-6"><h2 className="text-amber-300 font-semibold mb-2">Configuration requise</h2><p className="text-sm text-amber-400/80 mb-4">Configure tes informations légales dans Réglages avant d'émettre des factures.</p><Link href="/settings" className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-cyan-500 rounded-lg hover:bg-cyan-400 transition-colors">Configurer</Link></div></div>);
+  if (!settings) return (<div className="space-y-6"><div><h1 className="text-2xl lg:text-3xl text-white">Factures</h1></div><div className="bg-amber-500/[0.08] border border-amber-500/20 rounded-xl p-6"><h2 className="text-amber-300 font-semibold mb-2">Configuration requise</h2><p className="text-sm text-amber-400/80 mb-4">Configure tes informations légales dans Réglages avant d'émettre des factures.</p><Link href="/settings" className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors">Configurer</Link></div></div>);
 
   return (
     <div className="space-y-6">

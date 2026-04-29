@@ -26,7 +26,7 @@ export default function SalesFilters({ currentPeriod }: { currentPeriod: string 
           onClick={() => handleChange(key)}
           className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-all ${
             currentPeriod === key
-              ? "bg-[rgba(56,189,248,0.12)] text-cyan-400 shadow-sm"
+              ? "bg-[rgba(56,189,248,0.12)] text-rose-400 shadow-sm"
               : "text-zinc-500 hover:text-zinc-300"
           }`}
         >

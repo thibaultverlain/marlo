@@ -83,7 +83,7 @@ function LoginForm() {
       <button
         type="submit"
         disabled={isPending}
-        className="w-full py-3 text-sm font-medium text-white bg-cyan-500 rounded-lg hover:bg-cyan-400 transition-colors disabled:opacity-50"
+        className="w-full py-3 text-sm font-medium text-white bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors disabled:opacity-50"
       >
         {isPending ? "Connexion..." : "Se connecter"}
       </button>

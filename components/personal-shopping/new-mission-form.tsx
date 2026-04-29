@@ -25,7 +25,7 @@ export default function NewMissionForm() {
       </div>
       <div className="flex items-center justify-end gap-3 pb-8">
         <Link href="/personal-shopping" className="px-4 py-2.5 text-sm font-medium text-zinc-500 hover:text-zinc-300 transition-colors">Annuler</Link>
-        <button type="submit" disabled={isPending} className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-cyan-500 rounded-lg hover:bg-cyan-400 transition-colors disabled:opacity-50"><Save size={16}/>{isPending?"...":"Créer"}</button>
+        <button type="submit" disabled={isPending} className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors disabled:opacity-50"><Save size={16}/>{isPending?"...":"Créer"}</button>
       </div>
     </form>
   );

@@ -29,7 +29,7 @@ function formatEur(value: number): string {
 function CustomTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-xl px-4 py-3 text-sm shadow-xl" style={{ background: "rgba(18, 18, 26, 0.95)", backdropFilter: "blur(8px)", border: "1px solid rgba(56, 189, 248, 0.15)" }}>
+    <div className="rounded-xl px-4 py-3 text-sm shadow-xl" style={{ background: "rgba(18, 18, 26, 0.95)", backdropFilter: "blur(8px)", border: "1px solid rgba(251, 113, 133, 0.15)" }}>
       <p className="text-zinc-500 text-[11px] mb-0.5">{label}</p>
       <p className="text-white font-bold text-[15px] tabular-nums">
         {new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(payload[0].value)}
@@ -73,7 +73,7 @@ export default function RevenueChart() {
               onClick={() => setPeriod(key)}
               className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-all duration-200 ${
                 period === key
-                  ? "bg-[rgba(56,189,248,0.12)] text-cyan-400"
+                  ? "bg-[rgba(251,113,133,0.12)] text-rose-400"
                   : "text-zinc-600 hover:text-zinc-400"
               }`}
             >
@@ -93,9 +93,9 @@ export default function RevenueChart() {
             <AreaChart data={data} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#38bdf8" stopOpacity={0.25} />
-                  <stop offset="40%" stopColor="#38bdf8" stopOpacity={0.08} />
-                  <stop offset="100%" stopColor="#38bdf8" stopOpacity={0} />
+                  <stop offset="0%" stopColor="#fb7185" stopOpacity={0.25} />
+                  <stop offset="40%" stopColor="#fb7185" stopOpacity={0.08} />
+                  <stop offset="100%" stopColor="#fb7185" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid
@@ -117,17 +117,17 @@ export default function RevenueChart() {
                 tickFormatter={formatEur}
                 width={55}
               />
-              <Tooltip content={<CustomTooltip />} cursor={{ stroke: "rgba(56,189,248,0.15)", strokeWidth: 1 }} />
+              <Tooltip content={<CustomTooltip />} cursor={{ stroke: "rgba(251,113,133,0.15)", strokeWidth: 1 }} />
               <Area
                 type="monotone"
                 dataKey="revenue"
-                stroke="#38bdf8"
+                stroke="#fb7185"
                 strokeWidth={2.5}
                 fill="url(#revenueGradient)"
                 dot={false}
                 activeDot={{
                   r: 5,
-                  fill: "#38bdf8",
+                  fill: "#fb7185",
                   stroke: "#0a0a0f",
                   strokeWidth: 3,
                 }}

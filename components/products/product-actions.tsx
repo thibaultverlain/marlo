@@ -24,7 +24,7 @@ export default function ProductActions({ productId, status }: { productId: strin
           <Edit2 size={14} />Modifier
         </Link>
         {canBeSold && (
-          <Link href={`/sales/new?productId=${productId}`} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-cyan-500 rounded-lg hover:bg-cyan-400 transition-colors">
+          <Link href={`/sales/new?productId=${productId}`} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors">
             <ShoppingCart size={14} />Vendre
           </Link>
         )}

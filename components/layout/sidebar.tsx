@@ -84,12 +84,12 @@ export default function Sidebar() {
                     ? "bg-[var(--color-accent)]/12 text-[var(--color-accent)]"
                     : "text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.03]"
                 }`}
-                style={isActive ? { background: "rgba(56, 189, 248, 0.10)", color: "#38bdf8" } : {}}
+                style={isActive ? { background: "rgba(251, 113, 133, 0.10)", color: "#fb7185" } : {}}
               >
                 <Icon size={17} strokeWidth={isActive ? 1.8 : 1.5} />
                 <span className={`flex-1 ${isActive ? "font-semibold" : "font-normal"}`}>{item.label}</span>
                 {showBadge && (
-                  <span className="w-[18px] h-[18px] rounded-full bg-cyan-400/90 text-[9px] font-bold text-black flex items-center justify-center">
+                  <span className="w-[18px] h-[18px] rounded-full bg-rose-400/90 text-[9px] font-bold text-black flex items-center justify-center">
                     {alertCount}
                   </span>
                 )}
@@ -111,7 +111,7 @@ export default function Sidebar() {
                 className={`flex items-center gap-2.5 px-3 py-[8px] rounded-[10px] text-[13px] transition-all duration-200 ${
                   isActive ? "text-[var(--color-accent)]" : "text-zinc-600 hover:text-zinc-400 hover:bg-white/[0.03]"
                 }`}
-                style={isActive ? { background: "rgba(56, 189, 248, 0.10)", color: "#38bdf8" } : {}}
+                style={isActive ? { background: "rgba(251, 113, 133, 0.10)", color: "#fb7185" } : {}}
               >
                 <Icon size={16} strokeWidth={1.5} />
                 <span>{item.label}</span>

@@ -95,7 +95,7 @@ export default function ImportPage() {
             </table>
           </div>
           <div className="flex items-center justify-end mt-6 pt-4 border-t border-[var(--color-border)]">
-            <button onClick={handleImport} disabled={isPending||validCount===0} className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-cyan-500 rounded-lg hover:bg-cyan-400 transition-colors disabled:opacity-50"><FileText size={16}/>{isPending?"Import...":` Importer ${validCount} article${validCount>1?"s":""}`}</button>
+            <button onClick={handleImport} disabled={isPending||validCount===0} className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors disabled:opacity-50"><FileText size={16}/>{isPending?"Import...":` Importer ${validCount} article${validCount>1?"s":""}`}</button>
           </div>
         </div>
       )}
