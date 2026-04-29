@@ -117,8 +117,9 @@ export async function POST(req: NextRequest) {
 
     // Get user ID - webhook doesn't have auth session, so we look up the owner
     const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
-    const { data: settingsRow } = await supabase.from("shop_settings").select("user_id").limit(1).single();
+    const { data: settingsRow } = await supabase.from("shop_settings").select("user_id, shop_id").limit(1).single();
     const webhookUserId = settingsRow?.user_id;
+    const webhookShopId = settingsRow?.shop_id;
     if (!webhookUserId) {
       return NextResponse.json({ error: "No user configured" }, { status: 500 });
     }
@@ -128,6 +129,7 @@ export async function POST(req: NextRequest) {
       .insert(sales)
       .values({
         userId: webhookUserId,
+        shopId: webhookShopId,
         productId: matchedProduct?.id ?? null,
         channel: channel as any,
         salePrice: String(parsed.salePrice),

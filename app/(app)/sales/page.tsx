@@ -28,7 +28,7 @@ function ChannelBadge({ channel }: { channel: string }) {
   );
 }
 
-async function getSalesForPeriod(userId: string, period: string) {
+async function getSalesForPeriod(shopId: string, period: string) {
   const now = new Date();
   let startDate: Date | null = null;
 
@@ -71,7 +71,7 @@ export default async function SalesPage({ searchParams }: { searchParams: Promis
   const sp = await searchParams;
   const period = sp.period ?? "all";
   const { userId, shopId } = await getAuthContext();
-  const salesData = await getSalesForPeriod(userId, period);
+  const salesData = await getSalesForPeriod(shopId, period);
 
   const totalRevenue = salesData.reduce((s, v) => s + (Number(v.salePrice) || 0), 0);
   const totalMargin = salesData.reduce((s, v) => s + (Number(v.margin) || 0), 0);

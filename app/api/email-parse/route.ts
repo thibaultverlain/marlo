@@ -47,7 +47,8 @@ export async function POST(req: NextRequest) {
     const [sale] = await db
       .insert(sales)
       .values({
-        userId: auth.user.id,
+        userId: ctx.userId,
+        shopId: ctx.shopId,
         productId: matchedProduct?.id ?? null,
         channel: channel as any,
         salePrice: String(parsed.salePrice),
