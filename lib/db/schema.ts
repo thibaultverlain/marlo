@@ -8,6 +8,12 @@ export const teamRoleEnum = pgEnum("team_role", [
 export const invitationStatusEnum = pgEnum("invitation_status", [
   "pending", "accepted", "expired", "revoked"
 ]);
+export const taskStatusEnum = pgEnum("task_status", [
+  "a_faire", "en_cours", "fait"
+]);
+export const taskPriorityEnum = pgEnum("task_priority", [
+  "haute", "normale", "basse"
+]);
 
 export const productCategoryEnum = pgEnum("product_category", [
   "sacs", "chaussures", "vetements", "accessoires", "montres", "bijoux", "autre"
@@ -290,6 +296,25 @@ export const activityLog = pgTable("activity_log", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// ── Tasks ─────────────────────────────────────────────
+
+export const tasks = pgTable("tasks", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  shopId: uuid("shop_id").references(() => shops.id).notNull(),
+  createdBy: uuid("created_by").notNull(),
+  assignedTo: uuid("assigned_to"),
+  title: text("title").notNull(),
+  description: text("description"),
+  status: taskStatusEnum("status").notNull().default("a_faire"),
+  priority: taskPriorityEnum("priority").notNull().default("normale"),
+  relatedEntity: text("related_entity"),
+  relatedEntityId: uuid("related_entity_id"),
+  dueDate: date("due_date"),
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // ── Types ──────────────────────────────────────────────
 
 export type Product = typeof products.$inferSelect;
@@ -310,4 +335,6 @@ export type Shop = typeof shops.$inferSelect;
 export type TeamMember = typeof teamMembers.$inferSelect;
 export type TeamInvitation = typeof teamInvitations.$inferSelect;
 export type ActivityLogEntry = typeof activityLog.$inferSelect;
+export type Task = typeof tasks.$inferSelect;
+export type NewTask = typeof tasks.$inferInsert;
 export type TeamRole = "owner" | "manager" | "seller";

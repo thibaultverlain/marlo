@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Package, ShoppingCart, Users, Search,
-  ShoppingBag, FileText, Calculator, Settings, Menu, X, BarChart3, Users2,
+  ShoppingBag, FileText, Calculator, Settings, Menu, X, BarChart3, Users2, ListTodo,
 } from "lucide-react";
 import PushNotificationToggle from "./push-toggle";
 import ThemeToggle from "./theme-toggle";
@@ -20,6 +20,7 @@ const NAV_ITEMS = [
   { href: "/analytics", label: "Analytique", icon: BarChart3, minRole: "manager" },
   { href: "/sourcing", label: "Sourcing", icon: Search, alertKey: "sourcing", minRole: "manager" },
   { href: "/personal-shopping", label: "Personal Shop", icon: ShoppingBag, minRole: "manager" },
+  { href: "/tasks", label: "Tâches", icon: ListTodo, minRole: "seller" },
   { href: "/invoices", label: "Factures", icon: FileText, minRole: "owner" },
   { href: "/accounting", label: "Comptabilité", icon: Calculator, minRole: "owner" },
 ];

@@ -6,7 +6,7 @@ import NewSourcingForm from "@/components/sourcing/new-sourcing-form";
 export const dynamic = "force-dynamic";
 
 export default async function NewSourcingPage() {
-  const { userId, shopId } = await getAuthContext();
+  const { shopId } = await getAuthContext();
   const customers = await getAllCustomers(shopId);
   return (
     <div className="max-w-2xl space-y-6">

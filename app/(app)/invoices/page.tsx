@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 const SL: Record<string, { label: string; cl: string }> = { brouillon: { label: "Brouillon", cl: "bg-zinc-500/15 text-zinc-400" }, envoyee: { label: "Envoyée", cl: "bg-blue-500/15 text-blue-400" }, payee: { label: "Payée", cl: "bg-emerald-500/15 text-emerald-400" }, annulee: { label: "Annulée", cl: "bg-red-500/15 text-red-400" } };
 
 export default async function InvoicesPage() {
-  const { userId, shopId } = await getAuthContext();
+  const { shopId } = await getAuthContext();
   const [invoices, stats, settings] = await Promise.all([getAllInvoices(shopId), getInvoiceStats(shopId), getShopSettings(shopId)]);
   if (!settings) return (<div className="space-y-6"><div><h1 className="text-2xl lg:text-3xl text-white">Factures</h1></div><div className="bg-amber-500/[0.08] border border-amber-500/20 rounded-xl p-6"><h2 className="text-amber-300 font-semibold mb-2">Configuration requise</h2><p className="text-sm text-amber-400/80 mb-4">Configure tes informations légales dans Réglages avant d'émettre des factures.</p><Link href="/settings" className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors">Configurer</Link></div></div>);
 

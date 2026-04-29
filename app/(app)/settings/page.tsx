@@ -4,7 +4,7 @@ import SettingsForm from "@/components/settings/settings-form";
 export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {
-  const { userId, shopId } = await getAuthContext();
+  const { shopId } = await getAuthContext();
   const settings = await getShopSettings(shopId);
   return (
     <div className="max-w-3xl space-y-6">

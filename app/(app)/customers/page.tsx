@@ -7,7 +7,7 @@ import { formatCurrency, formatDate } from "@/lib/utils";
 export const dynamic = "force-dynamic";
 
 export default async function CustomersPage() {
-  const { userId, shopId } = await getAuthContext();
+  const { shopId } = await getAuthContext();
   const [customers, stats] = await Promise.all([getAllCustomers(shopId), getCustomerStats(shopId)]);
 
   return (

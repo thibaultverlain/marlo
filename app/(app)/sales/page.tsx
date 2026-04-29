@@ -70,7 +70,7 @@ async function getSalesForPeriod(shopId: string, period: string) {
 export default async function SalesPage({ searchParams }: { searchParams: Promise<{ period?: string }> }) {
   const sp = await searchParams;
   const period = sp.period ?? "all";
-  const { userId, shopId } = await getAuthContext();
+  const { shopId } = await getAuthContext();
   const salesData = await getSalesForPeriod(shopId, period);
 
   const totalRevenue = salesData.reduce((s, v) => s + (Number(v.salePrice) || 0), 0);

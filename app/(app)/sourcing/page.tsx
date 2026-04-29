@@ -11,7 +11,7 @@ const SM: Record<string, { label: string; cl: string; icon: React.ElementType }>
   annule: { label: "Annulé", cl: "bg-red-500/15 text-red-400", icon: XCircle },
 };
 export default async function SourcingPage() {
-  const { userId, shopId } = await getAuthContext();
+  const { shopId } = await getAuthContext();
   const [requests, stats] = await Promise.all([getAllSourcing(shopId), getSourcingStats(shopId)]);
   return (
     <div className="space-y-6">

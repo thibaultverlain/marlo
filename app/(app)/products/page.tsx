@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 export default async function ProductsPage({ searchParams }: { searchParams: Promise<{ show?: string }> }) {
   const sp = await searchParams;
   const showAll = sp.show === "all";
-  const { userId, shopId } = await getAuthContext();
+  const { shopId } = await getAuthContext();
   const [products, stats] = await Promise.all([
     showAll ? getAllProducts(shopId) : getInStockProducts(shopId),
     getStockStats(shopId),

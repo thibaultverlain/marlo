@@ -2,6 +2,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { db } from "@/lib/db/client";
 import { teamMembers, shops } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
+import { cache } from "react";
 import type { TeamRole } from "@/lib/db/schema";
 
 export type AuthContext = {
@@ -26,10 +27,9 @@ const ROLE_HIERARCHY: Record<TeamRole, number> = {
 
 /**
  * Get the authenticated user's context (user, shop, role).
- * If the user has no shop yet, auto-creates one (migration path for existing users).
- * Throws if not authenticated.
+ * Cached per request via React cache() — safe to call multiple times.
  */
-export async function getAuthContext(): Promise<AuthContext> {
+export const getAuthContext = cache(async (): Promise<AuthContext> => {
   const supabase = await createSupabaseServerClient();
   const { data: { user }, error } = await supabase.auth.getUser();
 
@@ -37,7 +37,6 @@ export async function getAuthContext(): Promise<AuthContext> {
     throw new Error("Non authentifié");
   }
 
-  // Find the user's team membership (for now, first shop they belong to)
   const membership = await db
     .select({
       shopId: teamMembers.shopId,
@@ -59,7 +58,6 @@ export async function getAuthContext(): Promise<AuthContext> {
   }
 
   // No shop found — auto-create for existing users (migration path)
-  // This ensures backward compatibility: existing single-user becomes owner
   const [newShop] = await db.insert(shops).values({
     name: "Ma boutique",
     ownerId: user.id,
@@ -77,7 +75,7 @@ export async function getAuthContext(): Promise<AuthContext> {
     role: "owner",
     shopName: newShop.name,
   };
-}
+});
 
 /**
  * Require a minimum role level. Throws if the user doesn't have sufficient permissions.

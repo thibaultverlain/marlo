@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 
 export default async function SourcingDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const { userId, shopId } = await getAuthContext();
+  const { shopId } = await getAuthContext();
   const [req, availableProducts] = await Promise.all([getSourcingById(id), getInStockProducts(shopId)]);
   if (!req) notFound();
   const commissionPct = req.commissionRate ? Number(req.commissionRate) * 100 : 0;

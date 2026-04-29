@@ -8,7 +8,7 @@ import NewSaleForm from "@/components/sales/new-sale-form";
 export const dynamic = "force-dynamic";
 
 export default async function NewSalePage({ searchParams }: { searchParams: Promise<{ productId?: string }> }) {
-  const { userId, shopId } = await getAuthContext();
+  const { shopId } = await getAuthContext();
   const [products, customers, sp] = await Promise.all([getInStockProducts(shopId), getAllCustomers(shopId), searchParams]);
   return (
     <div className="max-w-2xl space-y-6">
