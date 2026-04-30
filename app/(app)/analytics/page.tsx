@@ -39,8 +39,8 @@ export default function AnalyticsPage() {
   );
 
   if (!data || data.error) return (
-    <div className="space-y-6">
-      <h1 className="text-3xl text-white">Analytique</h1>
+    <div className="space-y-6 page-enter">
+      <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">Analytique</h1>
       <div className="card-static p-12 text-center">
         <p className="text-zinc-500">Pas assez de données pour afficher les analytics.</p>
       </div>
@@ -50,9 +50,9 @@ export default function AnalyticsPage() {
   const months = ["Jan", "Fév", "Mar", "Avr", "Mai", "Jun", "Jul", "Aoû", "Sep", "Oct", "Nov", "Déc"];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 page-enter">
       <div>
-        <h1 className="text-3xl text-white">Analytique</h1>
+        <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">Analytique</h1>
         <p className="text-zinc-500 mt-1 text-sm">Performance, vélocité et prédictions</p>
       </div>
 

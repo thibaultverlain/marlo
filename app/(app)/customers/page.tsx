@@ -11,10 +11,10 @@ export default async function CustomersPage() {
   const [customers, stats] = await Promise.all([getAllCustomers(shopId), getCustomerStats(shopId)]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 page-enter">
       <div className="flex items-start sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl lg:text-3xl text-white">Clients</h1>
+          <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">Clients</h1>
           <p className="text-zinc-500 mt-1 text-sm">{stats.total} client{stats.total > 1 ? "s" : ""}{stats.vipCount > 0 && ` · ${stats.vipCount} VIP`}</p>
         </div>
         <Link href="/customers/new" className="flex items-center gap-2 px-4 py-2 text-[13px] font-medium text-white bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors"><Plus size={14} />Ajouter</Link>

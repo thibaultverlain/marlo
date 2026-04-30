@@ -15,16 +15,16 @@ export default async function SourcingDetailPage({ params }: { params: Promise<{
   if (!req) notFound();
   const commissionPct = req.commissionRate ? Number(req.commissionRate) * 100 : 0;
   return (
-    <div className="max-w-3xl space-y-6">
+    <div className="max-w-3xl space-y-6 page-enter">
       <div className="flex items-center gap-4">
         <Link href="/sourcing" className="w-9 h-9 flex items-center justify-center rounded-lg border border-[var(--color-border)] text-zinc-500 hover:text-zinc-300 transition-colors"><ArrowLeft size={18} /></Link>
-        <div className="flex-1"><p className="text-[11px] text-zinc-600">Créée le {formatDate(req.createdAt)}</p><h1 className="text-2xl text-white">{req.description}</h1></div>
+        <div className="flex-1"><p className="text-[11px] text-zinc-600">Créée le {formatDate(req.createdAt)}</p><h1 className="text-2xl font-bold text-white tracking-tight">{req.description}</h1></div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 lg:gap-4">
-        <div className="card-static p-5"><p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Budget</p><p className="text-2xl font-semibold text-white tabular-nums">{req.targetBudget ? formatCurrency(req.targetBudget) : "—"}</p></div>
-        <div className="card-static p-5"><p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Commission</p><p className="text-2xl font-semibold text-rose-400">{commissionPct > 0 ? `${commissionPct.toFixed(0)}%` : "—"}</p>{req.commissionAmount && <p className="text-[11px] text-zinc-500 mt-0.5">{formatCurrency(req.commissionAmount)}</p>}</div>
-        <div className="card-static p-5"><p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Deadline</p><p className="text-lg font-semibold text-white">{req.deadline ? formatDate(req.deadline) : "—"}</p></div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="kpi-card p-5 flex flex-col justify-between min-h-[110px]"><p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Budget</p><p className="text-[24px] font-bold text-white tabular-nums mt-auto">{req.targetBudget ? formatCurrency(req.targetBudget) : "—"}</p></div>
+        <div className="kpi-card p-5 flex flex-col justify-between min-h-[110px]"><p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Commission</p><p className="text-[24px] font-bold text-rose-400 mt-auto">{commissionPct > 0 ? `${commissionPct.toFixed(0)}%` : "—"}</p>{req.commissionAmount && <p className="text-[11px] text-zinc-500 mt-0.5">{formatCurrency(req.commissionAmount)}</p>}</div>
+        <div className="kpi-card p-5 flex flex-col justify-between min-h-[110px]"><p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Deadline</p><p className="text-[20px] font-bold text-white mt-auto">{req.deadline ? formatDate(req.deadline) : "—"}</p></div>
       </div>
 
       <div className="card-static p-6">

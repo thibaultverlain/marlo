@@ -11,10 +11,10 @@ export default async function NewSalePage({ searchParams }: { searchParams: Prom
   const { shopId } = await getAuthContext();
   const [products, customers, sp] = await Promise.all([getInStockProducts(shopId), getAllCustomers(shopId), searchParams]);
   return (
-    <div className="max-w-2xl space-y-6">
+    <div className="max-w-2xl space-y-6 page-enter">
       <div className="flex items-center gap-4">
         <Link href="/sales" className="w-9 h-9 flex items-center justify-center rounded-lg border border-[var(--color-border)] text-zinc-500 hover:text-zinc-300 transition-colors"><ArrowLeft size={18} /></Link>
-        <div><h1 className="text-2xl text-white">Nouvelle vente</h1><p className="text-sm text-zinc-500 mt-0.5">Enregistrer une vente</p></div>
+        <div><h1 className="text-2xl font-bold text-white tracking-tight">Nouvelle vente</h1><p className="text-sm text-zinc-500 mt-0.5">Enregistrer une vente</p></div>
       </div>
       {products.length === 0 ? (
         <div className="card-static p-10 text-center"><p className="text-zinc-500 mb-4 text-sm">Aucun article en stock.</p><Link href="/products/new" className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors">Ajouter un article</Link></div>

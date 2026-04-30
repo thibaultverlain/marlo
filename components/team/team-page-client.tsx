@@ -167,8 +167,8 @@ export default function TeamPageClient({
             <Store size={16} className="text-[var(--color-accent)]" />
           </div>
           <div>
-            <h2 className="text-sm font-semibold text-[var(--color-text)]">Boutique</h2>
-            <p className="text-xs text-[var(--color-text-muted)]">Nom affiché pour l'équipe</p>
+            <h2 className="text-sm font-semibold text-white">Boutique</h2>
+            <p className="text-xs text-zinc-500">Nom affiché pour l'équipe</p>
           </div>
         </div>
         {editingShopName ? (
@@ -177,19 +177,19 @@ export default function TeamPageClient({
               type="text"
               value={newShopName}
               onChange={(e) => setNewShopName(e.target.value)}
-              className="flex-1 bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm text-[var(--color-text)] focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
+              className="flex-1 bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
               autoFocus
             />
             <button onClick={handleSaveShopName} disabled={isPending} className="px-4 py-2 bg-[var(--color-accent)] text-white text-sm font-medium rounded-lg hover:opacity-90 transition disabled:opacity-50">
               Enregistrer
             </button>
-            <button onClick={() => { setEditingShopName(false); setNewShopName(shopName); }} className="px-3 py-2 text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text)]">
+            <button onClick={() => { setEditingShopName(false); setNewShopName(shopName); }} className="px-3 py-2 text-sm text-zinc-500 hover:text-white">
               Annuler
             </button>
           </div>
         ) : (
           <div className="flex items-center justify-between">
-            <span className="text-[var(--color-text)] font-medium">{shopName}</span>
+            <span className="text-white font-medium">{shopName}</span>
             <button onClick={() => setEditingShopName(true)} className="text-xs text-[var(--color-accent)] hover:underline">
               Modifier
             </button>
@@ -199,7 +199,7 @@ export default function TeamPageClient({
 
       {/* Role legend */}
       <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-card)] p-5">
-        <h2 className="text-sm font-semibold text-[var(--color-text)] mb-4">Permissions par rôle</h2>
+        <h2 className="text-sm font-semibold text-white mb-4">Permissions par rôle</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {(["owner", "manager", "seller"] as const).map((role) => (
             <div key={role} className="rounded-lg border border-[var(--color-border)] p-3">
@@ -209,7 +209,7 @@ export default function TeamPageClient({
                   {ROLE_LABELS[role]}
                 </span>
               </div>
-              <p className="text-xs text-[var(--color-text-muted)]">{ROLE_DESCRIPTIONS[role]}</p>
+              <p className="text-xs text-zinc-500">{ROLE_DESCRIPTIONS[role]}</p>
             </div>
           ))}
         </div>
@@ -218,7 +218,7 @@ export default function TeamPageClient({
       {/* Members */}
       <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-card)] p-5">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-semibold text-[var(--color-text)]">
+          <h2 className="text-sm font-semibold text-white">
             Membres ({members.length})
           </h2>
           <button
@@ -239,14 +239,14 @@ export default function TeamPageClient({
                 placeholder="email@exemple.com"
                 value={inviteEmail}
                 onChange={(e) => setInviteEmail(e.target.value)}
-                className="flex-1 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
+                className="flex-1 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
                 onKeyDown={(e) => e.key === "Enter" && handleInvite()}
               />
               <div className="flex gap-2">
                 <select
                   value={inviteRole}
                   onChange={(e) => setInviteRole(e.target.value as "manager" | "seller")}
-                  className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm text-[var(--color-text)] focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
+                  className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
                 >
                   <option value="seller">Vendeur</option>
                   <option value="manager">Manager</option>
@@ -260,7 +260,7 @@ export default function TeamPageClient({
                 </button>
               </div>
             </div>
-            <p className="text-[10px] text-[var(--color-text-muted)] mt-2">
+            <p className="text-[10px] text-zinc-500 mt-2">
               Le lien d'invitation sera copié automatiquement. Validité : 7 jours.
             </p>
           </div>
@@ -274,12 +274,12 @@ export default function TeamPageClient({
             return (
               <div key={m.id} className="flex items-center justify-between py-3 px-3 rounded-lg hover:bg-[var(--color-bg)]/50 transition group">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-[var(--color-border)] flex items-center justify-center text-xs font-semibold text-[var(--color-text-muted)]">
+                  <div className="w-8 h-8 rounded-full bg-[var(--color-border)] flex items-center justify-center text-xs font-semibold text-zinc-500">
                     {m.userId.substring(0, 2).toUpperCase()}
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-[var(--color-text)]">
+                      <span className="text-sm text-white">
                         {isSelf ? "Vous" : `Membre ${m.userId.substring(0, 8)}`}
                       </span>
                       <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold border ${ROLE_COLORS[m.role]}`}>
@@ -287,7 +287,7 @@ export default function TeamPageClient({
                         {ROLE_LABELS[m.role]}
                       </span>
                     </div>
-                    <p className="text-[11px] text-[var(--color-text-muted)]">
+                    <p className="text-[11px] text-zinc-500">
                       Depuis {new Date(m.joinedAt).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
                     </p>
                   </div>
@@ -298,7 +298,7 @@ export default function TeamPageClient({
                     <select
                       value={m.role}
                       onChange={(e) => handleUpdateRole(m.id, e.target.value as "manager" | "seller")}
-                      className="bg-[var(--color-bg)] border border-[var(--color-border)] rounded px-2 py-1 text-[11px] text-[var(--color-text)] focus:outline-none"
+                      className="bg-[var(--color-bg)] border border-[var(--color-border)] rounded px-2 py-1 text-[11px] text-white focus:outline-none"
                     >
                       <option value="seller">Vendeur</option>
                       <option value="manager">Manager</option>
@@ -313,7 +313,7 @@ export default function TeamPageClient({
                         </button>
                         <button
                           onClick={() => setConfirmRemove(null)}
-                          className="px-2 py-1 text-[11px] text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
+                          className="px-2 py-1 text-[11px] text-zinc-500 hover:text-white"
                         >
                           Annuler
                         </button>
@@ -321,7 +321,7 @@ export default function TeamPageClient({
                     ) : (
                       <button
                         onClick={() => setConfirmRemove(m.id)}
-                        className="p-1.5 rounded hover:bg-red-500/10 text-[var(--color-text-muted)] hover:text-red-400 transition"
+                        className="p-1.5 rounded hover:bg-red-500/10 text-zinc-500 hover:text-red-400 transition"
                         title="Retirer"
                       >
                         <Trash2 size={13} />
@@ -338,19 +338,19 @@ export default function TeamPageClient({
       {/* Pending invitations */}
       {invitations.length > 0 && (
         <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-card)] p-5">
-          <h2 className="text-sm font-semibold text-[var(--color-text)] mb-4 flex items-center gap-2">
-            <Clock size={14} className="text-[var(--color-text-muted)]" />
+          <h2 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
+            <Clock size={14} className="text-zinc-500" />
             Invitations en attente ({invitations.length})
           </h2>
           <div className="space-y-2">
             {invitations.map((inv) => (
               <div key={inv.id} className="flex items-center justify-between py-2.5 px-3 rounded-lg bg-[var(--color-bg)]/40">
                 <div>
-                  <span className="text-sm text-[var(--color-text)]">{inv.email}</span>
+                  <span className="text-sm text-white">{inv.email}</span>
                   <span className={`ml-2 inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold border ${ROLE_COLORS[inv.role]}`}>
                     {ROLE_LABELS[inv.role]}
                   </span>
-                  <p className="text-[10px] text-[var(--color-text-muted)]">
+                  <p className="text-[10px] text-zinc-500">
                     Expire le {new Date(inv.expiresAt).toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}
                   </p>
                 </div>
@@ -362,7 +362,7 @@ export default function TeamPageClient({
                       setCopiedToken(inv.token);
                       setTimeout(() => setCopiedToken(null), 2000);
                     }}
-                    className="p-1.5 rounded hover:bg-[var(--color-border)]/50 text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition"
+                    className="p-1.5 rounded hover:bg-[var(--color-border)]/50 text-zinc-500 hover:text-white transition"
                     title="Copier le lien"
                   >
                     {copiedToken === inv.token ? <Check size={13} className="text-emerald-400" /> : <Copy size={13} />}
@@ -370,7 +370,7 @@ export default function TeamPageClient({
                   <button
                     onClick={() => handleRevokeInvitation(inv.id)}
                     disabled={isPending}
-                    className="p-1.5 rounded hover:bg-red-500/10 text-[var(--color-text-muted)] hover:text-red-400 transition"
+                    className="p-1.5 rounded hover:bg-red-500/10 text-zinc-500 hover:text-red-400 transition"
                     title="Révoquer"
                   >
                     <X size={13} />
@@ -385,8 +385,8 @@ export default function TeamPageClient({
       {/* Activity log */}
       {activity.length > 0 && (
         <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-card)] p-5">
-          <h2 className="text-sm font-semibold text-[var(--color-text)] mb-4 flex items-center gap-2">
-            <Activity size={14} className="text-[var(--color-text-muted)]" />
+          <h2 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
+            <Activity size={14} className="text-zinc-500" />
             Activité récente
           </h2>
           <div className="space-y-1">
@@ -394,14 +394,14 @@ export default function TeamPageClient({
               <div key={a.id} className="flex items-center justify-between py-2 px-2 text-xs">
                 <div className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)]/50" />
-                  <span className="text-[var(--color-text-muted)]">
+                  <span className="text-zinc-500">
                     {ACTION_LABELS[a.action] || a.action}
                   </span>
                   {a.details && (
-                    <span className="text-[var(--color-text)]">{a.details}</span>
+                    <span className="text-white">{a.details}</span>
                   )}
                 </div>
-                <span className="text-[var(--color-text-muted)] text-[10px]">{timeAgo(a.createdAt)}</span>
+                <span className="text-zinc-500 text-[10px]">{timeAgo(a.createdAt)}</span>
               </div>
             ))}
           </div>

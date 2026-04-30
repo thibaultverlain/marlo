@@ -83,10 +83,10 @@ export default async function SalesPage({ searchParams }: { searchParams: Promis
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 page-enter">
       <div className="flex items-start sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl lg:text-3xl text-white">Ventes</h1>
+          <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">Ventes</h1>
           <p className="text-zinc-500 mt-1 text-sm">
             {salesData.length} vente{salesData.length > 1 ? "s" : ""} · CA {formatCurrency(totalRevenue)} · Marge {formatCurrency(totalMargin)}
           </p>

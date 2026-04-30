@@ -91,14 +91,14 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
   if (!customer) notFound();
 
   return (
-    <div className="max-w-4xl space-y-6">
+    <div className="max-w-4xl space-y-6 page-enter">
       {/* Header */}
       <div className="flex items-center gap-4">
         <Link href="/customers" className="w-9 h-9 flex items-center justify-center rounded-lg border border-[var(--color-border)] text-zinc-500 hover:text-zinc-300 transition-colors"><ArrowLeft size={18} /></Link>
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center text-sm font-semibold text-zinc-400">{customer.firstName[0]}{customer.lastName[0]}</div>
           <div>
-            <div className="flex items-center gap-2"><h1 className="text-2xl text-white">{customer.firstName} {customer.lastName}</h1>{customer.vip && <Star size={16} className="text-amber-400 fill-amber-400" />}</div>
+            <div className="flex items-center gap-2"><h1 className="text-2xl font-bold text-white tracking-tight">{customer.firstName} {customer.lastName}</h1>{customer.vip && <Star size={16} className="text-amber-400 fill-amber-400" />}</div>
             {customer.city && <p className="text-sm text-zinc-500">{customer.city}</p>}
           </div>
         </div>
@@ -106,31 +106,43 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
 
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-        <div className="card-static p-4">
-          <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Total dépensé</p>
-          <p className="text-xl font-semibold text-white tabular-nums">{formatCurrency(metrics.totalSpent)}</p>
-        </div>
-        <div className="card-static p-4">
-          <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Commandes</p>
-          <p className="text-xl font-semibold text-white">{metrics.count}</p>
-        </div>
-        <div className="card-static p-4">
-          <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Panier moyen</p>
-          <p className="text-xl font-semibold text-white tabular-nums">{formatCurrency(metrics.avgBasket)}</p>
-        </div>
-        <div className="card-static p-4">
-          <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Marge moy.</p>
-          <p className="text-xl font-semibold text-emerald-400 tabular-nums">{formatPercent(metrics.avgMarginPct)}</p>
-        </div>
-        <div className="card-static p-4">
-          <div className="flex items-center gap-1 mb-1">
-            <Clock size={10} className="text-zinc-500" />
-            <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider">Fréquence</p>
+        <div className="kpi-card p-4 flex flex-col justify-between min-h-[100px]">
+          <div className="flex items-start justify-between">
+            <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Total depense</p>
+            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center"><TrendingUp size={15} className="text-emerald-400" /></div>
           </div>
-          <p className="text-xl font-semibold text-white">
-            {metrics.frequencyDays ? `${metrics.frequencyDays}j` : "—"}
-          </p>
-          {metrics.frequencyDays && <p className="text-[10px] text-zinc-600 mt-0.5">entre chaque achat</p>}
+          <p className="text-[20px] font-bold text-white tabular-nums mt-auto">{formatCurrency(metrics.totalSpent)}</p>
+        </div>
+        <div className="kpi-card p-4 flex flex-col justify-between min-h-[100px]">
+          <div className="flex items-start justify-between">
+            <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Commandes</p>
+            <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center"><ShoppingCart size={15} className="text-blue-400" /></div>
+          </div>
+          <p className="text-[20px] font-bold text-white mt-auto">{metrics.count}</p>
+        </div>
+        <div className="kpi-card p-4 flex flex-col justify-between min-h-[100px]">
+          <div className="flex items-start justify-between">
+            <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Panier moyen</p>
+            <div className="w-8 h-8 rounded-xl bg-violet-500/10 flex items-center justify-center"><Package size={15} className="text-violet-400" /></div>
+          </div>
+          <p className="text-[20px] font-bold text-white tabular-nums mt-auto">{formatCurrency(metrics.avgBasket)}</p>
+        </div>
+        <div className="kpi-card p-4 flex flex-col justify-between min-h-[100px]">
+          <div className="flex items-start justify-between">
+            <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Marge moy.</p>
+            <div className="w-8 h-8 rounded-xl bg-rose-500/10 flex items-center justify-center"><TrendingUp size={15} className="text-rose-400" /></div>
+          </div>
+          <p className="text-[20px] font-bold text-emerald-400 tabular-nums mt-auto">{formatPercent(metrics.avgMarginPct)}</p>
+        </div>
+        <div className="kpi-card p-4 flex flex-col justify-between min-h-[100px]">
+          <div className="flex items-start justify-between">
+            <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Frequence</p>
+            <div className="w-8 h-8 rounded-xl bg-amber-500/10 flex items-center justify-center"><Clock size={15} className="text-amber-400" /></div>
+          </div>
+          <div className="mt-auto">
+            <p className="text-[20px] font-bold text-white">{metrics.frequencyDays ? `${metrics.frequencyDays}j` : "—"}</p>
+            {metrics.frequencyDays && <p className="text-[10px] text-zinc-600 mt-0.5">entre chaque achat</p>}
+          </div>
         </div>
       </div>
 

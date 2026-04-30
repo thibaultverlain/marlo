@@ -10,9 +10,9 @@ export default async function PersonalShoppingPage() {
   const { shopId } = await getAuthContext();
   const [missions, stats] = await Promise.all([getAllMissions(shopId), getMissionStats(shopId)]);
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 page-enter">
       <div className="flex items-start sm:items-center justify-between gap-3">
-        <div><h1 className="text-2xl lg:text-3xl text-white">Personal Shopping</h1><p className="text-zinc-500 mt-1 text-sm">{stats.total} mission{stats.total>1?"s":""}{stats.totalCommissions>0&&` · ${formatCurrency(stats.totalCommissions)} commissions`}</p></div>
+        <div><h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">Personal Shopping</h1><p className="text-zinc-500 mt-1 text-sm">{stats.total} mission{stats.total>1?"s":""}{stats.totalCommissions>0&&` · ${formatCurrency(stats.totalCommissions)} commissions`}</p></div>
         <Link href="/personal-shopping/new" className="flex items-center gap-2 px-4 py-2 text-[13px] font-medium text-white bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors"><Plus size={14} />Nouvelle mission</Link>
       </div>
       {missions.length === 0 ? <div className="card-static p-12 text-center"><ShoppingBag size={40} className="mx-auto text-zinc-700 mb-3" /><p className="text-zinc-500 mb-4 text-sm">Aucune mission</p><Link href="/personal-shopping/new" className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors"><Plus size={14} />Créer</Link></div> : (

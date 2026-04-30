@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus, Upload, Package, FileDown } from "lucide-react";
+import { Plus, Upload, Package, FileDown, ShoppingCart, TrendingUp } from "lucide-react";
 import { getInStockProducts, getAllProducts, getStockStats } from "@/lib/db/queries/products";
 import { daysSince, formatCurrency } from "@/lib/utils";
 import { getAuthContext } from "@/lib/auth/require-role";
@@ -22,10 +22,10 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   const inStockCount = stats?.inStock ?? 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 page-enter">
       <div className="flex items-start sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl lg:text-3xl text-white">Stock</h1>
+          <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">Stock</h1>
           <p className="text-zinc-500 mt-1 text-sm">
             {inStockCount} article{inStockCount > 1 ? "s" : ""} en stock
             {stats?.dormant && stats.dormant > 0 && (
@@ -63,21 +63,33 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       {/* Stock value KPIs */}
       {inStockCount > 0 && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <div className="card-static p-4">
-            <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Articles en stock</p>
-            <p className="text-xl font-semibold text-white">{inStockCount}</p>
+          <div className="kpi-card p-4 flex flex-col justify-between min-h-[110px]">
+            <div className="flex items-start justify-between">
+              <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Articles en stock</p>
+              <div className="w-9 h-9 rounded-xl bg-violet-500/10 flex items-center justify-center"><Package size={17} className="text-violet-400" /></div>
+            </div>
+            <p className="text-[22px] font-bold tabular-nums text-white mt-auto">{inStockCount}</p>
           </div>
-          <div className="card-static p-4">
-            <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Valeur d'achat</p>
-            <p className="text-xl font-semibold text-white tabular-nums">{formatCurrency(stockValue)}</p>
+          <div className="kpi-card p-4 flex flex-col justify-between min-h-[110px]">
+            <div className="flex items-start justify-between">
+              <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Valeur d'achat</p>
+              <div className="w-9 h-9 rounded-xl bg-blue-500/10 flex items-center justify-center"><ShoppingCart size={17} className="text-blue-400" /></div>
+            </div>
+            <p className="text-[22px] font-bold tabular-nums text-white mt-auto">{formatCurrency(stockValue)}</p>
           </div>
-          <div className="card-static p-4">
-            <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Valeur visée</p>
-            <p className="text-xl font-semibold text-white tabular-nums">{formatCurrency(targetValue)}</p>
+          <div className="kpi-card p-4 flex flex-col justify-between min-h-[110px]">
+            <div className="flex items-start justify-between">
+              <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Valeur visée</p>
+              <div className="w-9 h-9 rounded-xl bg-cyan-500/10 flex items-center justify-center"><TrendingUp size={17} className="text-cyan-400" /></div>
+            </div>
+            <p className="text-[22px] font-bold tabular-nums text-white mt-auto">{formatCurrency(targetValue)}</p>
           </div>
-          <div className="card-static p-4">
-            <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Marge potentielle</p>
-            <p className={`text-xl font-semibold tabular-nums ${potentialMargin >= 0 ? "text-emerald-400" : "text-red-400"}`}>{formatCurrency(potentialMargin)}</p>
+          <div className="kpi-card p-4 flex flex-col justify-between min-h-[110px]">
+            <div className="flex items-start justify-between">
+              <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Marge potentielle</p>
+              <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${potentialMargin >= 0 ? "bg-emerald-500/10" : "bg-red-500/10"}`}><TrendingUp size={17} className={potentialMargin >= 0 ? "text-emerald-400" : "text-red-400"} /></div>
+            </div>
+            <p className={`text-[22px] font-bold tabular-nums mt-auto ${potentialMargin >= 0 ? "text-emerald-400" : "text-red-400"}`}>{formatCurrency(potentialMargin)}</p>
           </div>
         </div>
       )}

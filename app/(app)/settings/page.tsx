@@ -7,8 +7,8 @@ export default async function SettingsPage() {
   const { shopId } = await getAuthContext();
   const settings = await getShopSettings(shopId);
   return (
-    <div className="max-w-3xl space-y-6">
-      <div><h1 className="text-3xl text-white">Réglages</h1><p className="text-zinc-500 mt-1 text-sm">Informations légales pour les factures</p></div>
+    <div className="max-w-3xl space-y-6 page-enter">
+      <div><h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">Réglages</h1><p className="text-zinc-500 mt-1 text-sm">Informations légales pour les factures</p></div>
       <SettingsForm initialData={settings} />
     </div>
   );

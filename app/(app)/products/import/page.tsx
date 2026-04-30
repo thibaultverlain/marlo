@@ -62,10 +62,10 @@ export default function ImportPage() {
   const validCount = rows.filter((r) => r.title && r.brand && r.purchasePrice).length;
 
   return (
-    <div className="max-w-3xl space-y-6">
+    <div className="max-w-3xl space-y-6 page-enter">
       <div className="flex items-center gap-4">
         <Link href="/products" className="w-9 h-9 flex items-center justify-center rounded-lg border border-[var(--color-border)] text-zinc-500 hover:text-zinc-300 transition-colors"><ArrowLeft size={18} /></Link>
-        <div><h1 className="text-2xl text-white">Importer</h1><p className="text-sm text-zinc-500 mt-0.5">CSV</p></div>
+        <div><h1 className="text-2xl font-bold text-white tracking-tight">Importer</h1><p className="text-sm text-zinc-500 mt-0.5">CSV</p></div>
       </div>
 
       {success && <div className="flex items-start gap-2 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-sm text-emerald-400"><CheckCircle size={16} className="flex-shrink-0 mt-0.5" /><div><p className="font-semibold">{success.imported} importé{success.imported>1?"s":""}</p><p className="text-[11px] text-emerald-500 mt-1">Redirection...</p></div></div>}

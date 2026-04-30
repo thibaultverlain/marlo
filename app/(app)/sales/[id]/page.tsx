@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, User, Package, FileText, Truck, Eye } from "lucide-react";
+import { ArrowLeft, User, Package, FileText, Truck, Eye, ShoppingCart, TrendingUp } from "lucide-react";
 import { getSaleById } from "@/lib/db/queries/sales";
 import { getCustomerById } from "@/lib/db/queries/customers";
 import { getProductById } from "@/lib/db/queries/products";
@@ -27,16 +27,34 @@ export default async function SaleDetailPage({ params }: { params: Promise<{ id:
   const channelLabel = CHANNELS.find((c) => c.value === sale.channel)?.label ?? sale.channel;
 
   return (
-    <div className="max-w-3xl space-y-6">
+    <div className="max-w-3xl space-y-6 page-enter">
       <div className="flex items-center gap-4">
         <Link href="/sales" className="w-9 h-9 flex items-center justify-center rounded-lg border border-[var(--color-border)] text-zinc-500 hover:text-zinc-300 transition-colors"><ArrowLeft size={18} /></Link>
-        <div className="flex-1"><p className="text-[11px] text-zinc-600">Vente du {formatDate(sale.soldAt)}</p><h1 className="text-2xl text-white">{product?.title ?? "Article supprimé"}</h1></div>
+        <div className="flex-1"><p className="text-[11px] text-zinc-600">Vente du {formatDate(sale.soldAt)}</p><h1 className="text-2xl font-bold text-white tracking-tight">{product?.title ?? "Article supprimé"}</h1></div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 lg:gap-4">
-        <div className="card-static p-5"><p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Prix de vente</p><p className="text-2xl font-semibold text-white tabular-nums">{formatCurrency(sale.salePrice)}</p><p className="text-[11px] text-zinc-600 mt-0.5">sur {channelLabel}</p></div>
-        <div className="card-static p-5"><p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Revenu net</p><p className="text-2xl font-semibold text-white tabular-nums">{formatCurrency(sale.netRevenue)}</p><p className="text-[11px] text-zinc-600 mt-0.5">Après {formatCurrency(sale.platformFees)} de frais</p></div>
-        <div className="card-static p-5"><p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-1">Marge nette</p><p className={`text-2xl font-semibold tabular-nums ${Number(sale.margin) >= 0 ? "text-emerald-400" : "text-red-400"}`}>{formatCurrency(sale.margin)}</p><p className={`text-[11px] mt-0.5 ${Number(sale.marginPct) >= 0 ? "text-emerald-500" : "text-red-500"}`}>{formatPercent(Number(sale.marginPct))}</p></div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="kpi-card p-5 flex flex-col justify-between min-h-[110px]">
+          <div className="flex items-start justify-between">
+            <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Prix de vente</p>
+            <div className="w-9 h-9 rounded-xl bg-blue-500/10 flex items-center justify-center"><ShoppingCart size={17} className="text-blue-400" /></div>
+          </div>
+          <div className="mt-auto"><p className="text-[24px] font-bold text-white tabular-nums">{formatCurrency(sale.salePrice)}</p><p className="text-[11px] text-zinc-600 mt-0.5">sur {channelLabel}</p></div>
+        </div>
+        <div className="kpi-card p-5 flex flex-col justify-between min-h-[110px]">
+          <div className="flex items-start justify-between">
+            <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Revenu net</p>
+            <div className="w-9 h-9 rounded-xl bg-violet-500/10 flex items-center justify-center"><TrendingUp size={17} className="text-violet-400" /></div>
+          </div>
+          <div className="mt-auto"><p className="text-[24px] font-bold text-white tabular-nums">{formatCurrency(sale.netRevenue)}</p><p className="text-[11px] text-zinc-600 mt-0.5">Apres {formatCurrency(sale.platformFees)} de frais</p></div>
+        </div>
+        <div className="kpi-card p-5 flex flex-col justify-between min-h-[110px]">
+          <div className="flex items-start justify-between">
+            <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Marge nette</p>
+            <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${Number(sale.margin) >= 0 ? "bg-emerald-500/10" : "bg-red-500/10"}`}><TrendingUp size={17} className={Number(sale.margin) >= 0 ? "text-emerald-400" : "text-red-400"} /></div>
+          </div>
+          <div className="mt-auto"><p className={`text-[24px] font-bold tabular-nums ${Number(sale.margin) >= 0 ? "text-emerald-400" : "text-red-400"}`}>{formatCurrency(sale.margin)}</p><p className={`text-[11px] mt-0.5 ${Number(sale.marginPct) >= 0 ? "text-emerald-500" : "text-red-500"}`}>{formatPercent(Number(sale.marginPct))}</p></div>
+        </div>
       </div>
 
       {product && (
