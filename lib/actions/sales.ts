@@ -7,6 +7,8 @@ import { z } from "zod";
 import { createSale } from "@/lib/db/queries/sales";
 import { getProductById } from "@/lib/db/queries/products";
 import { calculatePlatformFees, calculateMargin } from "@/lib/data";
+import { notifyShopMembers } from "@/lib/db/queries/notifications";
+import { formatCurrency } from "@/lib/utils";
 
 // Clean price string: accept comma or dot, strip currency symbols and spaces
 function cleanPrice(s: string | null | undefined): string {
@@ -93,6 +95,27 @@ export async function createSaleAction(formData: FormData) {
       trackingNumber: parsed.data.trackingNumber ?? null,
       shippingStatus: parsed.data.channel === "prive" ? null : "a_expedier",
       notes: parsed.data.notes ?? null,
+    });
+
+    const productTitle = product?.title ?? "Article";
+    await notifyShopMembers(
+      ctx.shopId,
+      ctx.userId,
+      "sale_recorded",
+      "Nouvelle vente",
+      `${productTitle} — ${formatCurrency(salePriceNum)}`,
+      "/sales"
+    );
+
+    // Execute automations
+    const { executeAutomations } = await import("@/lib/automations/engine");
+    await executeAutomations("sale_recorded", {
+      shopId: ctx.shopId,
+      userId: ctx.userId,
+      entityType: "sale",
+      entityTitle: productTitle,
+      marginPct: marginPct,
+      salePrice: salePriceNum,
     });
   } catch (err) {
     console.error("createSaleAction error:", err);

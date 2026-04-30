@@ -5,11 +5,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Package, ShoppingCart, Users, Search,
-  ShoppingBag, FileText, Calculator, Settings, Menu, X, BarChart3, Users2, ListTodo,
+  ShoppingBag, FileText, Calculator, Settings, Menu, X, BarChart3, Users2, ListTodo, Zap,
 } from "lucide-react";
 import PushNotificationToggle from "./push-toggle";
 import ThemeToggle from "./theme-toggle";
 import LogoutButton from "./logout-button";
+import NotificationBell from "./notification-bell";
+import ShopSwitcher from "./shop-switcher";
 import { MarloIcon, MarloWordmark } from "./marlo-logo";
 
 const NAV_ITEMS = [
@@ -26,13 +28,26 @@ const NAV_ITEMS = [
 ];
 
 const BOTTOM_ITEMS = [
+  { href: "/automations", label: "Automations", icon: Zap, minRole: "owner" },
   { href: "/team", label: "Équipe", icon: Users2, minRole: "owner" },
   { href: "/settings", label: "Réglages", icon: Settings, minRole: "owner" },
 ];
 
 const ROLE_LEVEL: Record<string, number> = { owner: 3, manager: 2, seller: 1 };
 
-export default function Sidebar({ role = "owner" }: { role?: string }) {
+type ShopInfo = { shopId: string; shopName: string; role: string };
+
+export default function Sidebar({
+  role = "owner",
+  shops = [],
+  currentShopId = "",
+  currentShopName = "",
+}: {
+  role?: string;
+  shops?: ShopInfo[];
+  currentShopId?: string;
+  currentShopName?: string;
+}) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [alertCount, setAlertCount] = useState(0);
@@ -76,6 +91,8 @@ export default function Sidebar({ role = "owner" }: { role?: string }) {
           </div>
         </div>
 
+        <ShopSwitcher shops={shops} currentShopId={currentShopId} currentShopName={currentShopName} />
+
         <div className="h-14 lg:hidden" />
 
         <nav className="flex-1 px-3 py-2 space-y-[2px] overflow-y-auto">
@@ -107,6 +124,7 @@ export default function Sidebar({ role = "owner" }: { role?: string }) {
         </nav>
 
         <div className="px-3 py-3 border-t border-[var(--color-border-subtle)] space-y-1">
+          <NotificationBell />
           <PushNotificationToggle />
           <ThemeToggle />
           {visibleBottom.map((item) => {

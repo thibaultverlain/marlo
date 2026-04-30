@@ -315,6 +315,37 @@ export const tasks = pgTable("tasks", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// ── Notifications ─────────────────────────────────────
+
+export const notifications = pgTable("notifications", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  shopId: uuid("shop_id").references(() => shops.id).notNull(),
+  userId: uuid("user_id").notNull(),
+  type: text("type").notNull(),
+  title: text("title").notNull(),
+  body: text("body"),
+  href: text("href"),
+  read: boolean("read").notNull().default(false),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// ── Automations ──────────────────────────────────────
+
+export const automations = pgTable("automations", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  shopId: uuid("shop_id").references(() => shops.id).notNull(),
+  name: text("name").notNull(),
+  trigger: text("trigger").notNull(),
+  triggerValue: text("trigger_value"),
+  action: text("action").notNull(),
+  actionValue: text("action_value"),
+  enabled: boolean("enabled").notNull().default(true),
+  lastRun: timestamp("last_run"),
+  runCount: integer("run_count").notNull().default(0),
+  createdBy: uuid("created_by").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // ── Types ──────────────────────────────────────────────
 
 export type Product = typeof products.$inferSelect;
@@ -337,4 +368,7 @@ export type TeamInvitation = typeof teamInvitations.$inferSelect;
 export type ActivityLogEntry = typeof activityLog.$inferSelect;
 export type Task = typeof tasks.$inferSelect;
 export type NewTask = typeof tasks.$inferInsert;
+export type Notification = typeof notifications.$inferSelect;
+export type Automation = typeof automations.$inferSelect;
+export type NewAutomation = typeof automations.$inferInsert;
 export type TeamRole = "owner" | "manager" | "seller";

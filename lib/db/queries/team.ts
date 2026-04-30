@@ -154,6 +154,17 @@ export async function acceptInvitation(token: string, userId: string) {
   // Mark invitation as accepted
   await db.update(teamInvitations).set({ status: "accepted" }).where(eq(teamInvitations.id, invitation.id));
 
+  // Notify shop owner that someone joined
+  const { notifyShopMembers } = await import("./notifications");
+  await notifyShopMembers(
+    invitation.shopId,
+    userId,
+    "member_joined",
+    "Nouveau membre",
+    `${invitation.email} a rejoint l'equipe (${invitation.role})`,
+    "/team"
+  );
+
   return invitation;
 }
 

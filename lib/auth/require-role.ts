@@ -3,6 +3,7 @@ import { db } from "@/lib/db/client";
 import { teamMembers, shops } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 import { cache } from "react";
+import { cookies } from "next/headers";
 import type { TeamRole } from "@/lib/db/schema";
 
 export type AuthContext = {
@@ -12,12 +13,11 @@ export type AuthContext = {
   shopName: string;
 };
 
-/**
- * ROLE HIERARCHY:
- * owner   → full access (team, settings, compta, factures, everything)
- * manager → stock, ventes, clients, sourcing, PS, analytics — NOT compta, settings, team
- * seller  → stock (read), ventes (own), clients (read) — limited
- */
+export type UserShop = {
+  shopId: string;
+  shopName: string;
+  role: TeamRole;
+};
 
 const ROLE_HIERARCHY: Record<TeamRole, number> = {
   owner: 3,
@@ -25,19 +25,38 @@ const ROLE_HIERARCHY: Record<TeamRole, number> = {
   seller: 1,
 };
 
+const SHOP_COOKIE = "marlo-shop";
+
+/**
+ * Get all shops the user belongs to.
+ */
+export async function getUserShops(userId: string): Promise<UserShop[]> {
+  return db
+    .select({
+      shopId: teamMembers.shopId,
+      shopName: shops.name,
+      role: teamMembers.role,
+    })
+    .from(teamMembers)
+    .innerJoin(shops, eq(shops.id, teamMembers.shopId))
+    .where(eq(teamMembers.userId, userId));
+}
+
 /**
  * Get the authenticated user's context (user, shop, role).
- * Cached per request via React cache() — safe to call multiple times.
+ * Reads the active shop from the `marlo-shop` cookie.
+ * Falls back to the first shop if cookie is missing or invalid.
+ * Cached per request via React cache().
  */
 export const getAuthContext = cache(async (): Promise<AuthContext> => {
   const supabase = await createSupabaseServerClient();
   const { data: { user }, error } = await supabase.auth.getUser();
 
   if (error || !user) {
-    throw new Error("Non authentifié");
+    throw new Error("Non authentifie");
   }
 
-  const membership = await db
+  const allMemberships = await db
     .select({
       shopId: teamMembers.shopId,
       role: teamMembers.role,
@@ -45,15 +64,33 @@ export const getAuthContext = cache(async (): Promise<AuthContext> => {
     })
     .from(teamMembers)
     .innerJoin(shops, eq(shops.id, teamMembers.shopId))
-    .where(eq(teamMembers.userId, user.id))
-    .limit(1);
+    .where(eq(teamMembers.userId, user.id));
 
-  if (membership.length > 0) {
+  if (allMemberships.length > 0) {
+    // Check cookie for active shop
+    const cookieStore = await cookies();
+    const activeShopId = cookieStore.get(SHOP_COOKIE)?.value;
+
+    // If cookie points to a valid membership, use it
+    if (activeShopId) {
+      const match = allMemberships.find((m) => m.shopId === activeShopId);
+      if (match) {
+        return {
+          userId: user.id,
+          shopId: match.shopId,
+          role: match.role,
+          shopName: match.shopName,
+        };
+      }
+    }
+
+    // Default to first membership
+    const first = allMemberships[0];
     return {
       userId: user.id,
-      shopId: membership[0].shopId,
-      role: membership[0].role,
-      shopName: membership[0].shopName,
+      shopId: first.shopId,
+      role: first.role,
+      shopName: first.shopName,
     };
   }
 

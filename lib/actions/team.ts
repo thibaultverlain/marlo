@@ -11,6 +11,7 @@ import {
   updateShopName,
   logActivity,
 } from "@/lib/db/queries/team";
+import { notifyShopMembers } from "@/lib/db/queries/notifications";
 
 // ── Invite ────────────────────────────────────────────
 

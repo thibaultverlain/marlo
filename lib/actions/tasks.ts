@@ -5,6 +5,7 @@ import { z } from "zod";
 import { getAuthContext } from "@/lib/auth/require-role";
 import { createTask, updateTask, deleteTask, completeTask } from "@/lib/db/queries/tasks";
 import { logActivity } from "@/lib/db/queries/team";
+import { createNotification } from "@/lib/db/queries/notifications";
 
 const taskSchema = z.object({
   title: z.string().min(1, "Titre requis"),
@@ -47,6 +48,18 @@ export async function createTaskAction(formData: FormData) {
     });
 
     await logActivity(ctx.shopId, ctx.userId, "tache_creee", "task", task.id, parsed.data.title);
+
+    if (task.assignedTo && task.assignedTo !== ctx.userId) {
+      await createNotification(
+        ctx.shopId,
+        task.assignedTo,
+        "task_assigned",
+        "Nouvelle tache assignee",
+        parsed.data.title,
+        "/tasks"
+      );
+    }
+
     revalidatePath("/tasks");
     return { success: true };
   } catch (e: any) {

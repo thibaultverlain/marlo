@@ -24,13 +24,15 @@ function CustomTooltip({ active, payload, label }: any) {
 export default function AnalyticsPage() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [period, setPeriod] = useState("all");
 
   useEffect(() => {
-    fetch("/api/analytics")
+    setLoading(true);
+    fetch(`/api/analytics?period=${period}`)
       .then((r) => r.json())
       .then((d) => { setData(d); setLoading(false); })
       .catch(() => setLoading(false));
-  }, []);
+  }, [period]);
 
   if (loading) return (
     <div className="flex items-center justify-center h-[60vh]">
@@ -51,10 +53,67 @@ export default function AnalyticsPage() {
 
   return (
     <div className="space-y-6 page-enter">
-      <div>
-        <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">Analytique</h1>
-        <p className="text-zinc-500 mt-1 text-sm">Performance, vélocité et prédictions</p>
+      <div className="flex items-start sm:items-center justify-between gap-3">
+        <div>
+          <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">Analytique</h1>
+          <p className="text-zinc-500 mt-1 text-sm">Performance, velocite et predictions</p>
+        </div>
+        <div className="flex bg-zinc-800/60 rounded-lg p-0.5">
+          {([
+            { key: "30d", label: "30j" },
+            { key: "90d", label: "90j" },
+            { key: "year", label: "Annee" },
+            { key: "all", label: "Tout" },
+          ] as const).map((f) => (
+            <button
+              key={f.key}
+              onClick={() => setPeriod(f.key)}
+              className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-all ${
+                period === f.key
+                  ? "bg-[rgba(251,113,133,0.12)] text-rose-400"
+                  : "text-zinc-500 hover:text-zinc-300"
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
       </div>
+
+      {/* Month comparison KPIs */}
+      {data.comparison && (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="kpi-featured p-5 flex flex-col justify-between min-h-[120px]">
+            <p className="stat-label">CA ce mois</p>
+            <div className="mt-auto">
+              <p className="stat-value gradient-text">{formatCurrency(data.comparison.currentRevenue)}</p>
+              {data.comparison.previousRevenue > 0 && (
+                <p className={`text-[12px] font-semibold mt-1 ${data.comparison.revenueChange >= 0 ? "change-positive" : "change-negative"}`}>
+                  {data.comparison.revenueChange >= 0 ? "+" : ""}{data.comparison.revenueChange.toFixed(1)}% vs mois dernier
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="kpi-card p-5 flex flex-col justify-between min-h-[120px]">
+            <p className="stat-label">Marge ce mois</p>
+            <div className="mt-auto">
+              <p className="stat-value text-emerald-400">{formatCurrency(data.comparison.currentMargin)}</p>
+              {data.comparison.previousMargin > 0 && (
+                <p className={`text-[12px] font-semibold mt-1 ${data.comparison.marginChange >= 0 ? "change-positive" : "change-negative"}`}>
+                  {data.comparison.marginChange >= 0 ? "+" : ""}{data.comparison.marginChange.toFixed(1)}% vs mois dernier
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="kpi-card p-5 flex flex-col justify-between min-h-[120px]">
+            <p className="stat-label">Ventes ce mois</p>
+            <div className="mt-auto">
+              <p className="stat-value text-white">{data.comparison.currentCount}</p>
+              <p className="text-[12px] text-zinc-600 mt-1">vs {data.comparison.previousCount} le mois dernier</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Brand performance table */}
       <div className="card-static p-6">

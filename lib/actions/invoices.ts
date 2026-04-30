@@ -8,6 +8,7 @@ import { getProductById } from "@/lib/db/queries/products";
 import { getShopSettings, getNextInvoiceNumber } from "@/lib/db/queries/settings";
 import { createInvoice, getInvoiceById, updateInvoice } from "@/lib/db/queries/invoices";
 import { getSourcingById } from "@/lib/db/queries/sourcing";
+import { notifyShopMembers } from "@/lib/db/queries/notifications";
 import { getMissionById, getMissionItems } from "@/lib/db/queries/personal-shopping";
 import { db } from "@/lib/db/client";
 import { sales, sourcingRequests, personalShoppingMissions } from "@/lib/db/schema";
@@ -55,6 +56,8 @@ export async function generateInvoiceFromSaleAction(saleId: string) {
     });
 
     await db.update(sales).set({ invoiceNumber }).where(eq(sales.id, sale.id));
+
+    await notifyShopMembers(ctx.shopId, ctx.userId, "invoice_created", "Facture generee", `${invoiceNumber}`, `/invoices/${invoice.id}`);
 
     revalidatePath("/invoices");
     revalidatePath("/sales");
