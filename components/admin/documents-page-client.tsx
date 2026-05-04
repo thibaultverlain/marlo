@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useRef } from "react";
 import Link from "next/link";
 import {
-  ArrowLeft, Plus, FolderOpen, FileText, Trash2, X,
-  Building2, Shield, FileCheck, Landmark, Upload, ExternalLink,
+  ArrowLeft, Plus, FolderOpen, Trash2, X, Upload,
+  Building2, Shield, FileCheck, Landmark, ExternalLink, FileText,
 } from "lucide-react";
 import { addDocumentAction, deleteDocumentAction } from "@/lib/actions/documents";
 import type { Doc } from "@/lib/db/queries/documents";
@@ -28,25 +28,55 @@ export default function DocumentsPageClient({ documents }: { documents: Doc[] })
   const [showForm, setShowForm] = useState(false);
   const [category, setCategory] = useState("legal");
   const [name, setName] = useState("");
-  const [fileUrl, setFileUrl] = useState("");
   const [expiresAt, setExpiresAt] = useState("");
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [filterCat, setFilterCat] = useState("all");
+  const [uploading, setUploading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
 
-  function handleAdd() {
-    if (!name.trim() || !fileUrl.trim()) return;
-    startTransition(async () => {
-      const result = await addDocumentAction({
-        category,
-        name: name.trim(),
-        fileName: name.trim(),
-        fileUrl: fileUrl.trim(),
-        expiresAt: expiresAt || undefined,
+  async function handleUpload() {
+    if (!selectedFile || !name.trim()) return;
+    setUploading(true);
+    setError(null);
+
+    try {
+      // Upload file
+      const fd = new FormData();
+      fd.append("file", selectedFile);
+      const uploadRes = await fetch("/api/upload", { method: "POST", body: fd });
+      const uploadData = await uploadRes.json();
+
+      if (!uploadRes.ok || uploadData.error) {
+        setError(uploadData.error || "Erreur upload");
+        setUploading(false);
+        return;
+      }
+
+      // Save document record
+      startTransition(async () => {
+        const result = await addDocumentAction({
+          category,
+          name: name.trim(),
+          fileName: uploadData.fileName,
+          fileUrl: uploadData.url,
+          fileSize: uploadData.fileSize,
+          mimeType: uploadData.mimeType,
+          expiresAt: expiresAt || undefined,
+        });
+        if (result.error) setError(result.error);
+        else {
+          setName(""); setExpiresAt(""); setSelectedFile(null);
+          setShowForm(false);
+          if (fileRef.current) fileRef.current.value = "";
+        }
+        setUploading(false);
       });
-      if (result.error) setError(result.error);
-      else { setName(""); setFileUrl(""); setExpiresAt(""); setShowForm(false); }
-    });
+    } catch (e: any) {
+      setError(e.message || "Erreur");
+      setUploading(false);
+    }
   }
 
   function handleDelete(id: string) {
@@ -91,26 +121,64 @@ export default function DocumentsPageClient({ documents }: { documents: Doc[] })
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium border transition-all ${
                     category === c.value ? "border-rose-500/30 bg-rose-500/5 text-white" : "border-[var(--color-border)] text-zinc-500 hover:text-zinc-300"
                   }`}>
-                  <Icon size={12} />
-                  {c.label}
+                  <Icon size={12} />{c.label}
                 </button>
               );
             })}
           </div>
+
           <input type="text" placeholder="Nom du document (ex: Kbis 2025)" value={name} onChange={(e) => setName(e.target.value)}
             className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]" autoFocus />
-          <input type="url" placeholder="URL du document (lien Supabase Storage, Google Drive, etc.)" value={fileUrl} onChange={(e) => setFileUrl(e.target.value)}
-            className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]" />
+
+          {/* File upload zone */}
+          <div
+            onClick={() => fileRef.current?.click()}
+            className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${
+              selectedFile
+                ? "border-rose-500/30 bg-rose-500/[0.02]"
+                : "border-[var(--color-border)] hover:border-[var(--color-border-hover)] hover:bg-white/[0.01]"
+            }`}
+          >
+            <input ref={fileRef} type="file" className="hidden" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) { setSelectedFile(f); if (!name.trim()) setName(f.name.replace(/\.\w+$/, "")); }
+              }} />
+            {selectedFile ? (
+              <div className="flex items-center justify-center gap-3">
+                <FileText size={20} className="text-rose-400" />
+                <div className="text-left">
+                  <p className="text-[13px] text-white font-medium">{selectedFile.name}</p>
+                  <p className="text-[11px] text-zinc-500">{formatSize(selectedFile.size)}</p>
+                </div>
+                <button onClick={(e) => { e.stopPropagation(); setSelectedFile(null); if (fileRef.current) fileRef.current.value = ""; }}
+                  className="p-1 rounded hover:bg-red-500/10 text-zinc-500 hover:text-red-400"><X size={14} /></button>
+              </div>
+            ) : (
+              <>
+                <Upload size={24} className="mx-auto text-zinc-600 mb-2" />
+                <p className="text-[13px] text-zinc-400">Cliquez pour choisir un fichier</p>
+                <p className="text-[11px] text-zinc-600 mt-1">PDF, images, Word, Excel - Max 10 Mo</p>
+              </>
+            )}
+          </div>
+
           <div className="flex items-center gap-3">
-            <label className="text-[12px] text-zinc-500">Expiration (optionnel) :</label>
+            <label className="text-[12px] text-zinc-500">Expiration :</label>
             <input type="date" value={expiresAt} onChange={(e) => setExpiresAt(e.target.value)}
               className="bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]" />
           </div>
+
           <div className="flex gap-2 justify-end">
-            <button onClick={() => setShowForm(false)} className="px-3 py-2 text-[13px] text-zinc-500 hover:text-zinc-300">Annuler</button>
-            <button onClick={handleAdd} disabled={isPending || !name.trim() || !fileUrl.trim()}
-              className="px-4 py-2 text-[13px] font-semibold text-[#0a0a0f] bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors disabled:opacity-50">
-              {isPending ? "..." : "Ajouter"}
+            <button onClick={() => { setShowForm(false); setSelectedFile(null); }}
+              className="px-3 py-2 text-[13px] text-zinc-500 hover:text-zinc-300">Annuler</button>
+            <button onClick={handleUpload} disabled={uploading || isPending || !name.trim() || !selectedFile}
+              className="flex items-center gap-2 px-4 py-2 text-[13px] font-semibold text-[#0a0a0f] bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors disabled:opacity-50">
+              {uploading ? (
+                <><div className="w-3.5 h-3.5 border-2 border-[#0a0a0f] border-t-transparent rounded-full animate-spin" /> Upload...</>
+              ) : (
+                <><Upload size={14} /> Envoyer</>
+              )}
             </button>
           </div>
         </div>

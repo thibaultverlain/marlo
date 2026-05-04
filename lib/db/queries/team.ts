@@ -31,12 +31,12 @@ export async function getTeamMembers(shopId: string) {
 }
 
 export async function getTeamMemberWithEmail(shopId: string) {
-  // Get members
   const members = await db
     .select({
       id: teamMembers.id,
       userId: teamMembers.userId,
       role: teamMembers.role,
+      permissions: teamMembers.permissions,
       joinedAt: teamMembers.joinedAt,
     })
     .from(teamMembers)
