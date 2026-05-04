@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { parseSaleEmail } from "@/lib/email-parser";
 import { db } from "@/lib/db/client";
 import { products, sales } from "@/lib/db/schema";
-import { inArray } from "drizzle-orm";
+import { inArray, and, eq } from "drizzle-orm";
 import { createClient } from "@supabase/supabase-js";
 
 export const dynamic = "force-dynamic";
@@ -93,11 +93,23 @@ export async function POST(req: NextRequest) {
       return false;
     });
 
-    // Try to match a product in stock
+    // Get user/shop ID - webhook doesn't have auth session, look up the owner
+    const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
+    const { data: settingsRow } = await supabase.from("shop_settings").select("user_id, shop_id").limit(1).single();
+    const webhookUserId = settingsRow?.user_id;
+    const webhookShopId = settingsRow?.shop_id;
+    if (!webhookUserId) {
+      return NextResponse.json({ error: "No user configured" }, { status: 500 });
+    }
+
+    // Try to match a product in stock (filter by shop)
     const inStockProducts = await db
       .select()
       .from(products)
-      .where(inArray(products.status, ["en_stock", "en_vente", "reserve"] as any));
+      .where(and(
+        inArray(products.status, ["en_stock", "en_vente", "reserve"] as any),
+        webhookShopId ? eq(products.shopId, webhookShopId) : undefined
+      ));
 
     const matchedProduct = inStockProducts.find((p) => {
       const titleLower = parsed.productTitle.toLowerCase();
@@ -112,17 +124,8 @@ export async function POST(req: NextRequest) {
 
     const channel = parsed.platform === "vinted" ? "vinted" : "vestiaire";
     const purchasePrice = matchedProduct ? Number(matchedProduct.purchasePrice) : 0;
-    const margin = parsed.netRevenue - purchasePrice;
-    const marginPct = parsed.salePrice > 0 ? (margin / parsed.salePrice) * 100 : 0;
-
-    // Get user ID - webhook doesn't have auth session, so we look up the owner
-    const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
-    const { data: settingsRow } = await supabase.from("shop_settings").select("user_id, shop_id").limit(1).single();
-    const webhookUserId = settingsRow?.user_id;
-    const webhookShopId = settingsRow?.shop_id;
-    if (!webhookUserId) {
-      return NextResponse.json({ error: "No user configured" }, { status: 500 });
-    }
+    const margin = matchedProduct ? (parsed.netRevenue - purchasePrice) : 0;
+    const marginPct = matchedProduct && parsed.salePrice > 0 ? (margin / parsed.salePrice) * 100 : 0;
 
     // Create the sale
     const [sale] = await db

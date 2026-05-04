@@ -12,6 +12,26 @@ import RevenueChart from "@/components/dashboard/revenue-chart";
 
 export const dynamic = "force-dynamic";
 
+async function getChartDataMonth(shopId: string) {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const rows = await db
+    .select({
+      day: sql<number>`extract(day from sold_at)::int`,
+      revenue: sql<number>`coalesce(sum(sale_price), 0)::numeric`,
+    })
+    .from(sales)
+    .where(and(eq(sales.shopId, shopId), gte(sales.soldAt, new Date(year, month, 1)), lte(sales.soldAt, new Date(year, month + 1, 0, 23, 59, 59))))
+    .groupBy(sql`extract(day from sold_at)`)
+    .orderBy(sql`extract(day from sold_at)`);
+  return Array.from({ length: daysInMonth }, (_, i) => {
+    const row = rows.find((r) => r.day === i + 1);
+    return { label: String(i + 1), revenue: Number(row?.revenue ?? 0) };
+  });
+}
+
 async function getTodayStats(shopId: string) {
   const now = new Date();
   const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -42,7 +62,7 @@ async function getAllTimeStats(shopId: string) {
 
 export default async function DashboardPage() {
   const { userId, shopId } = await getAuthContext();
-  const [todayStats, allTimeStats, stockStats, monthStats, recentSales, pendingShipments, activeSourcing] = await Promise.all([
+  const [todayStats, allTimeStats, stockStats, monthStats, recentSales, pendingShipments, activeSourcing, chartData] = await Promise.all([
     getTodayStats(shopId),
     getAllTimeStats(shopId),
     getStockStats(shopId),
@@ -50,6 +70,7 @@ export default async function DashboardPage() {
     getRecentSales(shopId, 8),
     getPendingShipments(shopId),
     getActiveSourcingCount(shopId),
+    getChartDataMonth(shopId),
   ]);
 
   const totalRevenue = Number(allTimeStats.revenue);
@@ -138,7 +159,7 @@ export default async function DashboardPage() {
       )}
 
       {/* Chart */}
-      <RevenueChart />
+      <RevenueChart initialData={chartData} />
 
       {/* Recent sales table */}
       <div className="card-static overflow-hidden">

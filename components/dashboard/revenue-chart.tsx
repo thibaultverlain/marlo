@@ -2,13 +2,7 @@
 
 import { useState, useEffect } from "react";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
 
 type DataPoint = { label: string; revenue: number };
@@ -29,14 +23,8 @@ function formatEur(value: number): string {
 function CustomTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   return (
-    <div
-      className="rounded-xl px-4 py-3 text-sm shadow-xl border"
-      style={{
-        background: "var(--color-bg-card)",
-        borderColor: "var(--color-border-accent)",
-        backdropFilter: "blur(8px)",
-      }}
-    >
+    <div className="rounded-xl px-4 py-3 text-sm shadow-xl border"
+      style={{ background: "var(--color-bg-card)", borderColor: "var(--color-border-accent)", backdropFilter: "blur(8px)" }}>
       <p style={{ color: "var(--color-text-muted)" }} className="text-[11px] mb-0.5">{label}</p>
       <p style={{ color: "var(--color-text)" }} className="font-bold text-[15px] tabular-nums">
         {new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(payload[0].value)}
@@ -45,21 +33,20 @@ function CustomTooltip({ active, payload, label }: any) {
   );
 }
 
-export default function RevenueChart() {
+export default function RevenueChart({ initialData }: { initialData?: DataPoint[] }) {
   const [period, setPeriod] = useState<Period>("month");
-  const [data, setData] = useState<DataPoint[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<DataPoint[]>(initialData ?? []);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    // Skip fetch for initial "month" period if we have initialData
+    if (period === "month" && initialData) { setData(initialData); return; }
     setLoading(true);
     fetch(`/api/dashboard/chart?period=${period}`)
       .then((r) => r.json())
-      .then((json) => {
-        setData(json.data ?? []);
-        setLoading(false);
-      })
+      .then((json) => { setData(json.data ?? []); setLoading(false); })
       .catch(() => setLoading(false));
-  }, [period]);
+  }, [period, initialData]);
 
   const total = data.reduce((s, d) => s + d.revenue, 0);
 
@@ -74,17 +61,10 @@ export default function RevenueChart() {
         </div>
         <div className="flex bg-zinc-800/60 rounded-lg p-0.5 self-start sm:self-auto">
           {PERIOD_LABELS.map(({ key, label }) => (
-            <button
-              key={key}
-              onClick={() => setPeriod(key)}
+            <button key={key} onClick={() => setPeriod(key)}
               className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-all duration-200 ${
-                period === key
-                  ? "bg-[rgba(251,113,133,0.12)] text-rose-400"
-                  : "text-zinc-500 hover:text-zinc-300"
-              }`}
-            >
-              {label}
-            </button>
+                period === key ? "bg-[rgba(251,113,133,0.12)] text-rose-400" : "text-zinc-500 hover:text-zinc-300"
+              }`}>{label}</button>
           ))}
         </div>
       </div>

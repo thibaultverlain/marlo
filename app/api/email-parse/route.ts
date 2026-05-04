@@ -31,7 +31,10 @@ export async function POST(req: NextRequest) {
     const inStockProducts = await db
       .select()
       .from(products)
-      .where(inArray(products.status, ["en_stock", "en_vente", "reserve"] as any));
+      .where(and(
+        inArray(products.status, ["en_stock", "en_vente", "reserve"] as any),
+        eq(products.shopId, ctx.shopId)
+      ));
 
     let matchedProduct = inStockProducts.find((p) =>
       parsed.productTitle.toLowerCase().includes(p.brand.toLowerCase()) ||
@@ -40,8 +43,9 @@ export async function POST(req: NextRequest) {
 
     const channel = parsed.platform === "vinted" ? "vinted" : "vestiaire";
     const purchasePrice = matchedProduct ? Number(matchedProduct.purchasePrice) : 0;
-    const margin = parsed.netRevenue - purchasePrice;
-    const marginPct = parsed.salePrice > 0 ? (margin / parsed.salePrice) * 100 : 0;
+    // Margin = netRevenue - purchasePrice. If no product matched, margin is unknown (0)
+    const margin = matchedProduct ? (parsed.netRevenue - purchasePrice) : 0;
+    const marginPct = matchedProduct && parsed.salePrice > 0 ? (margin / parsed.salePrice) * 100 : 0;
 
     // Create the sale
     const [sale] = await db
