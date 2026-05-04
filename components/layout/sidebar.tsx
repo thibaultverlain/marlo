@@ -14,35 +14,36 @@ import ShopSwitcher from "./shop-switcher";
 import { MarloIcon, MarloWordmark } from "./marlo-logo";
 
 const NAV_ITEMS = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, alertKey: "dashboard", minRole: "seller" },
-  { href: "/products", label: "Stock", icon: Package, alertKey: "products", minRole: "seller" },
-  { href: "/sales", label: "Ventes", icon: ShoppingCart, minRole: "seller" },
-  { href: "/customers", label: "Clients", icon: Users, minRole: "manager" },
-  { href: "/analytics", label: "Analytique", icon: BarChart3, minRole: "manager" },
-  { href: "/sourcing", label: "Sourcing", icon: Search, alertKey: "sourcing", minRole: "manager" },
-  { href: "/personal-shopping", label: "Personal Shop", icon: ShoppingBag, minRole: "manager" },
-  { href: "/tasks", label: "Tâches", icon: ListTodo, minRole: "seller" },
-  { href: "/invoices", label: "Factures", icon: FileText, minRole: "owner" },
-  { href: "/accounting", label: "Comptabilité", icon: Calculator, minRole: "owner" },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, alertKey: "dashboard", perm: "dashboard" },
+  { href: "/products", label: "Stock", icon: Package, alertKey: "products", perm: "products" },
+  { href: "/sales", label: "Ventes", icon: ShoppingCart, perm: "sales" },
+  { href: "/customers", label: "Clients", icon: Users, perm: "customers" },
+  { href: "/analytics", label: "Analytique", icon: BarChart3, perm: "analytics" },
+  { href: "/sourcing", label: "Sourcing", icon: Search, alertKey: "sourcing", perm: "sourcing" },
+  { href: "/personal-shopping", label: "Personal Shop", icon: ShoppingBag, perm: "personal_shopping" },
+  { href: "/tasks", label: "Taches", icon: ListTodo, perm: "tasks" },
+  { href: "/templates", label: "Templates", icon: FileText, perm: "templates" },
+  { href: "/invoices", label: "Factures", icon: FileText, perm: "invoices" },
+  { href: "/accounting", label: "Comptabilite", icon: Calculator, perm: "accounting" },
 ];
 
 const BOTTOM_ITEMS = [
-  { href: "/automations", label: "Automations", icon: Zap, minRole: "owner" },
-  { href: "/team", label: "Équipe", icon: Users2, minRole: "owner" },
-  { href: "/settings", label: "Réglages", icon: Settings, minRole: "owner" },
+  { href: "/admin", label: "Administration", icon: Settings, perm: "settings" },
+  { href: "/automations", label: "Automations", icon: Zap, perm: "automations" },
+  { href: "/team", label: "Equipe", icon: Users2, perm: "team" },
 ];
-
-const ROLE_LEVEL: Record<string, number> = { owner: 3, manager: 2, seller: 1 };
 
 type ShopInfo = { shopId: string; shopName: string; role: string };
 
 export default function Sidebar({
   role = "owner",
+  permissions = [],
   shops = [],
   currentShopId = "",
   currentShopName = "",
 }: {
   role?: string;
+  permissions?: string[];
   shops?: ShopInfo[];
   currentShopId?: string;
   currentShopName?: string;
@@ -50,10 +51,10 @@ export default function Sidebar({
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [alertCount, setAlertCount] = useState(0);
-  const userLevel = ROLE_LEVEL[role] ?? 1;
+  const isOwner = role === "owner";
 
-  const visibleNav = NAV_ITEMS.filter((item) => userLevel >= (ROLE_LEVEL[item.minRole] ?? 3));
-  const visibleBottom = BOTTOM_ITEMS.filter((item) => userLevel >= (ROLE_LEVEL[item.minRole] ?? 3));
+  const visibleNav = NAV_ITEMS.filter((item) => isOwner || permissions.includes(item.perm));
+  const visibleBottom = BOTTOM_ITEMS.filter((item) => isOwner || permissions.includes(item.perm));
 
   useEffect(() => {
     fetch("/api/alerts").then((r) => r.json()).then((d) => setAlertCount(d.count ?? 0)).catch(() => {});

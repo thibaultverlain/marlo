@@ -5,12 +5,14 @@ import { eq, and } from "drizzle-orm";
 import { cache } from "react";
 import { cookies } from "next/headers";
 import type { TeamRole } from "@/lib/db/schema";
+import { ALL_PERMISSIONS, type Permission } from "@/lib/db/schema";
 
 export type AuthContext = {
   userId: string;
   shopId: string;
   role: TeamRole;
   shopName: string;
+  permissions: string[];
 };
 
 export type UserShop = {
@@ -60,34 +62,28 @@ export const getAuthContext = cache(async (): Promise<AuthContext> => {
   const allMemberships = await getUserShops(user.id);
 
   if (allMemberships.length > 0) {
-    // Check cookie for active shop
     const cookieStore = await cookies();
     const activeShopId = cookieStore.get(SHOP_COOKIE)?.value;
 
-    // If cookie points to a valid membership, use it
+    let selectedShop = allMemberships[0];
     if (activeShopId) {
       const match = allMemberships.find((m) => m.shopId === activeShopId);
-      if (match) {
-        return {
-          userId: user.id,
-          shopId: match.shopId,
-          role: match.role,
-          shopName: match.shopName,
-        };
-      }
+      if (match) selectedShop = match;
     }
 
-    // Default to first membership
-    const first = allMemberships[0];
+    // Resolve permissions for this membership
+    const perms = await resolvePermissions(user.id, selectedShop.shopId, selectedShop.role);
+
     return {
       userId: user.id,
-      shopId: first.shopId,
-      role: first.role,
-      shopName: first.shopName,
+      shopId: selectedShop.shopId,
+      role: selectedShop.role,
+      shopName: selectedShop.shopName,
+      permissions: perms,
     };
   }
 
-  // No shop found — auto-create for existing users (migration path)
+  // No shop found — auto-create for existing users
   const [newShop] = await db.insert(shops).values({
     name: "Ma boutique",
     ownerId: user.id,
@@ -104,6 +100,7 @@ export const getAuthContext = cache(async (): Promise<AuthContext> => {
     shopId: newShop.id,
     role: "owner",
     shopName: newShop.name,
+    permissions: [...ALL_PERMISSIONS],
   };
 });
 
@@ -121,34 +118,45 @@ export async function requireRole(minimumRole: TeamRole): Promise<AuthContext> {
 }
 
 /**
- * Check if a role has access to a specific feature.
+ * Resolve permissions for a user in a shop.
+ * Owner always gets all permissions.
+ * Others get permissions from their team_members.permissions JSON.
+ * If no custom permissions set, fall back to role-based defaults.
  */
-const FEATURE_ACCESS: Record<string, TeamRole> = {
-  team: "owner",
-  settings: "owner",
-  accounting: "owner",
-  invoices: "owner",
-  analytics: "manager",
-  sourcing: "manager",
-  "personal-shopping": "manager",
-  customers: "manager",
-  products: "seller",
-  sales: "seller",
-  dashboard: "seller",
-};
+async function resolvePermissions(userId: string, shopId: string, role: TeamRole): Promise<string[]> {
+  if (role === "owner") return [...ALL_PERMISSIONS];
 
-export function canAccess(role: TeamRole, feature: string): boolean {
-  const requiredRole = FEATURE_ACCESS[feature] || "owner";
-  return ROLE_HIERARCHY[role] >= ROLE_HIERARCHY[requiredRole];
+  const [member] = await db
+    .select({ permissions: teamMembers.permissions })
+    .from(teamMembers)
+    .where(and(eq(teamMembers.shopId, shopId), eq(teamMembers.userId, userId)))
+    .limit(1);
+
+  if (member?.permissions) {
+    try {
+      return JSON.parse(member.permissions);
+    } catch {}
+  }
+
+  // Default permissions by role
+  if (role === "manager") {
+    return ["dashboard", "products", "sales", "customers", "analytics", "sourcing", "personal_shopping", "tasks", "templates"];
+  }
+  return ["dashboard", "products", "sales", "tasks"];
+}
+
+/**
+ * Check if the current user has a specific permission.
+ */
+export function canAccess(ctx: AuthContext, feature: string): boolean {
+  if (ctx.role === "owner") return true;
+  return ctx.permissions.includes(feature);
 }
 
 export async function requireFeatureAccess(feature: string): Promise<AuthContext> {
   const ctx = await getAuthContext();
-  const requiredRole = FEATURE_ACCESS[feature] || "owner";
-
-  if (ROLE_HIERARCHY[ctx.role] < ROLE_HIERARCHY[requiredRole]) {
-    throw new Error(`Accès refusé à ${feature}. Rôle requis : ${requiredRole}.`);
+  if (!canAccess(ctx, feature)) {
+    throw new Error(`Acces refuse a ${feature}.`);
   }
-
   return ctx;
 }

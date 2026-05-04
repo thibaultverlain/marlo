@@ -3,6 +3,7 @@ import { getAuthContext, getUserShops } from "@/lib/auth/require-role";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   let role = "owner";
+  let permissions: string[] = [];
   let shops: { shopId: string; shopName: string; role: string }[] = [];
   let currentShopId = "";
   let currentShopName = "";
@@ -10,6 +11,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   try {
     const ctx = await getAuthContext();
     role = ctx.role;
+    permissions = ctx.permissions;
     currentShopId = ctx.shopId;
     currentShopName = ctx.shopName;
     shops = (await getUserShops(ctx.userId)).map((s) => ({
@@ -23,6 +25,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <div className="min-h-screen bg-[var(--color-bg)]">
       <Sidebar
         role={role}
+        permissions={permissions}
         shops={shops}
         currentShopId={currentShopId}
         currentShopName={currentShopName}

@@ -268,6 +268,7 @@ export const teamMembers = pgTable("team_members", {
   shopId: uuid("shop_id").references(() => shops.id).notNull(),
   userId: uuid("user_id").notNull(),
   role: teamRoleEnum("role").notNull().default("seller"),
+  permissions: text("permissions"),
   joinedAt: timestamp("joined_at").defaultNow().notNull(),
 }, (table) => [
   uniqueIndex("team_members_shop_user_idx").on(table.shopId, table.userId),
@@ -346,6 +347,36 @@ export const automations = pgTable("automations", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// ── Templates ─────────────────────────────────────────
+
+export const templates = pgTable("templates", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  shopId: uuid("shop_id").references(() => shops.id).notNull(),
+  type: text("type").notNull(),
+  name: text("name").notNull(),
+  content: text("content").notNull(),
+  variables: text("variables"),
+  createdBy: uuid("created_by").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// ── Documents ─────────────────────────────────────────
+
+export const documents = pgTable("documents", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  shopId: uuid("shop_id").references(() => shops.id).notNull(),
+  category: text("category").notNull(),
+  name: text("name").notNull(),
+  fileName: text("file_name").notNull(),
+  fileUrl: text("file_url").notNull(),
+  fileSize: integer("file_size"),
+  mimeType: text("mime_type"),
+  uploadedBy: uuid("uploaded_by").notNull(),
+  expiresAt: date("expires_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // ── Types ──────────────────────────────────────────────
 
 export type Product = typeof products.$inferSelect;
@@ -371,4 +402,17 @@ export type NewTask = typeof tasks.$inferInsert;
 export type Notification = typeof notifications.$inferSelect;
 export type Automation = typeof automations.$inferSelect;
 export type NewAutomation = typeof automations.$inferInsert;
+export type Template = typeof templates.$inferSelect;
+export type NewTemplate = typeof templates.$inferInsert;
+export type Document = typeof documents.$inferSelect;
+export type NewDocument = typeof documents.$inferInsert;
 export type TeamRole = "owner" | "manager" | "seller";
+
+// All available permissions
+export const ALL_PERMISSIONS = [
+  "dashboard", "products", "sales", "customers", "analytics",
+  "sourcing", "personal_shopping", "tasks", "invoices",
+  "accounting", "templates", "documents", "automations",
+  "team", "settings",
+] as const;
+export type Permission = typeof ALL_PERMISSIONS[number];
