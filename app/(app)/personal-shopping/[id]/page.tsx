@@ -1,7 +1,7 @@
 import { getAuthContext } from "@/lib/auth/require-role";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Calendar, MapPin, ShoppingBag } from "lucide-react";
+import { ArrowLeft, Calendar, MapPin } from "lucide-react";
 import { getMissionById, getMissionItems } from "@/lib/db/queries/personal-shopping";
 import { getAllCustomers } from "@/lib/db/queries/customers";
 import { formatCurrency, formatDate } from "@/lib/utils";

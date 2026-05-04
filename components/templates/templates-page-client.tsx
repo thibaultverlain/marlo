@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useMemo } from "react";
+import { useState, useTransition } from "react";
 import {
   Plus, FileText, MessageSquare, Mail, AlignLeft, Trash2, Pencil,
   X, Copy, Check, Eye, Wand2,
@@ -111,7 +111,7 @@ export default function TemplatesPageClient({
         </div>
         {isOwner && (
           <button onClick={() => { resetForm(); setShowForm(true); }}
-            className="flex items-center gap-2 px-4 py-2 text-[13px] font-semibold text-[#0a0a0f] bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors">
+            className="flex items-center gap-2 px-4 py-2 text-[13px] font-semibold text-[var(--color-text-inverse)] bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors">
             <Plus size={14} />
             Nouveau
           </button>
@@ -156,7 +156,7 @@ export default function TemplatesPageClient({
           <div className="flex gap-2 justify-end">
             <button onClick={resetForm} className="px-3 py-2 text-[13px] text-zinc-500 hover:text-zinc-300">Annuler</button>
             <button onClick={handleSave} disabled={isPending || !name.trim() || !content.trim()}
-              className="px-4 py-2 text-[13px] font-semibold text-[#0a0a0f] bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors disabled:opacity-50">
+              className="px-4 py-2 text-[13px] font-semibold text-[var(--color-text-inverse)] bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors disabled:opacity-50">
               {isPending ? "..." : editingId ? "Enregistrer" : "Creer"}
             </button>
           </div>
@@ -254,7 +254,7 @@ export default function TemplatesPageClient({
                     </div>
                     <div className="flex justify-end">
                       <button onClick={() => handleCopyFilled(t.content)}
-                        className="flex items-center gap-2 px-4 py-2 text-[13px] font-semibold text-[#0a0a0f] bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors">
+                        className="flex items-center gap-2 px-4 py-2 text-[13px] font-semibold text-[var(--color-text-inverse)] bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors">
                         {copied === "filled-" + t.id ? <Check size={14} /> : <Copy size={14} />}
                         {copied === "filled-" + t.id ? "Copie !" : "Copier le texte rempli"}
                       </button>

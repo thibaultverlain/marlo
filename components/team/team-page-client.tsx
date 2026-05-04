@@ -228,7 +228,7 @@ export default function TeamPageClient({
             <input type="text" value={newShopName} onChange={(e) => setNewShopName(e.target.value)}
               className="flex-1 bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]" autoFocus />
             <button onClick={handleSaveShopName} disabled={isPending}
-              className="px-4 py-2 text-[13px] font-semibold text-[#0a0a0f] bg-rose-500 rounded-lg hover:bg-rose-400 transition disabled:opacity-50">Enregistrer</button>
+              className="px-4 py-2 text-[13px] font-semibold text-[var(--color-text-inverse)] bg-rose-500 rounded-lg hover:bg-rose-400 transition disabled:opacity-50">Enregistrer</button>
             <button onClick={() => { setEditingShopName(false); setNewShopName(shopName); }}
               className="px-3 py-2 text-sm text-zinc-500 hover:text-zinc-300">Annuler</button>
           </div>
@@ -245,7 +245,7 @@ export default function TeamPageClient({
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-semibold text-white">Membres ({members.length})</h2>
           <button onClick={() => setShowInviteForm(!showInviteForm)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-semibold text-[#0a0a0f] bg-rose-500 rounded-lg hover:bg-rose-400 transition">
+            className="flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-semibold text-[var(--color-text-inverse)] bg-rose-500 rounded-lg hover:bg-rose-400 transition">
             <UserPlus size={13} />
             Inviter
           </button>
@@ -265,7 +265,7 @@ export default function TeamPageClient({
                   <option value="manager">Manager</option>
                 </select>
                 <button onClick={handleInvite} disabled={isPending || !inviteEmail.trim()}
-                  className="px-4 py-2 text-[13px] font-semibold text-[#0a0a0f] bg-rose-500 rounded-lg hover:bg-rose-400 transition disabled:opacity-50">
+                  className="px-4 py-2 text-[13px] font-semibold text-[var(--color-text-inverse)] bg-rose-500 rounded-lg hover:bg-rose-400 transition disabled:opacity-50">
                   {isPending ? "..." : "Envoyer"}
                 </button>
               </div>
@@ -374,7 +374,7 @@ export default function TeamPageClient({
                       <button onClick={() => setEditingPermsFor(null)}
                         className="px-3 py-1.5 text-[12px] text-zinc-500 hover:text-zinc-300">Annuler</button>
                       <button onClick={handleSavePerms} disabled={isPending}
-                        className="px-4 py-1.5 text-[12px] font-semibold text-[#0a0a0f] bg-rose-500 rounded-lg hover:bg-rose-400 transition disabled:opacity-50">
+                        className="px-4 py-1.5 text-[12px] font-semibold text-[var(--color-text-inverse)] bg-rose-500 rounded-lg hover:bg-rose-400 transition disabled:opacity-50">
                         {isPending ? "..." : "Enregistrer"}
                       </button>
                     </div>

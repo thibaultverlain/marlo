@@ -52,7 +52,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           </Link>
           <Link
             href="/products/new"
-            className="flex items-center gap-2 px-4 py-2 text-[13px] font-medium text-[#0a0a0f] bg-rose-500 font-semibold rounded-lg hover:bg-rose-400 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-[13px] font-medium text-[var(--color-text-inverse)] bg-rose-500 font-semibold rounded-lg hover:bg-rose-400 transition-colors"
           >
             <Plus size={14} />
             Ajouter
@@ -120,7 +120,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           </p>
           <Link
             href="/products/new"
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[#0a0a0f] bg-rose-500 font-semibold rounded-lg hover:bg-rose-400 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[var(--color-text-inverse)] bg-rose-500 font-semibold rounded-lg hover:bg-rose-400 transition-colors"
           >
             <Plus size={14} />
             Ajouter

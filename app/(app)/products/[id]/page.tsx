@@ -34,7 +34,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
           <h1 className="text-2xl font-bold text-white tracking-tight">{product.title}</h1>
         </div>
         {status && (
-          <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-zinc-800 text-zinc-300">
+          <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-[var(--color-bg-hover)] text-zinc-300">
             {status.label}
           </span>
         )}
@@ -84,7 +84,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
           <div className="flex gap-2 flex-wrap">
             {product.listedOn.map((ch) => {
               const channel = CHANNELS.find((c) => c.value === ch);
-              return <span key={ch} className="px-3 py-1.5 bg-zinc-800 rounded-lg text-sm text-zinc-300">{channel?.label ?? ch}</span>;
+              return <span key={ch} className="px-3 py-1.5 bg-[var(--color-bg-hover)] rounded-lg text-sm text-zinc-300">{channel?.label ?? ch}</span>;
             })}
           </div>
         </div>

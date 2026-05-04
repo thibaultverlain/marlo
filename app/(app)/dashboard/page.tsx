@@ -1,6 +1,6 @@
 import { TrendingUp, Package, AlertTriangle, Truck, ShoppingCart, Percent, BarChart3 } from "lucide-react";
 import Link from "next/link";
-import { formatCurrency, formatPercent } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils";
 import { db } from "@/lib/db/client";
 import { sales, products } from "@/lib/db/schema";
 import { sql, gte, lte, and, eq } from "drizzle-orm";

@@ -82,7 +82,7 @@ export default function AutomationsPageClient({ automations }: { automations: Au
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-2 px-4 py-2 text-[13px] font-semibold text-[#0a0a0f] bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 text-[13px] font-semibold text-[var(--color-text-inverse)] bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors"
         >
           <Plus size={14} />
           Nouvelle regle
@@ -198,7 +198,7 @@ export default function AutomationsPageClient({ automations }: { automations: Au
             <button
               onClick={handleCreate}
               disabled={isPending || !name.trim()}
-              className="px-4 py-2 text-[13px] font-semibold text-[#0a0a0f] bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors disabled:opacity-50"
+              className="px-4 py-2 text-[13px] font-semibold text-[var(--color-text-inverse)] bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors disabled:opacity-50"
             >
               {isPending ? "..." : "Creer"}
             </button>
@@ -214,7 +214,7 @@ export default function AutomationsPageClient({ automations }: { automations: Au
           <p className="text-zinc-600 text-xs mb-4">Creez des regles pour automatiser les taches repetitives</p>
           <button
             onClick={() => setShowForm(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-[#0a0a0f] bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-[var(--color-text-inverse)] bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors"
           >
             <Plus size={14} />
             Creer une regle

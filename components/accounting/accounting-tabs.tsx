@@ -28,14 +28,14 @@ export default function AccountingTabs({ year, activeTab, recipes, purchases }: 
             <button key={key} onClick={() => setTab(key)} className={`flex items-center gap-2 px-4 py-3 text-[13px] font-medium transition-colors border-b-2 -mb-px ${tab === key ? "border-indigo-500 text-white" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}><Icon size={14} />{label}<span className="text-[11px] text-zinc-600">({count})</span></button>
           ))}
         </div>
-        <button onClick={tab === "recipes" ? exportRecipes : exportPurchases} className="flex items-center gap-2 px-3 py-1.5 text-[13px] text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 rounded-lg transition-colors"><Download size={14} />CSV</button>
+        <button onClick={tab === "recipes" ? exportRecipes : exportPurchases} className="flex items-center gap-2 px-3 py-1.5 text-[13px] text-zinc-500 hover:text-zinc-200 hover:bg-[var(--color-bg-hover)] rounded-lg transition-colors"><Download size={14} />CSV</button>
       </div>
 
       {tab === "recipes" && (
         <div className="overflow-x-auto">
           {recipes.length === 0 ? <div className="p-12 text-center"><BookOpen size={40} className="mx-auto text-zinc-700 mb-3" /><p className="text-zinc-500 text-sm">Aucune recette pour {year}</p></div> : (
             <table className="w-full text-[13px]">
-              <thead><tr className="bg-zinc-800/30 border-b border-[var(--color-border)]">{["Date","Facture","Client","Article","Canal","Paiement","Montant"].map((h,i) => <th key={h} className={`${i===6?"text-right":"text-left"} px-5 py-2.5 text-[11px] font-medium text-zinc-500 uppercase tracking-wider`}>{h}</th>)}</tr></thead>
+              <thead><tr className="bg-[var(--color-bg-hover)]/50 border-b border-[var(--color-border)]">{["Date","Facture","Client","Article","Canal","Paiement","Montant"].map((h,i) => <th key={h} className={`${i===6?"text-right":"text-left"} px-5 py-2.5 text-[11px] font-medium text-zinc-500 uppercase tracking-wider`}>{h}</th>)}</tr></thead>
               <tbody className="divide-y divide-[var(--color-border)]">{recipes.map((r, i) => (
                 <tr key={i} className="hover:bg-[var(--color-bg-hover)] transition-colors">
                   <td className="px-5 py-2.5 text-zinc-400 whitespace-nowrap">{formatDate(r.date)}</td>
@@ -46,7 +46,7 @@ export default function AccountingTabs({ year, activeTab, recipes, purchases }: 
                   <td className="px-5 py-2.5 text-zinc-500">{r.paymentMethod ?? "—"}</td>
                   <td className="px-5 py-2.5 text-white font-medium text-right tabular-nums whitespace-nowrap">{formatCurrency(r.amount)}</td>
                 </tr>))}</tbody>
-              <tfoot><tr className="bg-zinc-800/50 border-t-2 border-zinc-700"><td colSpan={6} className="px-5 py-3 text-sm font-semibold text-zinc-400 text-right">Total {year}</td><td className="px-5 py-3 text-right text-lg font-semibold text-white tabular-nums">{formatCurrency(totalRecipes)}</td></tr></tfoot>
+              <tfoot><tr className="bg-[var(--color-bg-hover)] border-t-2 border-[var(--color-border)]"><td colSpan={6} className="px-5 py-3 text-sm font-semibold text-zinc-400 text-right">Total {year}</td><td className="px-5 py-3 text-right text-lg font-semibold text-white tabular-nums">{formatCurrency(totalRecipes)}</td></tr></tfoot>
             </table>
           )}
         </div>
@@ -56,17 +56,17 @@ export default function AccountingTabs({ year, activeTab, recipes, purchases }: 
         <div className="overflow-x-auto">
           {purchases.length === 0 ? <div className="p-12 text-center"><Receipt size={40} className="mx-auto text-zinc-700 mb-3" /><p className="text-zinc-500 text-sm">Aucun achat pour {year}</p></div> : (
             <table className="w-full text-[13px]">
-              <thead><tr className="bg-zinc-800/30 border-b border-[var(--color-border)]">{["Date","SKU","Description","Fournisseur","Catégorie","Montant"].map((h,i) => <th key={h} className={`${i===5?"text-right":"text-left"} px-5 py-2.5 text-[11px] font-medium text-zinc-500 uppercase tracking-wider`}>{h}</th>)}</tr></thead>
+              <thead><tr className="bg-[var(--color-bg-hover)]/50 border-b border-[var(--color-border)]">{["Date","SKU","Description","Fournisseur","Catégorie","Montant"].map((h,i) => <th key={h} className={`${i===5?"text-right":"text-left"} px-5 py-2.5 text-[11px] font-medium text-zinc-500 uppercase tracking-wider`}>{h}</th>)}</tr></thead>
               <tbody className="divide-y divide-[var(--color-border)]">{purchases.map((p) => (
                 <tr key={p.id} className="hover:bg-[var(--color-bg-hover)] transition-colors">
                   <td className="px-5 py-2.5 text-zinc-400 whitespace-nowrap">{p.date ? formatDate(p.date) : "—"}</td>
                   <td className="px-5 py-2.5 text-zinc-500 font-mono text-[11px]">{p.productSku ?? "—"}</td>
                   <td className="px-5 py-2.5 text-zinc-300 max-w-xs truncate">{p.description}</td>
                   <td className="px-5 py-2.5 text-zinc-400">{p.supplier ?? "—"}</td>
-                  <td className="px-5 py-2.5">{p.category && <span className="inline-flex px-2 py-0.5 bg-zinc-800 rounded text-[11px] text-zinc-400 capitalize">{p.category}</span>}</td>
+                  <td className="px-5 py-2.5">{p.category && <span className="inline-flex px-2 py-0.5 bg-[var(--color-bg-hover)] rounded text-[11px] text-zinc-400 capitalize">{p.category}</span>}</td>
                   <td className="px-5 py-2.5 text-white font-medium text-right tabular-nums whitespace-nowrap">{formatCurrency(p.amount)}</td>
                 </tr>))}</tbody>
-              <tfoot><tr className="bg-zinc-800/50 border-t-2 border-zinc-700"><td colSpan={5} className="px-5 py-3 text-sm font-semibold text-zinc-400 text-right">Total {year}</td><td className="px-5 py-3 text-right text-lg font-semibold text-white tabular-nums">{formatCurrency(totalPurchases)}</td></tr></tfoot>
+              <tfoot><tr className="bg-[var(--color-bg-hover)] border-t-2 border-[var(--color-border)]"><td colSpan={5} className="px-5 py-3 text-sm font-semibold text-zinc-400 text-right">Total {year}</td><td className="px-5 py-3 text-right text-lg font-semibold text-white tabular-nums">{formatCurrency(totalPurchases)}</td></tr></tfoot>
             </table>
           )}
         </div>

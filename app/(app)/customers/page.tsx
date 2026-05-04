@@ -2,7 +2,7 @@ import { getAuthContext } from "@/lib/auth/require-role";
 import Link from "next/link";
 import { Plus, Users, Star } from "lucide-react";
 import { getAllCustomers, getCustomerStats } from "@/lib/db/queries/customers";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -32,7 +32,7 @@ export default async function CustomersPage() {
             {customers.map((c) => (
               <Link key={c.id} href={`/customers/${c.id}`} className="flex items-start sm:items-center justify-between gap-3 px-5 py-3.5 row-hover transition-colors">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-sm font-semibold text-zinc-400">{c.firstName[0]}{c.lastName[0]}</div>
+                  <div className="w-10 h-10 rounded-full bg-[var(--color-bg-hover)] flex items-center justify-center text-sm font-semibold text-zinc-400">{c.firstName[0]}{c.lastName[0]}</div>
                   <div>
                     <div className="flex items-center gap-2">
                       <p className="text-[13px] font-medium text-zinc-200">{c.firstName} {c.lastName}</p>

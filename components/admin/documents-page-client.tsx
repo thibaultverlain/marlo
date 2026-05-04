@@ -98,7 +98,7 @@ export default function DocumentsPageClient({ documents }: { documents: Doc[] })
           </div>
         </div>
         <button onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-2 px-4 py-2 text-[13px] font-semibold text-[#0a0a0f] bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors">
+          className="flex items-center gap-2 px-4 py-2 text-[13px] font-semibold text-[var(--color-text-inverse)] bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors">
           <Plus size={14} />
           Ajouter
         </button>
@@ -173,7 +173,7 @@ export default function DocumentsPageClient({ documents }: { documents: Doc[] })
             <button onClick={() => { setShowForm(false); setSelectedFile(null); }}
               className="px-3 py-2 text-[13px] text-zinc-500 hover:text-zinc-300">Annuler</button>
             <button onClick={handleUpload} disabled={uploading || isPending || !name.trim() || !selectedFile}
-              className="flex items-center gap-2 px-4 py-2 text-[13px] font-semibold text-[#0a0a0f] bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors disabled:opacity-50">
+              className="flex items-center gap-2 px-4 py-2 text-[13px] font-semibold text-[var(--color-text-inverse)] bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors disabled:opacity-50">
               {uploading ? (
                 <><div className="w-3.5 h-3.5 border-2 border-[#0a0a0f] border-t-transparent rounded-full animate-spin" /> Upload...</>
               ) : (

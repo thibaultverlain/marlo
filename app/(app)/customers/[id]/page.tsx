@@ -1,4 +1,3 @@
-import { getAuthContext } from "@/lib/auth/require-role";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Star, Mail, Phone, MapPin, AtSign, ShoppingCart, TrendingUp, Clock, Package } from "lucide-react";
@@ -96,7 +95,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
       <div className="flex items-center gap-4">
         <Link href="/customers" className="w-9 h-9 flex items-center justify-center rounded-lg border border-[var(--color-border)] text-zinc-500 hover:text-zinc-300 transition-colors"><ArrowLeft size={18} /></Link>
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center text-sm font-semibold text-zinc-400">{customer.firstName[0]}{customer.lastName[0]}</div>
+          <div className="w-12 h-12 rounded-full bg-[var(--color-bg-hover)] flex items-center justify-center text-sm font-semibold text-zinc-400">{customer.firstName[0]}{customer.lastName[0]}</div>
           <div>
             <div className="flex items-center gap-2"><h1 className="text-2xl font-bold text-white tracking-tight">{customer.firstName} {customer.lastName}</h1>{customer.vip && <Star size={16} className="text-amber-400 fill-amber-400" />}</div>
             {customer.city && <p className="text-sm text-zinc-500">{customer.city}</p>}
@@ -170,7 +169,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
               {metrics.topBrands.map((b) => (
                 <div key={b.brand} className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <span className="w-6 h-6 rounded bg-zinc-800 flex items-center justify-center text-[10px] font-semibold text-zinc-400">{b.count}</span>
+                    <span className="w-6 h-6 rounded bg-[var(--color-bg-hover)] flex items-center justify-center text-[10px] font-semibold text-zinc-400">{b.count}</span>
                     <span className="text-sm text-zinc-200">{b.brand}</span>
                   </div>
                   <span className="text-sm text-zinc-400 tabular-nums">{formatCurrency(b.total)}</span>
@@ -187,7 +186,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
           <h2 className="text-[15px] font-semibold text-white mb-4">Préférences</h2>
           {customer.preferredBrands && customer.preferredBrands.length > 0 && (
             <div className="mb-4"><p className="text-[11px] font-medium text-zinc-600 uppercase tracking-wider mb-2">Marques favorites</p>
-              <div className="flex gap-1.5 flex-wrap">{customer.preferredBrands.map((b) => <span key={b} className="px-2.5 py-1 bg-zinc-800 rounded text-xs text-zinc-300">{b}</span>)}</div>
+              <div className="flex gap-1.5 flex-wrap">{customer.preferredBrands.map((b) => <span key={b} className="px-2.5 py-1 bg-[var(--color-bg-hover)] rounded text-xs text-zinc-300">{b}</span>)}</div>
             </div>
           )}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">

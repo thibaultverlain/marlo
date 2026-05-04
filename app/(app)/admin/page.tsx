@@ -1,6 +1,6 @@
 import { getAuthContext } from "@/lib/auth/require-role";
 import Link from "next/link";
-import { FileText, Calculator, Receipt, FolderOpen, Building2, Settings } from "lucide-react";
+import { FileText, Calculator, Receipt, FolderOpen, Building2 } from "lucide-react";
 export const dynamic = "force-dynamic";
 
 const ADMIN_SECTIONS = [

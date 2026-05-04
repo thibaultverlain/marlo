@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { BarChart3, TrendingUp, Zap, AlertTriangle, Package } from "lucide-react";
+import { BarChart3, TrendingUp, Zap, AlertTriangle } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { formatCurrency, formatPercent } from "@/lib/utils";
 import { CHANNELS, CATEGORIES } from "@/lib/data";
@@ -10,7 +10,7 @@ import { CHANNELS, CATEGORIES } from "@/lib/data";
 function CustomTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 shadow-xl">
+    <div className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg px-3 py-2 shadow-xl">
       <p className="text-[11px] text-zinc-400 mb-0.5">{label}</p>
       {payload.map((p: any, i: number) => (
         <p key={i} className="text-sm font-semibold text-white tabular-nums">
@@ -187,7 +187,7 @@ export default function AnalyticsClient({ initialData }: { initialData: any }) {
                         <span className="text-sm font-medium text-white tabular-nums">{formatPercent(c.avgMarginPct)}</span>
                       </div>
                     </div>
-                    <div className="w-full h-2 bg-zinc-800 rounded-full overflow-hidden">
+                    <div className="w-full h-2 bg-[var(--color-bg-hover)] rounded-full overflow-hidden">
                       <div className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500" style={{ width: `${pct}%` }} />
                     </div>
                     <p className="text-[10px] text-zinc-600 mt-1">
@@ -212,7 +212,7 @@ export default function AnalyticsClient({ initialData }: { initialData: any }) {
             {data.topArticles.map((a: any, i: number) => (
               <div key={i} className="flex items-center justify-between py-3">
                 <div className="flex items-center gap-3">
-                  <span className="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center text-[11px] font-semibold text-zinc-400">{i + 1}</span>
+                  <span className="w-6 h-6 rounded-full bg-[var(--color-bg-hover)] flex items-center justify-center text-[11px] font-semibold text-zinc-400">{i + 1}</span>
                   <div>
                     <p className="text-[13px] text-zinc-200">{a.title}</p>
                     <p className="text-[11px] text-zinc-500">{a.brand} · Achat {formatCurrency(a.purchasePrice)}</p>

@@ -44,7 +44,7 @@ function StatusBadge({ status }: { status: string }) {
 function ChannelTag({ channel }: { channel: string }) {
   const ch = CHANNELS.find((c) => c.value === channel);
   return (
-    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-zinc-800 text-zinc-500">
+    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-[var(--color-bg-hover)] text-zinc-500">
       {ch?.label ?? channel}
     </span>
   );

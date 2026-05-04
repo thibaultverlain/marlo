@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { parseSaleEmail } from "@/lib/email-parser";
 import { db } from "@/lib/db/client";
 import { products, sales } from "@/lib/db/schema";
-import { eq, sql, and, inArray } from "drizzle-orm";
+import { eq, and, inArray } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
 

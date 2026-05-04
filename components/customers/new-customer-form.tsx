@@ -55,7 +55,7 @@ export default function NewCustomerForm() {
           <h3 className="text-sm font-semibold text-zinc-300 mb-4">Préférences</h3>
           <div className="relative">
             <label className={labelClass}>Marques favorites</label>
-            <div className="flex flex-wrap gap-1.5 mb-2">{preferredBrands.map((b) => <span key={b} className="inline-flex items-center gap-1 px-2 py-1 bg-zinc-800 rounded text-xs text-zinc-300">{b}<button type="button" onClick={() => setPreferredBrands(preferredBrands.filter((x) => x !== b))} className="hover:text-red-400"><X size={12} /></button></span>)}</div>
+            <div className="flex flex-wrap gap-1.5 mb-2">{preferredBrands.map((b) => <span key={b} className="inline-flex items-center gap-1 px-2 py-1 bg-[var(--color-bg-hover)] rounded text-xs text-zinc-300">{b}<button type="button" onClick={() => setPreferredBrands(preferredBrands.filter((x) => x !== b))} className="hover:text-red-400"><X size={12} /></button></span>)}</div>
             <input type="text" value={brandInput} onChange={(e) => { setBrandInput(e.target.value); setShowBrandDropdown(true); }} onFocus={() => brandInput && setShowBrandDropdown(true)} onBlur={() => setTimeout(() => setShowBrandDropdown(false), 200)} placeholder="Ajouter..." className={inputClass} />
             {showBrandDropdown && filteredBrands.length > 0 && (
               <div className="absolute z-10 w-full mt-1 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg shadow-2xl max-h-40 overflow-y-auto">{filteredBrands.map((b) => <button key={b} type="button" onMouseDown={() => { setPreferredBrands([...preferredBrands, b]); setBrandInput(""); setShowBrandDropdown(false); }} className="w-full text-left px-3 py-2 text-sm text-zinc-300 hover:bg-[var(--color-bg-hover)]">{b}</button>)}</div>
@@ -65,7 +65,7 @@ export default function NewCustomerForm() {
             <div><label className={labelClass}>Tailles</label><input type="text" value={form.preferredSizes} onChange={(e) => updateField("preferredSizes", e.target.value)} placeholder="36/38, 42..." className={inputClass} /></div>
             <div><label className={labelClass}>Budget</label><input type="text" value={form.budgetRange} onChange={(e) => updateField("budgetRange", e.target.value)} placeholder="1000-3000€" className={inputClass} /></div>
           </div>
-          <div className="mt-4"><label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={form.vip} onChange={(e) => updateField("vip", e.target.checked)} className="rounded border-zinc-600 bg-zinc-800 text-indigo-500 focus:ring-indigo-500" /><span className="text-sm text-zinc-300 flex items-center gap-1">Client VIP{form.vip && <Star size={12} className="text-amber-400 fill-amber-400" />}</span></label></div>
+          <div className="mt-4"><label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={form.vip} onChange={(e) => updateField("vip", e.target.checked)} className="rounded border-[var(--color-border)] bg-[var(--color-bg)] text-rose-500 focus:ring-rose-500" /><span className="text-sm text-zinc-300 flex items-center gap-1">Client VIP{form.vip && <Star size={12} className="text-amber-400 fill-amber-400" />}</span></label></div>
         </div>
 
         <div className="border-t border-[var(--color-border)] pt-5">

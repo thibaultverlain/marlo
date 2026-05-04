@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, User, Package, FileText, Truck, Eye, ShoppingCart, TrendingUp } from "lucide-react";
+import { ArrowLeft, User, Package, FileText, Eye, ShoppingCart, TrendingUp } from "lucide-react";
 import { getSaleById } from "@/lib/db/queries/sales";
 import { getCustomerById } from "@/lib/db/queries/customers";
 import { getProductById } from "@/lib/db/queries/products";
@@ -61,7 +61,7 @@ export default async function SaleDetailPage({ params }: { params: Promise<{ id:
         <div className="card-static p-6">
           <div className="flex items-center gap-2 mb-4"><Package size={16} className="text-zinc-500" /><h2 className="text-[15px] font-semibold text-white">Article vendu</h2></div>
           <Link href={`/products/${product.id}`} className="flex items-center gap-4 p-3 rounded-lg row-hover transition-colors -m-3">
-            <div className="w-14 h-14 rounded-lg bg-zinc-800 flex items-center justify-center flex-shrink-0"><Package size={20} className="text-zinc-600" /></div>
+            <div className="w-14 h-14 rounded-lg bg-[var(--color-bg-hover)] flex items-center justify-center flex-shrink-0"><Package size={20} className="text-zinc-600" /></div>
             <div className="flex-1"><p className="text-sm text-zinc-200">{product.title}</p><div className="flex items-center gap-2 mt-0.5"><span className="text-[11px] text-zinc-600 font-mono">{product.sku}</span><span className="text-zinc-700">·</span><span className="text-[11px] text-zinc-500">{product.brand}</span><span className="text-zinc-700">·</span><span className="text-[11px] text-zinc-500">Achat : {formatCurrency(product.purchasePrice)}</span></div></div>
           </Link>
         </div>
@@ -71,7 +71,7 @@ export default async function SaleDetailPage({ params }: { params: Promise<{ id:
         <div className="flex items-center gap-2 mb-4"><User size={16} className="text-zinc-500" /><h2 className="text-[15px] font-semibold text-white">Client</h2></div>
         {customer ? (
           <Link href={`/customers/${customer.id}`} className="flex items-center gap-4 p-3 rounded-lg row-hover transition-colors -m-3">
-            <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-sm font-semibold text-zinc-400">{customer.firstName[0]}{customer.lastName[0]}</div>
+            <div className="w-10 h-10 rounded-full bg-[var(--color-bg-hover)] flex items-center justify-center text-sm font-semibold text-zinc-400">{customer.firstName[0]}{customer.lastName[0]}</div>
             <div><p className="text-sm text-zinc-200">{customer.firstName} {customer.lastName}</p>{customer.email && <p className="text-[11px] text-zinc-500 mt-0.5">{customer.email}</p>}</div>
           </Link>
         ) : <p className="text-sm text-zinc-500">Aucun client associé.</p>}

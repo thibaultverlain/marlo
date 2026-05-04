@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { getAuthContext, canAccess } from "@/lib/auth/require-role";
+import { getAuthContext } from "@/lib/auth/require-role";
 import { createTemplate, updateTemplate, deleteTemplate } from "@/lib/db/queries/templates";
 
 const templateSchema = z.object({

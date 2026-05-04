@@ -4,7 +4,7 @@ import { Plus, ShoppingCart } from "lucide-react";
 import { db } from "@/lib/db/client";
 import { sales, products, customers } from "@/lib/db/schema";
 import { eq, desc, sql, and, gte, lte } from "drizzle-orm";
-import { formatCurrency, formatPercent, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate } from "@/lib/utils";
 import { CHANNELS } from "@/lib/data";
 import SalesFilters from "@/components/sales/sales-filters";
 
@@ -91,7 +91,7 @@ export default async function SalesPage({ searchParams }: { searchParams: Promis
             {salesData.length} vente{salesData.length > 1 ? "s" : ""} · CA {formatCurrency(totalRevenue)} · Marge {formatCurrency(totalMargin)}
           </p>
         </div>
-        <Link href="/sales/new" className="flex items-center gap-2 px-4 py-2 text-[13px] font-medium text-[#0a0a0f] bg-rose-500 font-semibold rounded-lg hover:bg-rose-400 transition-colors">
+        <Link href="/sales/new" className="flex items-center gap-2 px-4 py-2 text-[13px] font-medium text-[var(--color-text-inverse)] bg-rose-500 font-semibold rounded-lg hover:bg-rose-400 transition-colors">
           <Plus size={14} />Enregistrer
         </Link>
       </div>
