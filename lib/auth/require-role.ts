@@ -21,6 +21,13 @@ export type UserShop = {
   role: TeamRole;
 };
 
+type MembershipRow = {
+  shopId: string;
+  shopName: string;
+  role: TeamRole;
+  permissions: string | null;
+};
+
 const ROLE_HIERARCHY: Record<TeamRole, number> = {
   owner: 3,
   manager: 2,
@@ -29,16 +36,31 @@ const ROLE_HIERARCHY: Record<TeamRole, number> = {
 
 const SHOP_COOKIE = "marlo-shop";
 
+const DEFAULT_PERMS: Record<TeamRole, string[]> = {
+  owner: [...ALL_PERMISSIONS],
+  manager: ["dashboard", "products", "sales", "customers", "analytics", "sourcing", "personal_shopping", "tasks", "templates"],
+  seller: ["dashboard", "products", "sales", "tasks"],
+};
+
+function resolvePerms(role: TeamRole, raw: string | null): string[] {
+  if (role === "owner") return [...ALL_PERMISSIONS];
+  if (raw) {
+    try { return JSON.parse(raw); } catch {}
+  }
+  return DEFAULT_PERMS[role] ?? DEFAULT_PERMS.seller;
+}
+
 /**
- * Get all shops the user belongs to.
+ * Single DB query: get all memberships with permissions included.
  * Cached per request.
  */
-export const getUserShops = cache(async (userId: string): Promise<UserShop[]> => {
+const getAllMemberships = cache(async (userId: string): Promise<MembershipRow[]> => {
   return db
     .select({
       shopId: teamMembers.shopId,
       shopName: shops.name,
       role: teamMembers.role,
+      permissions: teamMembers.permissions,
     })
     .from(teamMembers)
     .innerJoin(shops, eq(shops.id, teamMembers.shopId))
@@ -46,10 +68,16 @@ export const getUserShops = cache(async (userId: string): Promise<UserShop[]> =>
 });
 
 /**
- * Get the authenticated user's context (user, shop, role).
- * Reads the active shop from the `marlo-shop` cookie.
- * Falls back to the first shop if cookie is missing or invalid.
- * Cached per request via React cache().
+ * Get all shops (without permissions). Derived from cached memberships.
+ */
+export const getUserShops = cache(async (userId: string): Promise<UserShop[]> => {
+  const rows = await getAllMemberships(userId);
+  return rows.map(({ shopId, shopName, role }) => ({ shopId, shopName, role }));
+});
+
+/**
+ * Get the authenticated user's context.
+ * 1 Supabase Auth call + 1 DB call (cached). Zero extra queries.
  */
 export const getAuthContext = cache(async (): Promise<AuthContext> => {
   const supabase = await createSupabaseServerClient();
@@ -59,31 +87,28 @@ export const getAuthContext = cache(async (): Promise<AuthContext> => {
     throw new Error("Non authentifie");
   }
 
-  const allMemberships = await getUserShops(user.id);
+  const memberships = await getAllMemberships(user.id);
 
-  if (allMemberships.length > 0) {
+  if (memberships.length > 0) {
     const cookieStore = await cookies();
     const activeShopId = cookieStore.get(SHOP_COOKIE)?.value;
 
-    let selectedShop = allMemberships[0];
+    let selected = memberships[0];
     if (activeShopId) {
-      const match = allMemberships.find((m) => m.shopId === activeShopId);
-      if (match) selectedShop = match;
+      const match = memberships.find((m) => m.shopId === activeShopId);
+      if (match) selected = match;
     }
-
-    // Resolve permissions for this membership
-    const perms = await resolvePermissions(user.id, selectedShop.shopId, selectedShop.role);
 
     return {
       userId: user.id,
-      shopId: selectedShop.shopId,
-      role: selectedShop.role,
-      shopName: selectedShop.shopName,
-      permissions: perms,
+      shopId: selected.shopId,
+      role: selected.role,
+      shopName: selected.shopName,
+      permissions: resolvePerms(selected.role, selected.permissions),
     };
   }
 
-  // No shop found — auto-create for existing users
+  // Auto-create shop for existing users
   const [newShop] = await db.insert(shops).values({
     name: "Ma boutique",
     ownerId: user.id,
@@ -104,50 +129,14 @@ export const getAuthContext = cache(async (): Promise<AuthContext> => {
   };
 });
 
-/**
- * Require a minimum role level. Throws if the user doesn't have sufficient permissions.
- */
 export async function requireRole(minimumRole: TeamRole): Promise<AuthContext> {
   const ctx = await getAuthContext();
-
   if (ROLE_HIERARCHY[ctx.role] < ROLE_HIERARCHY[minimumRole]) {
-    throw new Error(`Accès refusé. Rôle requis : ${minimumRole}. Votre rôle : ${ctx.role}`);
+    throw new Error(`Acces refuse. Role requis : ${minimumRole}.`);
   }
-
   return ctx;
 }
 
-/**
- * Resolve permissions for a user in a shop.
- * Owner always gets all permissions.
- * Others get permissions from their team_members.permissions JSON.
- * If no custom permissions set, fall back to role-based defaults.
- */
-async function resolvePermissions(userId: string, shopId: string, role: TeamRole): Promise<string[]> {
-  if (role === "owner") return [...ALL_PERMISSIONS];
-
-  const [member] = await db
-    .select({ permissions: teamMembers.permissions })
-    .from(teamMembers)
-    .where(and(eq(teamMembers.shopId, shopId), eq(teamMembers.userId, userId)))
-    .limit(1);
-
-  if (member?.permissions) {
-    try {
-      return JSON.parse(member.permissions);
-    } catch {}
-  }
-
-  // Default permissions by role
-  if (role === "manager") {
-    return ["dashboard", "products", "sales", "customers", "analytics", "sourcing", "personal_shopping", "tasks", "templates"];
-  }
-  return ["dashboard", "products", "sales", "tasks"];
-}
-
-/**
- * Check if the current user has a specific permission.
- */
 export function canAccess(ctx: AuthContext, feature: string): boolean {
   if (ctx.role === "owner") return true;
   return ctx.permissions.includes(feature);

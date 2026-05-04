@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Package, ShoppingCart, Users, Search,
-  ShoppingBag, FileText, Calculator, Settings, Menu, X, BarChart3, Users2, ListTodo, Zap,
+  ShoppingBag, FileText, Calculator, Settings, Menu, X, BarChart3, Users2, ListTodo, Zap, ClipboardList,
 } from "lucide-react";
 import ThemeToggle from "./theme-toggle";
 import LogoutButton from "./logout-button";
@@ -22,7 +22,7 @@ const NAV_ITEMS = [
   { href: "/sourcing", label: "Sourcing", icon: Search, alertKey: "sourcing", perm: "sourcing" },
   { href: "/personal-shopping", label: "Personal Shop", icon: ShoppingBag, perm: "personal_shopping" },
   { href: "/tasks", label: "Taches", icon: ListTodo, perm: "tasks" },
-  { href: "/templates", label: "Templates", icon: FileText, perm: "templates" },
+  { href: "/templates", label: "Templates", icon: ClipboardList, perm: "templates" },
   { href: "/invoices", label: "Factures", icon: FileText, perm: "invoices" },
   { href: "/accounting", label: "Comptabilite", icon: Calculator, perm: "accounting" },
 ];
@@ -41,24 +41,22 @@ export default function Sidebar({
   shops = [],
   currentShopId = "",
   currentShopName = "",
+  alertCount: initialAlertCount = 0,
 }: {
   role?: string;
   permissions?: string[];
   shops?: ShopInfo[];
   currentShopId?: string;
   currentShopName?: string;
+  alertCount?: number;
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const [alertCount, setAlertCount] = useState(0);
   const isOwner = role === "owner";
+  const alertCount = initialAlertCount;
 
   const visibleNav = NAV_ITEMS.filter((item) => isOwner || permissions.includes(item.perm));
   const visibleBottom = BOTTOM_ITEMS.filter((item) => isOwner || permissions.includes(item.perm));
-
-  useEffect(() => {
-    fetch("/api/alerts").then((r) => r.json()).then((d) => setAlertCount(d.count ?? 0)).catch(() => {});
-  }, [pathname]);
 
   useEffect(() => { setOpen(false); }, [pathname]);
 
