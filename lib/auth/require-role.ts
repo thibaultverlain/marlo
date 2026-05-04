@@ -29,8 +29,9 @@ const SHOP_COOKIE = "marlo-shop";
 
 /**
  * Get all shops the user belongs to.
+ * Cached per request.
  */
-export async function getUserShops(userId: string): Promise<UserShop[]> {
+export const getUserShops = cache(async (userId: string): Promise<UserShop[]> => {
   return db
     .select({
       shopId: teamMembers.shopId,
@@ -40,7 +41,7 @@ export async function getUserShops(userId: string): Promise<UserShop[]> {
     .from(teamMembers)
     .innerJoin(shops, eq(shops.id, teamMembers.shopId))
     .where(eq(teamMembers.userId, userId));
-}
+});
 
 /**
  * Get the authenticated user's context (user, shop, role).
@@ -56,15 +57,7 @@ export const getAuthContext = cache(async (): Promise<AuthContext> => {
     throw new Error("Non authentifie");
   }
 
-  const allMemberships = await db
-    .select({
-      shopId: teamMembers.shopId,
-      role: teamMembers.role,
-      shopName: shops.name,
-    })
-    .from(teamMembers)
-    .innerJoin(shops, eq(shops.id, teamMembers.shopId))
-    .where(eq(teamMembers.userId, user.id));
+  const allMemberships = await getUserShops(user.id);
 
   if (allMemberships.length > 0) {
     // Check cookie for active shop

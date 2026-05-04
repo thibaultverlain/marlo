@@ -7,7 +7,6 @@ import {
   LayoutDashboard, Package, ShoppingCart, Users, Search,
   ShoppingBag, FileText, Calculator, Settings, Menu, X, BarChart3, Users2, ListTodo, Zap,
 } from "lucide-react";
-import PushNotificationToggle from "./push-toggle";
 import ThemeToggle from "./theme-toggle";
 import LogoutButton from "./logout-button";
 import NotificationBell from "./notification-bell";
@@ -125,7 +124,6 @@ export default function Sidebar({
 
         <div className="px-3 py-3 border-t border-[var(--color-border-subtle)] space-y-1">
           <NotificationBell />
-          <PushNotificationToggle />
           <ThemeToggle />
           {visibleBottom.map((item) => {
             const Icon = item.icon;

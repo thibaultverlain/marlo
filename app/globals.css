@@ -57,52 +57,77 @@
   --color-border: rgba(0, 0, 0, 0.08);
   --color-border-hover: rgba(0, 0, 0, 0.15);
   --color-border-subtle: rgba(0, 0, 0, 0.04);
-  --color-border-accent: rgba(251, 113, 133, 0.15);
+  --color-border-accent: rgba(225, 29, 72, 0.18);
 
   --color-text: #111117;
   --color-text-secondary: #495057;
-  --color-text-muted: #adb5bd;
+  --color-text-muted: #868e96;
   --color-text-inverse: #ffffff;
 
   --color-accent: #e11d48;
   --color-accent-hover: #be123c;
   --color-accent-muted: rgba(225, 29, 72, 0.08);
   --color-accent-text: #881337;
+  --color-accent-glow: rgba(225, 29, 72, 0.08);
 
   --color-success: #059669;
+  --color-success-bright: #10b981;
   --color-success-muted: rgba(5, 150, 105, 0.08);
   --color-warning: #d97706;
   --color-warning-muted: rgba(217, 119, 6, 0.08);
   --color-danger: #dc2626;
   --color-danger-muted: rgba(220, 38, 38, 0.08);
 
-  --shadow-card: 0 1px 3px rgba(0,0,0,0.06);
-  --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.04);
+  --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.06), 0 0 0 1px rgba(225,29,72,0.08);
+  --shadow-glow-accent: 0 0 16px rgba(225, 29, 72, 0.04);
 
   color-scheme: light;
 }
 
-/* ── Light overrides ── */
+/* ── Light overrides: text ── */
 [data-theme="light"] .text-white { color: #111117 !important; }
 [data-theme="light"] .text-zinc-200 { color: #1f2937 !important; }
 [data-theme="light"] .text-zinc-300 { color: #374151 !important; }
-[data-theme="light"] .text-zinc-400 { color: #6b7280 !important; }
-[data-theme="light"] .text-zinc-500 { color: #9ca3af !important; }
-[data-theme="light"] .text-zinc-600 { color: #d1d5db !important; }
-[data-theme="light"] .text-zinc-700 { color: #e5e7eb !important; }
-[data-theme="light"] .border-\[var\(--color-border\)\] { border-color: rgba(0, 0, 0, 0.08) !important; }
+[data-theme="light"] .text-zinc-400 { color: #4b5563 !important; }
+[data-theme="light"] .text-zinc-500 { color: #6b7280 !important; }
+[data-theme="light"] .text-zinc-600 { color: #9ca3af !important; }
+[data-theme="light"] .text-zinc-700 { color: #d1d5db !important; }
+
+/* ── Light overrides: semantic colors ── */
+[data-theme="light"] .text-emerald-400 { color: #059669 !important; }
+[data-theme="light"] .text-emerald-500 { color: #047857 !important; }
+[data-theme="light"] .text-red-400 { color: #dc2626 !important; }
+[data-theme="light"] .text-red-500 { color: #b91c1c !important; }
+[data-theme="light"] .text-amber-400 { color: #d97706 !important; }
+[data-theme="light"] .text-amber-300 { color: #b45309 !important; }
+[data-theme="light"] .text-blue-400 { color: #2563eb !important; }
+[data-theme="light"] .text-violet-400 { color: #7c3aed !important; }
+[data-theme="light"] .text-cyan-400 { color: #0891b2 !important; }
+[data-theme="light"] .text-rose-400 { color: #e11d48 !important; }
+
+/* ── Light overrides: backgrounds ── */
 [data-theme="light"] .bg-zinc-800 { background-color: #f1f3f5 !important; }
 [data-theme="light"] .bg-zinc-800\/30 { background-color: rgba(241, 243, 245, 0.5) !important; }
 [data-theme="light"] .bg-zinc-800\/50 { background-color: rgba(241, 243, 245, 0.7) !important; }
-[data-theme="light"] .bg-zinc-800\/60 { background-color: rgba(241, 243, 245, 0.8) !important; }
-[data-theme="light"] .text-emerald-400 { color: #059669 !important; }
-[data-theme="light"] .text-red-400 { color: #dc2626 !important; }
-[data-theme="light"] .text-amber-400 { color: #d97706 !important; }
-[data-theme="light"] .text-amber-300 { color: #b45309 !important; }
-[data-theme="light"] .text-indigo-400 { color: #4f46e5 !important; }
-[data-theme="light"] .text-indigo-300 { color: #6366f1 !important; }
-[data-theme="light"] .text-blue-400 { color: #2563eb !important; }
-[data-theme="light"] .text-cyan-400 { color: #e11d48 !important; }
+[data-theme="light"] .bg-zinc-800\/60 { background-color: rgba(241, 243, 245, 0.9) !important; }
+[data-theme="light"] .border-\[var\(--color-border\)\] { border-color: rgba(0, 0, 0, 0.08) !important; }
+
+/* ── Light overrides: icon background chips ── */
+[data-theme="light"] .bg-emerald-500\/10 { background-color: rgba(5, 150, 105, 0.08) !important; }
+[data-theme="light"] .bg-blue-500\/10 { background-color: rgba(37, 99, 235, 0.08) !important; }
+[data-theme="light"] .bg-violet-500\/10 { background-color: rgba(124, 58, 237, 0.08) !important; }
+[data-theme="light"] .bg-red-500\/10 { background-color: rgba(220, 38, 38, 0.08) !important; }
+[data-theme="light"] .bg-amber-500\/10 { background-color: rgba(217, 119, 6, 0.08) !important; }
+[data-theme="light"] .bg-amber-500\/15 { background-color: rgba(217, 119, 6, 0.10) !important; }
+[data-theme="light"] .bg-cyan-500\/10 { background-color: rgba(8, 145, 178, 0.08) !important; }
+[data-theme="light"] .bg-zinc-500\/10 { background-color: rgba(0, 0, 0, 0.04) !important; }
+[data-theme="light"] .bg-zinc-500\/15 { background-color: rgba(0, 0, 0, 0.06) !important; }
+[data-theme="light"] .bg-rose-500\/5 { background-color: rgba(225, 29, 72, 0.04) !important; }
+[data-theme="light"] .bg-rose-500\/10 { background-color: rgba(225, 29, 72, 0.06) !important; }
+[data-theme="light"] .bg-red-500\/20 { background-color: rgba(220, 38, 38, 0.10) !important; }
+
+/* ── Light overrides: forms ── */
 [data-theme="light"] input,
 [data-theme="light"] select,
 [data-theme="light"] textarea {
@@ -177,7 +202,7 @@ select option { background-color: var(--color-bg-card); color: var(--color-text)
 
 /* KPI card - gradient background with glow */
 .kpi-card {
-  background: linear-gradient(145deg, var(--color-bg-card) 0%, rgba(18, 18, 26, 0.6) 100%);
+  background: linear-gradient(145deg, var(--color-bg-card) 0%, var(--color-bg-raised) 100%);
   border: 1px solid var(--color-border);
   border-radius: 14px;
   box-shadow: var(--shadow-card);
@@ -196,15 +221,15 @@ select option { background-color: var(--color-bg-card); color: var(--color-text)
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent 0%, rgba(251,113,133,0.15) 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, var(--color-accent-glow) 50%, transparent 100%);
 }
 
 /* Featured KPI - main stat */
 .kpi-featured {
-  background: linear-gradient(145deg, rgba(251,113,133,0.06) 0%, var(--color-bg-card) 60%);
-  border: 1px solid rgba(251,113,133,0.15);
+  background: linear-gradient(145deg, var(--color-accent-muted) 0%, var(--color-bg-card) 60%);
+  border: 1px solid var(--color-border-accent);
   border-radius: 14px;
-  box-shadow: var(--shadow-card), 0 0 30px rgba(251,113,133,0.04);
+  box-shadow: var(--shadow-card), var(--shadow-glow-accent);
   position: relative;
   overflow: hidden;
 }
@@ -215,7 +240,8 @@ select option { background-color: var(--color-bg-card); color: var(--color-text)
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent 0%, rgba(251,113,133,0.3) 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, var(--color-accent) 50%, transparent 100%);
+  opacity: 0.3;
 }
 
 /* Stat typography */
@@ -253,20 +279,20 @@ select option { background-color: var(--color-bg-card); color: var(--color-text)
   flex-shrink: 0;
 }
 .icon-circle-accent {
-  background: rgba(251, 113, 133, 0.10);
-  color: #fb7185;
+  background: var(--color-accent-muted);
+  color: var(--color-accent);
 }
 .icon-circle-success {
-  background: rgba(16, 185, 129, 0.10);
-  color: #10b981;
+  background: var(--color-success-muted);
+  color: var(--color-success);
 }
 .icon-circle-warning {
-  background: rgba(245, 158, 11, 0.10);
-  color: #f59e0b;
+  background: var(--color-warning-muted);
+  color: var(--color-warning);
 }
 .icon-circle-danger {
-  background: rgba(239, 68, 68, 0.10);
-  color: #ef4444;
+  background: var(--color-danger-muted);
+  color: var(--color-danger);
 }
 
 /* Row hover for lists */
@@ -352,12 +378,12 @@ select option { background-color: var(--color-bg-card); color: var(--color-text)
 
 /* Percentage change badge */
 .change-positive {
-  color: #10b981;
+  color: var(--color-success);
   font-size: 12px;
   font-weight: 600;
 }
 .change-negative {
-  color: #ef4444;
+  color: var(--color-danger);
   font-size: 12px;
   font-weight: 600;
 }
@@ -380,7 +406,7 @@ select option { background-color: var(--color-bg-card); color: var(--color-text)
 
 /* Gradient text for accent values */
 .gradient-text {
-  background: linear-gradient(135deg, #fb7185 0%, #f43f5e 100%);
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-hover) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
