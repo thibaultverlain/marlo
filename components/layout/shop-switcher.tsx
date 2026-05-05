@@ -60,7 +60,7 @@ export default function ShopSwitcher({
       <button
         onClick={() => setOpen(!open)}
         disabled={isPending}
-        className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-[12px] text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.03] transition-all"
+        className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-[12px] text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-bg-hover)] transition-all"
       >
         <Store size={13} className="flex-shrink-0" />
         <span className="truncate flex-1 text-left">{currentShopName}</span>
@@ -68,7 +68,7 @@ export default function ShopSwitcher({
       </button>
 
       {open && (
-        <div className="absolute left-3 right-3 top-full mt-1 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-xl shadow-xl shadow-black/30 z-50 py-1 animate-in">
+        <div className="absolute left-3 right-3 top-full mt-1 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-xl shadow-xl shadow-black/10 z-50 py-1 animate-in">
           {shops.map((s) => (
             <button
               key={s.shopId}
@@ -76,7 +76,7 @@ export default function ShopSwitcher({
               className={`w-full flex items-center gap-2 px-3 py-2 text-[12px] transition-colors rounded-lg mx-0 ${
                 s.shopId === currentShopId
                   ? "text-rose-400 bg-rose-500/5"
-                  : "text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.03]"
+                  : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-bg-hover)]"
               }`}
             >
               <Store size={12} className="flex-shrink-0" />

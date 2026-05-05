@@ -74,14 +74,15 @@ export default function Sidebar({
           <MarloIcon size={28} />
           <MarloWordmark />
         </div>
-        <button onClick={() => setOpen(!open)} className="w-9 h-9 flex items-center justify-center rounded-lg text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-all duration-150">
+        <button onClick={() => setOpen(!open)} className="w-9 h-9 flex items-center justify-center rounded-lg text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-bg-hover)] transition-all duration-150">
           {open ? <X size={20} /> : <Menu size={20} />}
         </button>
       </div>
 
       {open && <div className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-[2px] z-40" onClick={() => setOpen(false)} />}
 
-      <aside className={`fixed top-0 bottom-0 w-[220px] bg-[var(--color-bg-sidebar)] flex flex-col z-50 border-r border-[var(--color-border)] transition-transform duration-200 ease-out lg:left-0 lg:translate-x-0 ${open ? "left-0 translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
+      <aside className={`fixed top-0 bottom-0 w-[220px] bg-[var(--color-bg-sidebar)] flex flex-col z-50 border-r border-[var(--color-border)] transition-transform duration-200 ease-out lg:left-0 lg:translate-x-0 ${open ? "left-0 translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
+        style={{ boxShadow: "var(--shadow-sidebar)" }}>
         <div className="px-5 py-5 hidden lg:block">
           <div className="flex items-center gap-1.5">
             <MarloIcon size={28} />
@@ -104,10 +105,10 @@ export default function Sidebar({
                 href={item.href}
                 className={`flex items-center gap-2.5 px-3 py-[9px] lg:py-[8px] rounded-[10px] text-[13px] transition-all duration-200 ${
                   isActive
-                    ? "bg-[var(--color-accent)]/12 text-[var(--color-accent)]"
-                    : "text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.03]"
+                    ? "font-semibold"
+                    : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-bg-hover)]"
                 }`}
-                style={isActive ? { background: "rgba(251, 113, 133, 0.10)", color: "#fb7185" } : {}}
+                style={isActive ? { background: "rgba(225, 29, 72, 0.08)", color: "var(--color-accent)" } : {}}
               >
                 <Icon size={17} strokeWidth={isActive ? 1.8 : 1.5} />
                 <span className={`flex-1 ${isActive ? "font-semibold" : "font-normal"}`}>{item.label}</span>
@@ -132,9 +133,9 @@ export default function Sidebar({
                 key={item.href}
                 href={item.href}
                 className={`flex items-center gap-2.5 px-3 py-[8px] rounded-[10px] text-[13px] transition-all duration-200 ${
-                  isActive ? "text-[var(--color-accent)]" : "text-zinc-600 hover:text-zinc-400 hover:bg-white/[0.03]"
+                  isActive ? "font-semibold" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-bg-hover)]"
                 }`}
-                style={isActive ? { background: "rgba(251, 113, 133, 0.10)", color: "#fb7185" } : {}}
+                style={isActive ? { background: "rgba(225, 29, 72, 0.08)", color: "var(--color-accent)" } : {}}
               >
                 <Icon size={16} strokeWidth={1.5} />
                 <span>{item.label}</span>

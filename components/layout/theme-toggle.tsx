@@ -24,7 +24,7 @@ export default function ThemeToggle() {
   return (
     <button
       onClick={toggle}
-      className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg text-sm text-zinc-500 hover:text-zinc-300 bg-[var(--color-bg-raised)] border border-[var(--color-border)] hover:bg-[var(--color-bg-hover)] transition-colors"
+      className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text)] bg-[var(--color-bg)] border border-[var(--color-border)] hover:bg-[var(--color-bg-hover)] transition-colors"
     >
       {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
       <span className="flex-1 text-left">

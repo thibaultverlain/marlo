@@ -11,7 +11,7 @@ export default function LogoutButton() {
     <button
       onClick={() => startTransition(() => logoutAction())}
       disabled={isPending}
-      className="flex items-center gap-2.5 w-full px-2.5 py-[9px] lg:py-[7px] rounded-md text-[13px] text-zinc-600 hover:text-red-400 hover:bg-white/[0.04] transition-all duration-100"
+      className="flex items-center gap-2.5 w-full px-2.5 py-[9px] lg:py-[7px] rounded-md text-[13px] text-[var(--color-text-muted)] hover:text-red-400 hover:bg-[var(--color-bg-hover)] transition-all duration-100"
     >
       <LogOut size={16} strokeWidth={1.5} />
       <span>{isPending ? "..." : "Déconnexion"}</span>

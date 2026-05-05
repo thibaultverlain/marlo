@@ -40,6 +40,7 @@
   --shadow-card: 0 1px 3px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.03);
   --shadow-card-hover: 0 8px 24px rgba(0,0,0,0.5), 0 0 0 1px rgba(251,113,133,0.08);
   --shadow-glow-accent: 0 0 24px rgba(251, 113, 133, 0.06);
+  --shadow-sidebar: none;
 
   --sidebar-width: 220px;
   color-scheme: dark;
@@ -52,7 +53,7 @@
   --color-bg-card: #ffffff;
   --color-bg-card-hover: #f8f9fa;
   --color-bg-hover: #f1f3f5;
-  --color-bg-sidebar: #111117;
+  --color-bg-sidebar: #ffffff;
   --color-bg-input: #ffffff;
   --color-border: rgba(0, 0, 0, 0.08);
   --color-border-hover: rgba(0, 0, 0, 0.15);
@@ -81,6 +82,7 @@
   --shadow-card: 0 1px 3px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.04);
   --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.06), 0 0 0 1px rgba(225,29,72,0.08);
   --shadow-glow-accent: 0 0 16px rgba(225, 29, 72, 0.04);
+  --shadow-sidebar: 1px 0 12px rgba(225, 29, 72, 0.04), 1px 0 0 rgba(225, 29, 72, 0.06);
 
   color-scheme: light;
 }

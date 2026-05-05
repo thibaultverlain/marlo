@@ -98,7 +98,7 @@ export default function NotificationBell() {
     <div className="relative" ref={panelRef}>
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2.5 px-3 py-[8px] rounded-[10px] text-[13px] transition-all duration-200 text-zinc-600 hover:text-zinc-400 hover:bg-white/[0.03] w-full"
+        className="flex items-center gap-2.5 px-3 py-[8px] rounded-[10px] text-[13px] transition-all duration-200 text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-bg-hover)] w-full"
       >
         <Bell size={16} strokeWidth={1.5} />
         <span className="flex-1 text-left">Notifications</span>
@@ -118,7 +118,7 @@ export default function NotificationBell() {
               {unread > 0 && (
                 <button
                   onClick={handleMarkAllRead}
-                  className="text-[11px] text-zinc-500 hover:text-zinc-300 px-2 py-1 rounded-md hover:bg-white/5 transition flex items-center gap-1"
+                  className="text-[11px] text-zinc-500 hover:text-zinc-300 px-2 py-1 rounded-md hover:bg-[var(--color-bg-hover)] transition flex items-center gap-1"
                 >
                   <CheckCheck size={12} />
                   Tout lire
@@ -126,7 +126,7 @@ export default function NotificationBell() {
               )}
               <button
                 onClick={() => setOpen(false)}
-                className="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-600 hover:text-zinc-300 hover:bg-white/5 transition"
+                className="w-7 h-7 flex items-center justify-center rounded-lg text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-bg-hover)] transition"
               >
                 <X size={14} />
               </button>
@@ -150,7 +150,7 @@ export default function NotificationBell() {
                       key={n.id}
                       onClick={() => handleClickNotif(n)}
                       className={`w-full text-left px-4 py-3 flex items-start gap-3 transition-colors ${
-                        n.read ? "opacity-50 hover:opacity-70" : "hover:bg-white/[0.02]"
+                        n.read ? "opacity-50 hover:opacity-70" : "hover:bg-[var(--color-bg-hover)]"
                       }`}
                     >
                       <div className={`w-8 h-8 rounded-xl ${cfg.bgClass} flex items-center justify-center flex-shrink-0 mt-0.5`}>
@@ -171,7 +171,7 @@ export default function NotificationBell() {
                       {!n.read && (
                         <button
                           onClick={(e) => { e.stopPropagation(); handleMarkRead(n.id); }}
-                          className="p-1 rounded hover:bg-white/5 text-zinc-700 hover:text-zinc-400 transition flex-shrink-0"
+                          className="p-1 rounded hover:bg-[var(--color-bg-hover)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition flex-shrink-0"
                           title="Marquer comme lu"
                         >
                           <Check size={12} />
