@@ -4,7 +4,7 @@ import { formatCurrency } from "@/lib/utils";
 import { db } from "@/lib/db/client";
 import { sales, products } from "@/lib/db/schema";
 import { sql, gte, lte, and, eq } from "drizzle-orm";
-import { getRecentSales, getPendingShipments, getCurrentMonthStats } from "@/lib/db/queries/sales";
+import { getRecentSales, getPendingShipments } from "@/lib/db/queries/sales";
 import { getStockStats } from "@/lib/db/queries/products";
 import { getActiveSourcingCount } from "@/lib/db/queries/sourcing";
 import { getAuthContext } from "@/lib/auth/require-role";
@@ -32,59 +32,69 @@ async function getChartDataMonth(shopId: string) {
   });
 }
 
-async function getTodayStats(shopId: string) {
+/**
+ * Single query that returns all sales stats: today, all-time, current month, previous month.
+ * Replaces 4 separate queries.
+ */
+async function getAllSalesStats(shopId: string) {
   const now = new Date();
   const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
-  const rows = await db
-    .select({
-      revenue: sql<number>`coalesce(sum(sale_price), 0)::numeric`,
-      margin: sql<number>`coalesce(sum(margin), 0)::numeric`,
-      count: sql<number>`count(*)::int`,
-    })
-    .from(sales)
-    .where(and(eq(sales.shopId, shopId), gte(sales.soldAt, startOfDay), lte(sales.soldAt, endOfDay)));
-  return rows[0] ?? { revenue: 0, margin: 0, count: 0 };
-}
+  const curMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const prevMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
 
-async function getAllTimeStats(shopId: string) {
   const rows = await db
     .select({
-      revenue: sql<number>`coalesce(sum(sale_price), 0)::numeric`,
-      margin: sql<number>`coalesce(sum(margin), 0)::numeric`,
-      count: sql<number>`count(*)::int`,
+      totalRevenue: sql<number>`coalesce(sum(sale_price), 0)::numeric`,
+      totalMargin: sql<number>`coalesce(sum(margin), 0)::numeric`,
+      totalCount: sql<number>`count(*)::int`,
       avgMarginPct: sql<number>`coalesce(avg(margin_pct), 0)::numeric`,
+      todayRevenue: sql<number>`coalesce(sum(sale_price) filter (where sold_at >= ${startOfDay} and sold_at <= ${endOfDay}), 0)::numeric`,
+      todayMargin: sql<number>`coalesce(sum(margin) filter (where sold_at >= ${startOfDay} and sold_at <= ${endOfDay}), 0)::numeric`,
+      todayCount: sql<number>`count(*) filter (where sold_at >= ${startOfDay} and sold_at <= ${endOfDay})::int`,
+      curMonthRevenue: sql<number>`coalesce(sum(sale_price) filter (where sold_at >= ${curMonthStart}), 0)::numeric`,
+      curMonthMargin: sql<number>`coalesce(sum(margin) filter (where sold_at >= ${curMonthStart}), 0)::numeric`,
+      curMonthCount: sql<number>`count(*) filter (where sold_at >= ${curMonthStart})::int`,
+      prevMonthRevenue: sql<number>`coalesce(sum(sale_price) filter (where sold_at >= ${prevMonthStart} and sold_at < ${curMonthStart}), 0)::numeric`,
+      prevMonthCount: sql<number>`count(*) filter (where sold_at >= ${prevMonthStart} and sold_at < ${curMonthStart})::int`,
     })
     .from(sales)
     .where(eq(sales.shopId, shopId));
-  return rows[0] ?? { revenue: 0, margin: 0, count: 0, avgMarginPct: 0 };
+
+  return rows[0];
 }
 
 export default async function DashboardPage() {
-  const { userId, shopId } = await getAuthContext();
-  const [todayStats, allTimeStats, stockStats, monthStats, recentSales, pendingShipments, activeSourcing, chartData] = await Promise.all([
-    getTodayStats(shopId),
-    getAllTimeStats(shopId),
+  const { shopId } = await getAuthContext();
+  const [stats, stockStats, recentSales, pendingShipments, activeSourcing, chartData] = await Promise.all([
+    getAllSalesStats(shopId),
     getStockStats(shopId),
-    getCurrentMonthStats(shopId),
     getRecentSales(shopId, 8),
     getPendingShipments(shopId),
     getActiveSourcingCount(shopId),
     getChartDataMonth(shopId),
   ]);
 
-  const totalRevenue = Number(allTimeStats.revenue);
-  const totalMargin = Number(allTimeStats.margin);
-  const avgMarginPct = Number(allTimeStats.avgMarginPct);
+  const totalRevenue = Number(stats?.totalRevenue ?? 0);
+  const totalMargin = Number(stats?.totalMargin ?? 0);
+  const avgMarginPct = Number(stats?.avgMarginPct ?? 0);
   const inStock = stockStats?.inStock ?? 0;
   const stockValue = Number(stockStats?.totalValue ?? 0);
   const dormant = stockStats?.dormant ?? 0;
 
-  const currentMonthRevenue = Number(monthStats.current?.revenue ?? 0);
-  const prevMonthRevenue = Number(monthStats.previous?.revenue ?? 0);
+  const currentMonthRevenue = Number(stats?.curMonthRevenue ?? 0);
+  const prevMonthRevenue = Number(stats?.prevMonthRevenue ?? 0);
   const monthChange = prevMonthRevenue > 0 ? ((currentMonthRevenue - prevMonthRevenue) / prevMonthRevenue) * 100 : 0;
 
   const alertCount = dormant + pendingShipments + activeSourcing;
+
+  const todayStats = {
+    revenue: Number(stats?.todayRevenue ?? 0),
+    margin: Number(stats?.todayMargin ?? 0),
+    count: Number(stats?.todayCount ?? 0),
+  };
+  const monthCount = Number(stats?.curMonthCount ?? 0);
+  const totalCount = Number(stats?.totalCount ?? 0);
 
   const today = new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date());
 
@@ -109,7 +119,7 @@ export default async function DashboardPage() {
             </div>
           </div>
           <p className="text-[40px] font-bold tabular-nums tracking-tight leading-none gradient-text mt-3">{formatCurrency(totalRevenue)}</p>
-          <p className="text-[12px] text-zinc-500 mt-2">{allTimeStats.count} vente{Number(allTimeStats.count) > 1 ? "s" : ""}</p>
+          <p className="text-[12px] text-zinc-500 mt-2">{totalCount} vente{totalCount > 1 ? "s" : ""}</p>
           <div className="flex gap-8 mt-5 pt-4 border-t border-white/[0.04]">
             <div>
               <p className="text-[10px] text-zinc-600 uppercase tracking-wider">Ce mois</p>
@@ -136,7 +146,7 @@ export default async function DashboardPage() {
         <div className="lg:col-span-7 grid grid-cols-2 lg:grid-cols-3 gap-3">
           <KpiCard icon={<TrendingUp size={18} />} iconClass="bg-rose-500/10 text-rose-400" label="Marge totale" value={formatCurrency(totalMargin)} sub={`~${avgMarginPct.toFixed(0)}% moy.`} />
           <KpiCard icon={<Package size={18} />} iconClass="bg-violet-500/10 text-violet-400" label="Stock" value={`${inStock} articles`} sub={formatCurrency(stockValue)} />
-          <KpiCard icon={<ShoppingCart size={18} />} iconClass="bg-cyan-500/10 text-cyan-400" label="Ventes ce mois" value={String(Number(monthStats.current?.count ?? 0))} sub={formatCurrency(currentMonthRevenue)} />
+          <KpiCard icon={<ShoppingCart size={18} />} iconClass="bg-cyan-500/10 text-cyan-400" label="Ventes ce mois" value={String(monthCount)} sub={formatCurrency(currentMonthRevenue)} />
           <KpiCard icon={<Percent size={18} />} iconClass="bg-emerald-500/10 text-emerald-400" label="Marge aujourd'hui" value={formatCurrency(todayStats.margin)} sub={`${todayStats.count} vente${Number(todayStats.count) > 1 ? "s" : ""}`} />
           <KpiCard icon={<AlertTriangle size={18} />} iconClass="bg-amber-500/10 text-amber-400" label="Dormants" value={String(dormant)} sub={dormant > 0 ? "> 30 jours" : "Aucun"} warning={dormant > 0} />
           <KpiCard icon={<Truck size={18} />} iconClass="bg-orange-500/10 text-orange-400" label="A expédier" value={String(pendingShipments)} sub={pendingShipments > 0 ? "En attente" : "Tout envoyé"} warning={pendingShipments > 0} />

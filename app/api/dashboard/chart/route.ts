@@ -114,6 +114,53 @@ export async function GET(req: NextRequest) {
         const row = rows.find((r) => r.hour === i);
         return { label: `${String(i).padStart(2, "0")}h`, revenue: Number(row?.revenue ?? 0) };
       });
+    } else if (period === "custom") {
+      const fromStr = req.nextUrl.searchParams.get("from");
+      const toStr = req.nextUrl.searchParams.get("to");
+      if (!fromStr || !toStr) {
+        return NextResponse.json({ data: [], error: "Dates requises" }, { status: 400 });
+      }
+      const from = new Date(fromStr);
+      const to = new Date(toStr + "T23:59:59");
+      const diffDays = Math.ceil((to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24));
+
+      if (diffDays <= 31) {
+        // Day-by-day
+        const rows = await db
+          .select({
+            day: sql<string>`to_char(sold_at, 'YYYY-MM-DD')`,
+            revenue: sql<number>`coalesce(sum(sale_price), 0)::numeric`,
+          })
+          .from(sales)
+          .where(and(eq(sales.shopId, shopId), gte(sales.soldAt, from), lte(sales.soldAt, to)))
+          .groupBy(sql`to_char(sold_at, 'YYYY-MM-DD')`)
+          .orderBy(sql`to_char(sold_at, 'YYYY-MM-DD')`);
+
+        const dayMap = new Map(rows.map((r) => [r.day, Number(r.revenue)]));
+        data = [];
+        const cursor = new Date(from);
+        while (cursor <= to) {
+          const key = cursor.toISOString().split("T")[0];
+          data.push({ label: `${cursor.getDate()}/${cursor.getMonth() + 1}`, revenue: dayMap.get(key) ?? 0 });
+          cursor.setDate(cursor.getDate() + 1);
+        }
+      } else {
+        // Week-by-week for longer ranges
+        const rows = await db
+          .select({
+            week: sql<string>`to_char(date_trunc('week', sold_at), 'YYYY-MM-DD')`,
+            revenue: sql<number>`coalesce(sum(sale_price), 0)::numeric`,
+          })
+          .from(sales)
+          .where(and(eq(sales.shopId, shopId), gte(sales.soldAt, from), lte(sales.soldAt, to)))
+          .groupBy(sql`date_trunc('week', sold_at)`)
+          .orderBy(sql`date_trunc('week', sold_at)`);
+
+        data = rows.map((r) => {
+          const d = new Date(r.week);
+          return { label: `${d.getDate()}/${d.getMonth() + 1}`, revenue: Number(r.revenue) };
+        });
+      }
     }
 
     return NextResponse.json({ data });
