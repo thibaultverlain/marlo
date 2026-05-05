@@ -42,8 +42,9 @@ export async function updateTask(id: string, data: Partial<NewTask>): Promise<Ta
   return rows[0];
 }
 
-export async function deleteTask(id: string): Promise<void> {
-  await db.delete(tasks).where(eq(tasks.id, id));
+export async function deleteTask(id: string, shopId?: string): Promise<void> {
+  const cond = shopId ? and(eq(tasks.id, id), eq(tasks.shopId, shopId)) : eq(tasks.id, id);
+  await db.delete(tasks).where(cond);
 }
 
 export async function completeTask(id: string): Promise<Task | undefined> {

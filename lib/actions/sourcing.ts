@@ -116,7 +116,8 @@ export async function linkProductToSourcingAction(
 
 export async function deleteSourcingAction(id: string) {
   try {
-    await deleteSourcingRequest(id);
+    const ctx = await getAuthContext();
+    await deleteSourcingRequest(id, ctx.shopId);
   } catch (err) {
     console.error("deleteSourcingAction:", err);
     return { error: "Erreur lors de la suppression." };

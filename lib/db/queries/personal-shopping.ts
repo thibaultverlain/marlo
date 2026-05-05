@@ -1,6 +1,6 @@
 import { db } from "../client";
 import { personalShoppingMissions, psItems, customers } from "../schema";
-import { eq, desc, sql } from "drizzle-orm";
+import { eq, desc, sql, and } from "drizzle-orm";
 
 type NewMission = typeof personalShoppingMissions.$inferInsert;
 type NewItem = typeof psItems.$inferInsert;
@@ -85,8 +85,9 @@ export async function updateMission(id: string, data: Partial<NewMission>) {
   return rows[0];
 }
 
-export async function deleteMission(id: string) {
-  await db.delete(personalShoppingMissions).where(eq(personalShoppingMissions.id, id));
+export async function deleteMission(id: string, shopId?: string) {
+  const cond = shopId ? and(eq(personalShoppingMissions.id, id), eq(personalShoppingMissions.shopId, shopId)) : eq(personalShoppingMissions.id, id);
+  await db.delete(personalShoppingMissions).where(cond);
 }
 
 export async function createPsItem(data: NewItem) {

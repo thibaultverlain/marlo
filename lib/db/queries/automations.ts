@@ -1,6 +1,6 @@
 import { db } from "../client";
 import { automations, type NewAutomation, type Automation } from "../schema";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, sql } from "drizzle-orm";
 
 export async function getShopAutomations(shopId: string): Promise<Automation[]> {
   return db
@@ -44,14 +44,9 @@ export async function deleteAutomation(id: string, shopId: string): Promise<void
 export async function markAutomationRun(id: string): Promise<void> {
   await db
     .update(automations)
-    .set({
-      lastRun: new Date(),
-      runCount: automations.runCount,
-    })
+    .set({ lastRun: new Date() })
     .where(eq(automations.id, id));
 
-  // Increment run count separately
-  await db.execute(
-    `UPDATE automations SET run_count = run_count + 1 WHERE id = '${id}'`
-  );
+  // Increment run count with parameterized query
+  await db.execute(sql`UPDATE automations SET run_count = run_count + 1 WHERE id = ${id}`);
 }

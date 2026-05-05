@@ -65,9 +65,12 @@ export async function updateProduct(id: string, data: Partial<NewProduct>): Prom
   return rows[0];
 }
 
-export async function deleteProduct(id: string): Promise<void> {
+export async function deleteProduct(id: string, shopId?: string): Promise<void> {
   await db.update(sales).set({ productId: null }).where(eq(sales.productId, id));
-  await db.delete(products).where(eq(products.id, id));
+  const conditions = shopId
+    ? and(eq(products.id, id), eq(products.shopId, shopId))
+    : eq(products.id, id);
+  await db.delete(products).where(conditions);
 }
 
 export async function getStockStats(shopId: string) {

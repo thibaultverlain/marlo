@@ -81,7 +81,8 @@ export async function updateMissionStatusAction(id: string, newStatus: string) {
 
 export async function deleteMissionAction(id: string) {
   try {
-    await deleteMission(id);
+    const ctx = await getAuthContext();
+    await deleteMission(id, ctx.shopId);
   } catch (err) {
     console.error("deleteMissionAction:", err);
     return { error: "Erreur lors de la suppression." };

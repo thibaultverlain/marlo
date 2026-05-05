@@ -12,12 +12,13 @@ export async function POST(req: NextRequest) {
   try {
     // Verify webhook secret via header or query param
     const webhookSecret = process.env.WEBHOOK_EMAIL_SECRET;
-    if (webhookSecret) {
-      const authHeader = req.headers.get("authorization");
-      const querySecret = req.nextUrl.searchParams.get("secret");
-      if (authHeader !== `Bearer ${webhookSecret}` && querySecret !== webhookSecret) {
-        return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
-      }
+    if (!webhookSecret) {
+      return NextResponse.json({ error: "Webhook not configured" }, { status: 500 });
+    }
+    const authHeader = req.headers.get("authorization");
+    const querySecret = req.nextUrl.searchParams.get("secret");
+    if (authHeader !== `Bearer ${webhookSecret}` && querySecret !== webhookSecret) {
+      return NextResponse.json({ error: "Non autorise" }, { status: 401 });
     }
 
     let subject = "";

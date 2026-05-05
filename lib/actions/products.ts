@@ -134,7 +134,8 @@ export async function updateProductAction(id: string, formData: FormData) {
 
 export async function deleteProductAction(id: string) {
   try {
-    await deleteProduct(id);
+    const ctx = await getAuthContext();
+    await deleteProduct(id, ctx.shopId);
   } catch (err) {
     console.error("deleteProductAction error:", err);
     return { error: "Erreur lors de la suppression." };

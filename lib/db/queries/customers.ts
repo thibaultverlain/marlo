@@ -1,6 +1,6 @@
 import { db } from "../client";
 import { customers, type NewCustomer, type Customer } from "../schema";
-import { eq, desc, sql } from "drizzle-orm";
+import { eq, desc, sql, and } from "drizzle-orm";
 
 export async function getAllCustomers(shopId: string): Promise<Customer[]> {
   return db.select().from(customers).where(eq(customers.shopId, shopId)).orderBy(desc(customers.createdAt));
@@ -32,6 +32,7 @@ export async function updateCustomer(id: string, data: Partial<NewCustomer>): Pr
   return rows[0];
 }
 
-export async function deleteCustomer(id: string): Promise<void> {
-  await db.delete(customers).where(eq(customers.id, id));
+export async function deleteCustomer(id: string, shopId?: string): Promise<void> {
+  const cond = shopId ? and(eq(customers.id, id), eq(customers.shopId, shopId)) : eq(customers.id, id);
+  await db.delete(customers).where(cond);
 }

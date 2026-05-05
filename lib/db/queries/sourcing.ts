@@ -83,8 +83,9 @@ export async function updateSourcingRequest(id: string, data: Partial<NewSourcin
   return rows[0];
 }
 
-export async function deleteSourcingRequest(id: string): Promise<void> {
-  await db.delete(sourcingRequests).where(eq(sourcingRequests.id, id));
+export async function deleteSourcingRequest(id: string, shopId?: string): Promise<void> {
+  const cond = shopId ? and(eq(sourcingRequests.id, id), eq(sourcingRequests.shopId, shopId)) : eq(sourcingRequests.id, id);
+  await db.delete(sourcingRequests).where(cond);
 }
 
 export async function getSourcingStats(shopId: string) {

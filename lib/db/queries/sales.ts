@@ -111,6 +111,7 @@ export async function getPendingShipments(shopId: string) {
   return rows[0]?.count ?? 0;
 }
 
-export async function deleteSale(id: string) {
-  await db.delete(sales).where(eq(sales.id, id));
+export async function deleteSale(id: string, shopId?: string) {
+  const cond = shopId ? and(eq(sales.id, id), eq(sales.shopId, shopId)) : eq(sales.id, id);
+  await db.delete(sales).where(cond);
 }

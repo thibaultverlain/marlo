@@ -1,10 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthContext } from "@/lib/auth/require-role";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { rateLimit } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
+  // Rate limit by IP
+  const ip = req.headers.get("x-forwarded-for") ?? "unknown";
+  const { allowed } = rateLimit(`upload:${ip}`);
+  if (!allowed) {
+    return NextResponse.json({ error: "Trop de requetes. Reessayez dans 1 minute." }, { status: 429 });
+  }
+
   let ctx;
   try { ctx = await getAuthContext(); } catch {
     return NextResponse.json({ error: "Non autorise" }, { status: 401 });
@@ -26,8 +34,23 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Fichier trop volumineux (max 10 Mo)" }, { status: 400 });
     }
 
+    // MIME type whitelist
+    const ALLOWED_TYPES = [
+      "application/pdf",
+      "image/jpeg", "image/png", "image/webp", "image/gif",
+      "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "text/plain", "text/csv",
+    ];
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      return NextResponse.json({ error: `Type de fichier non autorise: ${file.type}` }, { status: 400 });
+    }
+
+    // Sanitize filename: remove path traversal
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+
     const supabase = await createSupabaseServerClient();
-    const ext = file.name.split(".").pop() ?? "pdf";
+    const ext = safeName.split(".").pop() ?? "pdf";
     const path = `${ctx.shopId}/${Date.now()}-${crypto.randomUUID().substring(0, 8)}.${ext}`;
 
     const buffer = Buffer.from(await file.arrayBuffer());

@@ -95,7 +95,7 @@ export async function updateTaskStatusAction(taskId: string, status: "a_faire" |
 export async function deleteTaskAction(taskId: string) {
   const ctx = await getAuthContext();
   try {
-    await deleteTask(taskId);
+    await deleteTask(taskId, ctx.shopId);
     await logActivity(ctx.shopId, ctx.userId, "tache_supprimee", "task", taskId);
     revalidatePath("/tasks");
     return { success: true };

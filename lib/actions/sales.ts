@@ -132,7 +132,8 @@ export async function deleteSaleAction(saleId: string) {
   const { deleteSale } = await import("@/lib/db/queries/sales");
 
   try {
-    await deleteSale(saleId);
+    const ctx = await getAuthContext();
+    await deleteSale(saleId, ctx.shopId);
   } catch (err) {
     console.error("deleteSaleAction error:", err);
     return { error: "Erreur lors de la suppression." };
