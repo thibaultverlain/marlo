@@ -97,6 +97,10 @@ export async function createSaleAction(formData: FormData) {
       notes: parsed.data.notes ?? null,
     });
 
+    // Update product status to "vendu"
+    const { updateProduct } = await import("@/lib/db/queries/products");
+    await updateProduct(parsed.data.productId, { status: "vendu" });
+
     const productTitle = product?.title ?? "Article";
     await notifyShopMembers(
       ctx.shopId,
@@ -106,17 +110,6 @@ export async function createSaleAction(formData: FormData) {
       `${productTitle} — ${formatCurrency(salePriceNum)}`,
       "/sales"
     );
-
-    // Execute automations
-    const { executeAutomations } = await import("@/lib/automations/engine");
-    await executeAutomations("sale_recorded", {
-      shopId: ctx.shopId,
-      userId: ctx.userId,
-      entityType: "sale",
-      entityTitle: productTitle,
-      marginPct: marginPct,
-      salePrice: salePriceNum,
-    });
   } catch (err) {
     console.error("createSaleAction error:", err);
     return { error: "Erreur lors de l'enregistrement de la vente." };

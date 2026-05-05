@@ -2,8 +2,8 @@
 
 import { useState, useTransition } from "react";
 import {
-  Plus, FileText, MessageSquare, Mail, AlignLeft, Trash2, Pencil,
-  X, Copy, Check, Eye, Wand2,
+  Plus, FileText, MessageSquare, Trash2, Pencil,
+  X, Copy, Check, Eye, Wand2, AlertTriangle, Search, Users,
 } from "lucide-react";
 import {
   createTemplateAction,
@@ -13,10 +13,11 @@ import {
 import type { Template } from "@/lib/db/schema";
 
 const TYPE_CONFIG = {
-  annonce: { label: "Annonce", icon: FileText, iconClass: "text-blue-400", bgClass: "bg-blue-500/10" },
-  message: { label: "Message", icon: MessageSquare, iconClass: "text-violet-400", bgClass: "bg-violet-500/10" },
-  email: { label: "Email", icon: Mail, iconClass: "text-cyan-400", bgClass: "bg-cyan-500/10" },
-  description: { label: "Description", icon: AlignLeft, iconClass: "text-amber-400", bgClass: "bg-amber-500/10" },
+  favoris: { label: "Messages favoris", icon: MessageSquare, iconClass: "text-rose-400", bgClass: "bg-rose-500/10" },
+  litiges: { label: "Messages litiges", icon: AlertTriangle, iconClass: "text-red-400", bgClass: "bg-red-500/10" },
+  sourcing: { label: "Sourcing / PS", icon: Search, iconClass: "text-violet-400", bgClass: "bg-violet-500/10" },
+  communaute: { label: "Communaute privee", icon: Users, iconClass: "text-blue-400", bgClass: "bg-blue-500/10" },
+  annonces: { label: "Annonces plateforme", icon: FileText, iconClass: "text-amber-400", bgClass: "bg-amber-500/10" },
 } as const;
 
 const COMMON_VARS = ["marque", "modele", "prix", "taille", "couleur", "etat", "reference"];
@@ -40,7 +41,7 @@ export default function TemplatesPageClient({
 }) {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [type, setType] = useState<"annonce" | "message" | "email" | "description">("annonce");
+  const [type, setType] = useState<"favoris" | "litiges" | "sourcing" | "communaute" | "annonces">("favoris");
   const [name, setName] = useState("");
   const [content, setContent] = useState("");
   const [variables, setVariables] = useState("");
@@ -53,7 +54,7 @@ export default function TemplatesPageClient({
   const [varValues, setVarValues] = useState<Record<string, string>>({});
 
   function resetForm() {
-    setName(""); setContent(""); setVariables(""); setType("annonce");
+    setName(""); setContent(""); setVariables(""); setType("favoris");
     setEditingId(null); setShowForm(false);
   }
 
@@ -129,7 +130,7 @@ export default function TemplatesPageClient({
       {showForm && isOwner && (
         <div className="card-static p-6 space-y-4">
           <div className="flex gap-2">
-            {(["annonce", "message", "email", "description"] as const).map((t) => {
+            {(["favoris", "litiges", "sourcing", "communaute", "annonces"] as const).map((t) => {
               const cfg = TYPE_CONFIG[t]; const Icon = cfg.icon;
               return (
                 <button key={t} onClick={() => setType(t)}
@@ -182,7 +183,7 @@ export default function TemplatesPageClient({
       ) : (
         <div className="space-y-3">
           {filtered.map((t) => {
-            const cfg = TYPE_CONFIG[t.type as keyof typeof TYPE_CONFIG] ?? TYPE_CONFIG.annonce;
+            const cfg = TYPE_CONFIG[t.type as keyof typeof TYPE_CONFIG] ?? TYPE_CONFIG.favoris;
             const Icon = cfg.icon;
             const isPreview = previewId === t.id;
             const vars = extractVariables(t.content);

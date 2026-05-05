@@ -38,13 +38,17 @@ export async function GET(req: NextRequest) {
     }));
 
     // @ts-ignore - react-pdf type mismatch with React 19
-    const doc = <StockCatalogPDF products={pdfProducts} shopName={settings?.commercialName ?? settings?.legalName ?? "Marlo"} generatedAt={new Date()} />;
+    const doc = React.createElement(StockCatalogPDF, {
+      products: pdfProducts,
+      shopName: settings?.commercialName ?? settings?.legalName ?? "Marlo",
+      generatedAt: new Date(),
+    });
     const buffer = await renderToBuffer(doc as any);
 
     const download = req.nextUrl.searchParams.get("download") === "1";
     const filename = `stock-${new Date().toISOString().slice(0, 10)}.pdf`;
 
-    return new NextResponse(buffer as unknown as BodyInit, {
+    return new NextResponse(Buffer.from(buffer), {
       headers: {
         "Content-Type": "application/pdf",
         "Content-Disposition": download

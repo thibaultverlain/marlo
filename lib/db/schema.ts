@@ -290,6 +290,7 @@ export const activityLog = pgTable("activity_log", {
   id: uuid("id").defaultRandom().primaryKey(),
   shopId: uuid("shop_id").references(() => shops.id).notNull(),
   userId: uuid("user_id").notNull(),
+  userName: text("user_name"),
   action: text("action").notNull(),
   entity: text("entity"),
   entityId: uuid("entity_id"),

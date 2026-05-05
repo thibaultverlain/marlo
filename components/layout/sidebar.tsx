@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Package, ShoppingCart, Users, Search,
-  ShoppingBag, FileText, Calculator, Settings, Menu, X, BarChart3, Users2, ListTodo, Zap, ClipboardList,
+  ShoppingBag, FileText, Calculator, Settings, Menu, X, BarChart3, Users2, ListTodo, Zap, ClipboardList, Truck,
 } from "lucide-react";
 import ThemeToggle from "./theme-toggle";
 import LogoutButton from "./logout-button";
@@ -17,6 +17,7 @@ const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, alertKey: "dashboard", perm: "dashboard" },
   { href: "/products", label: "Stock", icon: Package, alertKey: "products", perm: "products" },
   { href: "/sales", label: "Ventes", icon: ShoppingCart, perm: "sales" },
+  { href: "/orders", label: "Commandes", icon: Truck, perm: "sales" },
   { href: "/customers", label: "Clients", icon: Users, perm: "customers" },
   { href: "/analytics", label: "Analytique", icon: BarChart3, perm: "analytics" },
   { href: "/sourcing", label: "Sourcing", icon: Search, alertKey: "sourcing", perm: "sourcing" },
@@ -29,7 +30,6 @@ const NAV_ITEMS = [
 
 const BOTTOM_ITEMS = [
   { href: "/admin", label: "Administration", icon: Settings, perm: "settings" },
-  { href: "/automations", label: "Automations", icon: Zap, perm: "automations" },
   { href: "/team", label: "Equipe", icon: Users2, perm: "team" },
 ];
 

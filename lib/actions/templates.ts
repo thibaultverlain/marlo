@@ -6,7 +6,7 @@ import { getAuthContext } from "@/lib/auth/require-role";
 import { createTemplate, updateTemplate, deleteTemplate } from "@/lib/db/queries/templates";
 
 const templateSchema = z.object({
-  type: z.enum(["annonce", "message", "email", "description"]),
+  type: z.enum(["favoris", "litiges", "sourcing", "communaute", "annonces"]),
   name: z.string().min(1, "Nom requis"),
   content: z.string().min(1, "Contenu requis"),
   variables: z.string().optional().nullable(),

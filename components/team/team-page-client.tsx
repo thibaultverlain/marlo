@@ -437,8 +437,9 @@ export default function TeamPageClient({
               <div key={a.id} className="flex items-center justify-between py-2 px-2 text-xs">
                 <div className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-rose-500/50" />
+                  <span className="text-white font-medium">{a.userName ?? a.userId.substring(0, 8)}</span>
                   <span className="text-zinc-500">{ACTION_LABELS[a.action] || a.action}</span>
-                  {a.details && <span className="text-white">{a.details}</span>}
+                  {a.details && <span className="text-zinc-400">{a.details}</span>}
                 </div>
                 <span className="text-zinc-600 text-[10px]">{timeAgo(a.createdAt)}</span>
               </div>

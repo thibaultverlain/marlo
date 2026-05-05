@@ -187,11 +187,13 @@ export async function logActivity(
   action: string,
   entity?: string,
   entityId?: string,
-  details?: string
+  details?: string,
+  userName?: string
 ) {
   await db.insert(activityLog).values({
     shopId,
     userId,
+    userName: userName ?? userId.substring(0, 8),
     action,
     entity,
     entityId,
