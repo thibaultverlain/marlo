@@ -38,10 +38,10 @@ async function getChartDataMonth(shopId: string) {
  */
 async function getAllSalesStats(shopId: string) {
   const now = new Date();
-  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
-  const curMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-  const prevMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+  const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59).toISOString();
+  const curMonthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+  const prevMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString();
 
   const rows = await db
     .select({
@@ -49,14 +49,14 @@ async function getAllSalesStats(shopId: string) {
       totalMargin: sql<number>`coalesce(sum(margin), 0)::numeric`,
       totalCount: sql<number>`count(*)::int`,
       avgMarginPct: sql<number>`coalesce(avg(margin_pct), 0)::numeric`,
-      todayRevenue: sql<number>`coalesce(sum(sale_price) filter (where sold_at >= ${startOfDay} and sold_at <= ${endOfDay}), 0)::numeric`,
-      todayMargin: sql<number>`coalesce(sum(margin) filter (where sold_at >= ${startOfDay} and sold_at <= ${endOfDay}), 0)::numeric`,
-      todayCount: sql<number>`count(*) filter (where sold_at >= ${startOfDay} and sold_at <= ${endOfDay})::int`,
-      curMonthRevenue: sql<number>`coalesce(sum(sale_price) filter (where sold_at >= ${curMonthStart}), 0)::numeric`,
-      curMonthMargin: sql<number>`coalesce(sum(margin) filter (where sold_at >= ${curMonthStart}), 0)::numeric`,
-      curMonthCount: sql<number>`count(*) filter (where sold_at >= ${curMonthStart})::int`,
-      prevMonthRevenue: sql<number>`coalesce(sum(sale_price) filter (where sold_at >= ${prevMonthStart} and sold_at < ${curMonthStart}), 0)::numeric`,
-      prevMonthCount: sql<number>`count(*) filter (where sold_at >= ${prevMonthStart} and sold_at < ${curMonthStart})::int`,
+      todayRevenue: sql<number>`coalesce(sum(sale_price) filter (where sold_at >= ${startOfDay}::timestamptz and sold_at <= ${endOfDay}::timestamptz), 0)::numeric`,
+      todayMargin: sql<number>`coalesce(sum(margin) filter (where sold_at >= ${startOfDay}::timestamptz and sold_at <= ${endOfDay}::timestamptz), 0)::numeric`,
+      todayCount: sql<number>`count(*) filter (where sold_at >= ${startOfDay}::timestamptz and sold_at <= ${endOfDay}::timestamptz)::int`,
+      curMonthRevenue: sql<number>`coalesce(sum(sale_price) filter (where sold_at >= ${curMonthStart}::timestamptz), 0)::numeric`,
+      curMonthMargin: sql<number>`coalesce(sum(margin) filter (where sold_at >= ${curMonthStart}::timestamptz), 0)::numeric`,
+      curMonthCount: sql<number>`count(*) filter (where sold_at >= ${curMonthStart}::timestamptz)::int`,
+      prevMonthRevenue: sql<number>`coalesce(sum(sale_price) filter (where sold_at >= ${prevMonthStart}::timestamptz and sold_at < ${curMonthStart}::timestamptz), 0)::numeric`,
+      prevMonthCount: sql<number>`count(*) filter (where sold_at >= ${prevMonthStart}::timestamptz and sold_at < ${curMonthStart}::timestamptz)::int`,
     })
     .from(sales)
     .where(eq(sales.shopId, shopId));
