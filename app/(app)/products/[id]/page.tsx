@@ -24,7 +24,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   const condition = CONDITIONS.find(c => c.value === product.condition);
 
   return (
-    <div className="max-w-3xl space-y-6 page-enter">
+    <div className="max-w-3xl mx-auto space-y-6 page-enter">
       <div className="flex items-center gap-4">
         <Link href="/products" className="w-9 h-9 flex items-center justify-center rounded-lg border border-[var(--color-border)] text-zinc-500 hover:text-zinc-300 transition-colors">
           <ArrowLeft size={18} />

@@ -19,7 +19,7 @@ export default async function TemplatesPage() {
   const templates = await getShopTemplates(ctx.shopId);
 
   return (
-    <div className="max-w-4xl space-y-6 page-enter">
+    <div className="max-w-4xl mx-auto space-y-6 page-enter">
       <TemplatesPageClient templates={templates} isOwner={ctx.role === "owner"} />
     </div>
   );

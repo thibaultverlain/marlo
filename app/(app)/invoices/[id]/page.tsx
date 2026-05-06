@@ -14,7 +14,7 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
   const { invoice, customer } = data;
   const st = SL[invoice.status ?? "brouillon"];
   return (
-    <div className="max-w-5xl space-y-6 page-enter">
+    <div className="max-w-5xl mx-auto space-y-6 page-enter">
       <div className="flex items-center gap-4">
         <Link href="/invoices" className="w-9 h-9 flex items-center justify-center rounded-lg border border-[var(--color-border)] text-zinc-500 hover:text-zinc-300 transition-colors"><ArrowLeft size={18} /></Link>
         <div className="flex-1"><p className="text-[11px] text-zinc-600">{formatDate(invoice.createdAt)}</p><div className="flex items-center gap-3"><h1 className="text-2xl font-bold text-white tracking-tight">Facture {invoice.invoiceNumber}</h1><span className={`inline-flex px-2.5 py-1 rounded-md text-[11px] font-medium ${st.cl}`}>{st.label}</span></div></div>

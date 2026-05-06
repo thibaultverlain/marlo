@@ -9,7 +9,7 @@ export default async function NewSourcingPage() {
   const { shopId } = await getAuthContext();
   const customers = await getAllCustomers(shopId);
   return (
-    <div className="max-w-2xl space-y-6 page-enter">
+    <div className="max-w-2xl mx-auto space-y-6 page-enter">
       <div className="flex items-center gap-4">
         <Link href="/sourcing" className="w-9 h-9 flex items-center justify-center rounded-lg border border-[var(--color-border)] text-zinc-500 hover:text-zinc-300 transition-colors"><ArrowLeft size={18} /></Link>
         <div><h1 className="text-2xl font-bold text-white tracking-tight">Nouvelle demande de sourcing</h1><p className="text-sm text-zinc-500 mt-0.5">Un client cherche une pièce</p></div>

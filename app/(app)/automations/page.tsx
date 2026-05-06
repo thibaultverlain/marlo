@@ -20,7 +20,7 @@ export default async function AutomationsPage() {
   const automations = await getShopAutomations(ctx.shopId);
 
   return (
-    <div className="max-w-4xl space-y-6 page-enter">
+    <div className="max-w-4xl mx-auto space-y-6 page-enter">
       <AutomationsPageClient automations={automations} />
     </div>
   );

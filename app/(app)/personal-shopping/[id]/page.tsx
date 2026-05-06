@@ -16,7 +16,7 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
   const itemsByCustomer = items.reduce((acc, item) => { const k = item.customerId; if (!acc[k]) acc[k] = { customerId: item.customerId, customerName: item.customerName ?? "Supprimé", items: [], total: 0, commission: 0 }; acc[k].items.push(item); acc[k].total += item.purchasePrice; acc[k].commission += item.commissionAmount ?? 0; return acc; }, {} as Record<string, any>);
 
   return (
-    <div className="max-w-4xl space-y-6 page-enter">
+    <div className="max-w-4xl mx-auto space-y-6 page-enter">
       <div className="flex items-center gap-4">
         <Link href="/personal-shopping" className="w-9 h-9 flex items-center justify-center rounded-lg border border-[var(--color-border)] text-zinc-500 hover:text-zinc-300 transition-colors"><ArrowLeft size={18} /></Link>
         <div className="flex-1"><p className="text-[11px] text-zinc-600">Mission personal shopping</p><h1 className="text-2xl font-bold text-white tracking-tight">{mission.name}</h1><div className="flex items-center gap-3 mt-1 text-[11px] text-zinc-500">{mission.eventDate&&<span className="flex items-center gap-1"><Calendar size={10}/>{formatDate(mission.eventDate)}</span>}{mission.location&&<span className="flex items-center gap-1"><MapPin size={10}/>{mission.location}</span>}</div></div>

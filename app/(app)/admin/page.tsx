@@ -53,7 +53,7 @@ export default async function AdminPage() {
   }
 
   return (
-    <div className="max-w-3xl space-y-6 page-enter">
+    <div className="max-w-3xl mx-auto space-y-6 page-enter">
       <div>
         <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">Centre de gestion</h1>
         <p className="text-zinc-500 mt-1 text-sm">Administration de votre activite</p>
