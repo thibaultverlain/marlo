@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Package, ShoppingCart, Users, Search,
-  ShoppingBag, FileText, Calculator, Settings, Menu, X, BarChart3, Users2, ListTodo, Zap, ClipboardList, Truck,
+  ShoppingBag, FileText, Calculator, Settings, Menu, X, BarChart3, Users2, ListTodo, Zap, ClipboardList, Truck, RotateCcw, Wallet,
 } from "lucide-react";
 import ThemeToggle from "./theme-toggle";
 import LogoutButton from "./logout-button";
@@ -18,6 +18,8 @@ const NAV_ITEMS = [
   { href: "/products", label: "Stock", icon: Package, alertKey: "products", perm: "products" },
   { href: "/sales", label: "Ventes", icon: ShoppingCart, perm: "sales" },
   { href: "/orders", label: "Commandes", icon: Truck, perm: "sales" },
+  { href: "/returns", label: "Retours", icon: RotateCcw, perm: "sales" },
+  { href: "/payouts", label: "Virements", icon: Wallet, perm: "accounting" },
   { href: "/customers", label: "Clients", icon: Users, perm: "customers" },
   { href: "/analytics", label: "Analytique", icon: BarChart3, perm: "analytics" },
   { href: "/sourcing", label: "Sourcing", icon: Search, alertKey: "sourcing", perm: "sourcing" },

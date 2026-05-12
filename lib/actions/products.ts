@@ -111,19 +111,34 @@ export async function updateProductAction(id: string, formData: FormData) {
 
   const parsed = productSchema.partial().safeParse(raw);
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Données invalides" };
+    return { error: parsed.error.issues[0]?.message ?? "Donnees invalides" };
   }
 
   try {
+    const ctx = await getAuthContext();
     const updateData: Record<string, any> = { ...parsed.data };
-    // Include status if provided
     const status = formData.get("status") as string;
     if (status) updateData.status = status;
+
+    // Record price history if target_price changed
+    if (parsed.data.targetPrice !== undefined) {
+      const { getProductById } = await import("@/lib/db/queries/products");
+      const existing = await getProductById(id);
+      if (existing && existing.targetPrice !== parsed.data.targetPrice) {
+        const { recordPriceChange } = await import("@/lib/db/queries/price-history");
+        await recordPriceChange(
+          id, ctx.shopId, ctx.userId,
+          existing.targetPrice,
+          parsed.data.targetPrice ?? "0",
+          "target_price"
+        );
+      }
+    }
 
     await updateProduct(id, updateData);
   } catch (err) {
     console.error("updateProductAction error:", err);
-    return { error: "Erreur lors de la mise à jour." };
+    return { error: "Erreur lors de la mise a jour." };
   }
 
   revalidatePath("/products");

@@ -378,6 +378,84 @@ export const documents = pgTable("documents", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// ── Payouts (rapprochement virements) ────────────────
+
+export const payoutStatusEnum = pgEnum("payout_status", [
+  "en_attente", "recu", "partiel", "litige"
+]);
+
+export const payouts = pgTable("payouts", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  shopId: uuid("shop_id").references(() => shops.id).notNull(),
+  platform: text("platform").notNull(),
+  expectedAmount: decimal("expected_amount", { precision: 10, scale: 2 }).notNull(),
+  receivedAmount: decimal("received_amount", { precision: 10, scale: 2 }),
+  expectedDate: date("expected_date"),
+  receivedDate: date("received_date"),
+  status: payoutStatusEnum("status").notNull().default("en_attente"),
+  reference: text("reference"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const payoutSales = pgTable("payout_sales", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  payoutId: uuid("payout_id").references(() => payouts.id).notNull(),
+  saleId: uuid("sale_id").references(() => sales.id).notNull(),
+});
+
+// ── Order groups (commandes groupees) ────────────────
+
+export const orderGroups = pgTable("order_groups", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  shopId: uuid("shop_id").references(() => shops.id).notNull(),
+  customerId: uuid("customer_id").references(() => customers.id),
+  channel: text("channel").notNull(),
+  totalPrice: decimal("total_price", { precision: 10, scale: 2 }).notNull(),
+  shippingStatus: text("shipping_status").notNull().default("a_expedier"),
+  paymentStatus: text("payment_status").notNull().default("en_attente"),
+  trackingNumber: text("tracking_number"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Add group_id to sales (nullable, for grouped orders)
+// This is done via migration only - drizzle column added here for type safety
+
+// ── Price history ─────────────────────────────────────
+
+export const priceHistory = pgTable("price_history", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  productId: uuid("product_id").references(() => products.id).notNull(),
+  shopId: uuid("shop_id").references(() => shops.id).notNull(),
+  oldPrice: decimal("old_price", { precision: 10, scale: 2 }),
+  newPrice: decimal("new_price", { precision: 10, scale: 2 }).notNull(),
+  field: text("field").notNull().default("target_price"),
+  changedBy: uuid("changed_by").notNull(),
+  changedAt: timestamp("changed_at").defaultNow().notNull(),
+  reason: text("reason"),
+});
+
+// ── Returns ──────────────────────────────────────────
+
+export const returnStatusEnum = pgEnum("return_status", [
+  "en_cours", "recu", "rembourse", "refuse"
+]);
+
+export const returns = pgTable("returns", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  shopId: uuid("shop_id").references(() => shops.id).notNull(),
+  saleId: uuid("sale_id").references(() => sales.id).notNull(),
+  productId: uuid("product_id").references(() => products.id),
+  reason: text("reason").notNull(),
+  status: returnStatusEnum("status").notNull().default("en_cours"),
+  refundAmount: decimal("refund_amount", { precision: 10, scale: 2 }),
+  restockProduct: boolean("restock_product").default(true),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  resolvedAt: timestamp("resolved_at"),
+});
+
 // ── Types ──────────────────────────────────────────────
 
 export type Product = typeof products.$inferSelect;
@@ -407,6 +485,12 @@ export type Template = typeof templates.$inferSelect;
 export type NewTemplate = typeof templates.$inferInsert;
 export type Document = typeof documents.$inferSelect;
 export type NewDocument = typeof documents.$inferInsert;
+export type Payout = typeof payouts.$inferSelect;
+export type NewPayout = typeof payouts.$inferInsert;
+export type OrderGroup = typeof orderGroups.$inferSelect;
+export type PriceHistory = typeof priceHistory.$inferSelect;
+export type Return = typeof returns.$inferSelect;
+export type NewReturn = typeof returns.$inferInsert;
 export type TeamRole = "owner" | "manager" | "seller";
 
 // All available permissions

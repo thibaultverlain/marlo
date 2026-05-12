@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Package, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Package, AlertTriangle, TrendingDown } from "lucide-react";
 import { getProductById } from "@/lib/db/queries/products";
+import { getPriceHistory } from "@/lib/db/queries/price-history";
 import { formatCurrency, formatPercent, formatDate, daysSince } from "@/lib/utils";
 import { PRODUCT_STATUSES, CHANNELS, CATEGORIES, CONDITIONS } from "@/lib/data";
 import ProductActions from "@/components/products/product-actions";
@@ -11,7 +12,10 @@ export const dynamic = "force-dynamic";
 
 export default async function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const product = await getProductById(id);
+  const [product, priceHistory] = await Promise.all([
+    getProductById(id),
+    getPriceHistory(id),
+  ]);
   if (!product) notFound();
 
   const purchasePrice = Number(product.purchasePrice);
@@ -98,13 +102,39 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
       )}
 
       <div className="card-static p-6">
-        <h2 className="text-[15px] font-semibold text-white mb-4">Traçabilité</h2>
+        <h2 className="text-[15px] font-semibold text-white mb-4">Tracabilite</h2>
         <div className="space-y-2 text-sm">
-          <div className="flex justify-between"><span className="text-zinc-500">Ajouté le</span><span className="text-zinc-300">{formatDate(product.createdAt)}</span></div>
-          <div className="flex justify-between"><span className="text-zinc-500">Dernière modification</span><span className="text-zinc-300">{formatDate(product.updatedAt)}</span></div>
+          <div className="flex justify-between"><span className="text-zinc-500">Ajoute le</span><span className="text-zinc-300">{formatDate(product.createdAt)}</span></div>
+          <div className="flex justify-between"><span className="text-zinc-500">Derniere modification</span><span className="text-zinc-300">{formatDate(product.updatedAt)}</span></div>
           <div className="flex justify-between"><span className="text-zinc-500">Jours en stock</span><span className="text-zinc-300">{days} jours</span></div>
         </div>
       </div>
+
+      {priceHistory.length > 0 && (
+        <div className="card-static p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <TrendingDown size={16} className="text-zinc-500" />
+            <h2 className="text-[15px] font-semibold text-white">Historique de prix</h2>
+          </div>
+          <div className="space-y-2">
+            {priceHistory.map((entry) => (
+              <div key={entry.id} className="flex items-center justify-between py-2 border-b border-[var(--color-border)] last:border-0">
+                <div>
+                  <p className="text-[12px] text-zinc-400">
+                    {entry.oldPrice ? (
+                      <span>{formatCurrency(entry.oldPrice)} <span className="text-zinc-600">→</span> <span className="text-white">{formatCurrency(entry.newPrice)}</span></span>
+                    ) : (
+                      <span>Prix initial : <span className="text-white">{formatCurrency(entry.newPrice)}</span></span>
+                    )}
+                  </p>
+                  {entry.reason && <p className="text-[11px] text-zinc-600 mt-0.5">{entry.reason}</p>}
+                </div>
+                <span className="text-[11px] text-zinc-600">{formatDate(entry.changedAt)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <ProductActions productId={product.id} status={product.status} />
     </div>
