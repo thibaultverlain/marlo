@@ -45,6 +45,7 @@ export async function middleware(request: NextRequest) {
     pathname === "/";
 
   if (isPublic) {
+    addSecurityHeaders(supabaseResponse);
     return supabaseResponse;
   }
 
@@ -63,7 +64,23 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  addSecurityHeaders(supabaseResponse);
   return supabaseResponse;
+}
+
+function addSecurityHeaders(response: NextResponse) {
+  // Prevent clickjacking
+  response.headers.set("X-Frame-Options", "DENY");
+  // Prevent MIME sniffing
+  response.headers.set("X-Content-Type-Options", "nosniff");
+  // Referrer policy: send origin only on cross-origin
+  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  // Disable browser features we don't use
+  response.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  // HSTS: force HTTPS for 1 year (only in production)
+  if (process.env.NODE_ENV === "production") {
+    response.headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+  }
 }
 
 export const config = {
