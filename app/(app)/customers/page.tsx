@@ -4,7 +4,7 @@ import { Plus, Users, Star } from "lucide-react";
 import { getAllCustomers, getCustomerStats } from "@/lib/db/queries/customers";
 import { formatCurrency } from "@/lib/utils";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 30;
 
 export default async function CustomersPage() {
   const { shopId } = await getAuthContext();

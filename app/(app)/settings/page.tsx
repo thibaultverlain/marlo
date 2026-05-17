@@ -1,7 +1,7 @@
 import { getAuthContext } from "@/lib/auth/require-role";
 import { getShopSettings } from "@/lib/db/queries/settings";
 import SettingsForm from "@/components/settings/settings-form";
-export const dynamic = "force-dynamic";
+export const revalidate = 30;
 
 export default async function SettingsPage() {
   const { shopId } = await getAuthContext();

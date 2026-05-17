@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Plus, ShoppingBag, Calendar, MapPin } from "lucide-react";
 import { getAllMissions, getMissionStats } from "@/lib/db/queries/personal-shopping";
 import { formatCurrency, formatDate } from "@/lib/utils";
-export const dynamic = "force-dynamic";
+export const revalidate = 30;
 const SM: Record<string, { label: string; cl: string }> = { planifie: { label: "Planifiée", cl: "bg-blue-500/15 text-blue-400" }, en_cours: { label: "En cours", cl: "bg-amber-500/15 text-amber-400" }, termine: { label: "Terminée", cl: "bg-emerald-500/15 text-emerald-400" }, facture: { label: "Facturée", cl: "bg-zinc-500/15 text-zinc-400" }, annule: { label: "Annulée", cl: "bg-red-500/15 text-red-400" } };
 
 export default async function PersonalShoppingPage() {

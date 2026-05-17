@@ -8,7 +8,7 @@ import { eq, desc, sql } from "drizzle-orm";
 import { formatCurrency, formatPercent, formatDate } from "@/lib/utils";
 import { CHANNELS } from "@/lib/data";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 30;
 
 async function getCustomerSalesHistory(customerId: string) {
   return db

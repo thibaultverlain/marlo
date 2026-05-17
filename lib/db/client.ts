@@ -12,7 +12,7 @@ if (!connectionString) {
 const client = postgres(connectionString, {
   prepare: false,
   idle_timeout: 20,
-  max: 1,
+  max: 5,
   connect_timeout: 10,
   max_lifetime: 60 * 5,
 });

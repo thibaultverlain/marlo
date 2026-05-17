@@ -4,7 +4,7 @@ import { FileText, Download } from "lucide-react";
 import { getAllInvoices, getInvoiceStats } from "@/lib/db/queries/invoices";
 import { getShopSettings } from "@/lib/db/queries/settings";
 import { formatCurrency, formatDate } from "@/lib/utils";
-export const dynamic = "force-dynamic";
+export const revalidate = 30;
 const SL: Record<string, { label: string; cl: string }> = { brouillon: { label: "Brouillon", cl: "bg-zinc-500/15 text-zinc-400" }, envoyee: { label: "Envoyée", cl: "bg-blue-500/15 text-blue-400" }, payee: { label: "Payée", cl: "bg-emerald-500/15 text-emerald-400" }, annulee: { label: "Annulée", cl: "bg-red-500/15 text-red-400" } };
 
 export default async function InvoicesPage() {

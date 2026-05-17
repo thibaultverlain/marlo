@@ -8,7 +8,7 @@ import { PRODUCT_STATUSES, CHANNELS, CATEGORIES, CONDITIONS } from "@/lib/data";
 import ProductActions from "@/components/products/product-actions";
 import ProductPhotos from "@/components/products/product-photos";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 30;
 
 export default async function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

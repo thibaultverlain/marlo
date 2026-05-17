@@ -1,7 +1,7 @@
 import { getAuthContext } from "@/lib/auth/require-role";
 import { getShopDocuments } from "@/lib/db/queries/documents";
 import DocumentsPageClient from "@/components/admin/documents-page-client";
-export const dynamic = "force-dynamic";
+export const revalidate = 30;
 
 export default async function DocumentsPage() {
   const ctx = await getAuthContext();

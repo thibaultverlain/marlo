@@ -12,7 +12,7 @@ import { CHANNELS } from "@/lib/data";
 import SaleActions from "@/components/sales/sale-actions";
 import SaleDeleteButton from "@/components/sales/sale-delete-button";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 30;
 
 export default async function SaleDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

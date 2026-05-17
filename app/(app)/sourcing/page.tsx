@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Plus, Search, Clock, CheckCircle, XCircle, Package } from "lucide-react";
 import { getAllSourcing, getSourcingStats } from "@/lib/db/queries/sourcing";
 import { formatCurrency, formatDate } from "@/lib/utils";
-export const dynamic = "force-dynamic";
+export const revalidate = 30;
 const SM: Record<string, { label: string; cl: string; icon: React.ElementType }> = {
   ouvert: { label: "Ouvert", cl: "bg-blue-500/15 text-blue-400", icon: Search }, en_recherche: { label: "En recherche", cl: "bg-amber-500/15 text-amber-400", icon: Clock },
   trouve: { label: "Trouvé", cl: "bg-emerald-500/15 text-emerald-400", icon: CheckCircle }, achete: { label: "Acheté", cl: "bg-emerald-500/15 text-emerald-400", icon: Package },

@@ -4,7 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { getProductById } from "@/lib/db/queries/products";
 import EditProductForm from "@/components/products/edit-product-form";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 30;
 
 export default async function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

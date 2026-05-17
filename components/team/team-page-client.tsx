@@ -58,7 +58,6 @@ const PERM_CONFIG: { key: string; label: string; icon: React.ElementType; desc: 
   { key: "invoices", label: "Factures", icon: FileText, desc: "Generer et voir les factures" },
   { key: "accounting", label: "Comptabilite", icon: Calculator, desc: "Livre de recettes/depenses" },
   { key: "documents", label: "Documents", icon: FolderOpen, desc: "Documents administratifs" },
-  { key: "automations", label: "Automations", icon: Zap, desc: "Regles automatiques" },
   { key: "team", label: "Equipe", icon: Users2, desc: "Gerer l'equipe" },
   { key: "settings", label: "Reglages", icon: Settings2, desc: "Configuration de la boutique" },
 ];
@@ -85,7 +84,6 @@ const ACTION_LABELS: Record<string, string> = {
   boutique_renommee: "Boutique renommee",
   tache_creee: "Tache creee",
   tache_terminee: "Tache terminee",
-  automation_creee: "Automation creee",
 };
 
 function timeAgo(date: Date): string {
@@ -340,7 +338,7 @@ export default function TeamPageClient({
                     <div className="flex items-center justify-between mb-3">
                       <p className="text-[12px] font-semibold text-white">Permissions de {isSelf ? "votre compte" : `Membre ${m.userId.substring(0, 8)}`}</p>
                       <div className="flex gap-2">
-                        <button onClick={() => setEditPerms(ALL_PERMISSIONS.filter((p) => !["team", "settings", "accounting", "automations"].includes(p)))}
+                        <button onClick={() => setEditPerms(ALL_PERMISSIONS.filter((p) => !["team", "settings", "accounting"].includes(p)))}
                           className="text-[10px] text-zinc-500 hover:text-zinc-300">Tout cocher</button>
                         <button onClick={() => setEditPerms(["dashboard"])}
                           className="text-[10px] text-zinc-500 hover:text-zinc-300">Minimum</button>

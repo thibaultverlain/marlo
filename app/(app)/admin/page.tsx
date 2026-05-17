@@ -1,7 +1,7 @@
 import { getAuthContext } from "@/lib/auth/require-role";
 import Link from "next/link";
 import { FileText, Calculator, Receipt, FolderOpen, Building2 } from "lucide-react";
-export const dynamic = "force-dynamic";
+export const revalidate = 30;
 
 const ADMIN_SECTIONS = [
   {

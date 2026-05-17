@@ -1,7 +1,7 @@
 import { getAuthContext } from "@/lib/auth/require-role";
 import { getPayouts, getPayoutStats } from "@/lib/db/queries/payouts";
 import PayoutsPageClient from "@/components/payouts/payouts-page-client";
-export const dynamic = "force-dynamic";
+export const revalidate = 30;
 
 export default async function PayoutsPage() {
   const ctx = await getAuthContext();

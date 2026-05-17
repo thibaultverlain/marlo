@@ -6,7 +6,7 @@ import { getSourcingById } from "@/lib/db/queries/sourcing";
 import { getInStockProducts } from "@/lib/db/queries/products";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import SourcingActions from "@/components/sourcing/sourcing-actions";
-export const dynamic = "force-dynamic";
+export const revalidate = 30;
 
 export default async function SourcingDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

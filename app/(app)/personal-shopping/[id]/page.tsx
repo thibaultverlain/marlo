@@ -6,7 +6,7 @@ import { getMissionById, getMissionItems } from "@/lib/db/queries/personal-shopp
 import { getAllCustomers } from "@/lib/db/queries/customers";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import MissionDetailClient from "@/components/personal-shopping/mission-detail-client";
-export const dynamic = "force-dynamic";
+export const revalidate = 30;
 
 export default async function MissionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

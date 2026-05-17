@@ -331,23 +331,6 @@ export const notifications = pgTable("notifications", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-// ── Automations ──────────────────────────────────────
-
-export const automations = pgTable("automations", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  shopId: uuid("shop_id").references(() => shops.id).notNull(),
-  name: text("name").notNull(),
-  trigger: text("trigger").notNull(),
-  triggerValue: text("trigger_value"),
-  action: text("action").notNull(),
-  actionValue: text("action_value"),
-  enabled: boolean("enabled").notNull().default(true),
-  lastRun: timestamp("last_run"),
-  runCount: integer("run_count").notNull().default(0),
-  createdBy: uuid("created_by").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
 // ── Templates ─────────────────────────────────────────
 
 export const templates = pgTable("templates", {
@@ -479,8 +462,6 @@ export type ActivityLogEntry = typeof activityLog.$inferSelect;
 export type Task = typeof tasks.$inferSelect;
 export type NewTask = typeof tasks.$inferInsert;
 export type Notification = typeof notifications.$inferSelect;
-export type Automation = typeof automations.$inferSelect;
-export type NewAutomation = typeof automations.$inferInsert;
 export type Template = typeof templates.$inferSelect;
 export type NewTemplate = typeof templates.$inferInsert;
 export type Document = typeof documents.$inferSelect;
@@ -497,7 +478,7 @@ export type TeamRole = "owner" | "manager" | "seller";
 export const ALL_PERMISSIONS = [
   "dashboard", "products", "sales", "customers", "analytics",
   "sourcing", "personal_shopping", "tasks", "invoices",
-  "accounting", "templates", "documents", "automations",
+  "accounting", "templates", "documents",
   "team", "settings",
 ] as const;
 export type Permission = typeof ALL_PERMISSIONS[number];

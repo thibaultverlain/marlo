@@ -1,7 +1,7 @@
 import { getAuthContext, canAccess } from "@/lib/auth/require-role";
 import { getShopTemplates } from "@/lib/db/queries/templates";
 import TemplatesPageClient from "@/components/templates/templates-page-client";
-export const dynamic = "force-dynamic";
+export const revalidate = 30;
 
 export default async function TemplatesPage() {
   const ctx = await getAuthContext();

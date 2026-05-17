@@ -4,7 +4,7 @@ import { getRecipeBook, getPurchasesRegister, getAccountingStats } from "@/lib/d
 import { formatCurrency } from "@/lib/utils";
 import { CHANNELS } from "@/lib/data";
 import AccountingTabs from "@/components/accounting/accounting-tabs";
-export const dynamic = "force-dynamic";
+export const revalidate = 30;
 
 export default async function AccountingPage({ searchParams }: { searchParams: Promise<{ year?: string; tab?: string }> }) {
   const sp = await searchParams;

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { getAllCustomers } from "@/lib/db/queries/customers";
 import NewSourcingForm from "@/components/sourcing/new-sourcing-form";
-export const dynamic = "force-dynamic";
+export const revalidate = 30;
 
 export default async function NewSourcingPage() {
   const { shopId } = await getAuthContext();

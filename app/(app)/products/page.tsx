@@ -5,7 +5,7 @@ import { daysSince, formatCurrency } from "@/lib/utils";
 import { getAuthContext } from "@/lib/auth/require-role";
 import ProductsList from "@/components/products/products-list";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 30;
 
 export default async function ProductsPage({ searchParams }: { searchParams: Promise<{ show?: string }> }) {
   const sp = await searchParams;

@@ -25,9 +25,6 @@ export async function GET(req: NextRequest) {
     // Get all shops
     const allShops = await db.select({ id: shops.id }).from(shops);
 
-    // Import automation engine
-    const { processDailyAutomations } = await import("@/lib/automations/engine");
-
     for (const shop of allShops) {
       // Get shop owner (notifications go to owner)
       const [owner] = await db
@@ -96,10 +93,6 @@ export async function GET(req: NextRequest) {
         );
         created++;
       }
-
-      // Process custom automations
-      const autoCount = await processDailyAutomations(shop.id);
-      created += autoCount;
     }
 
     return NextResponse.json({ success: true, created });

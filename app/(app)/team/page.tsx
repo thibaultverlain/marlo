@@ -1,7 +1,7 @@
 import { getAuthContext } from "@/lib/auth/require-role";
 import { getTeamMemberWithEmail, getPendingInvitations, getShop, getRecentActivity } from "@/lib/db/queries/team";
 import TeamPageClient from "@/components/team/team-page-client";
-export const dynamic = "force-dynamic";
+export const revalidate = 30;
 
 export default async function TeamPage() {
   const ctx = await getAuthContext();

@@ -8,7 +8,7 @@ import { formatCurrency, formatDate } from "@/lib/utils";
 import { CHANNELS } from "@/lib/data";
 import SalesFilters from "@/components/sales/sales-filters";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 30;
 
 function ChannelBadge({ channel }: { channel: string }) {
   const styles: Record<string, { bg: string; dot: string }> = {

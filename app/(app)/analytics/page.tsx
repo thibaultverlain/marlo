@@ -1,6 +1,6 @@
 import { getAuthContext } from "@/lib/auth/require-role";
 import AnalyticsClient from "@/components/analytics/analytics-client";
-export const dynamic = "force-dynamic";
+export const revalidate = 30;
 
 async function fetchAnalyticsData(shopId: string) {
   // Import the same logic the API route uses, but call it directly server-side
