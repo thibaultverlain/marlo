@@ -2,6 +2,26 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+
+  // Public routes that don't need auth - check FIRST to avoid Supabase call
+  const publicRoutes = ["/login", "/api/webhook/email", "/api/cron", "/api/auth/callback"];
+  const isPublic =
+    publicRoutes.some((r) => pathname.startsWith(r)) ||
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/icons") ||
+    pathname === "/manifest.json" ||
+    pathname === "/logo.svg" ||
+    pathname === "/favicon.png" ||
+    pathname === "/favicon-32.png" ||
+    pathname === "/";
+
+  if (isPublic) {
+    const response = NextResponse.next({ request });
+    addSecurityHeaders(response);
+    return response;
+  }
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -28,26 +48,6 @@ export async function middleware(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  const pathname = request.nextUrl.pathname;
-
-  // Public routes that don't need auth
-  const publicRoutes = ["/login", "/api/webhook/email", "/api/cron", "/api/auth/callback"];
-  const isPublic =
-    publicRoutes.some((r) => pathname.startsWith(r)) ||
-    pathname.startsWith("/_next") ||
-    pathname.startsWith("/icons") ||
-    pathname === "/manifest.json" ||
-    pathname === "/sw.js" ||
-    pathname === "/logo.svg" ||
-    pathname === "/favicon.png" ||
-    pathname === "/favicon-32.png" ||
-    pathname === "/";
-
-  if (isPublic) {
-    addSecurityHeaders(supabaseResponse);
-    return supabaseResponse;
-  }
 
   // If not logged in, redirect to login
   if (!user) {

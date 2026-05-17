@@ -3,18 +3,23 @@ import { getAuthContext, getUserShops } from "@/lib/auth/require-role";
 import { db } from "@/lib/db/client";
 import { products, sourcingRequests } from "@/lib/db/schema";
 import { sql, and, inArray, eq } from "drizzle-orm";
+import { unstable_cache } from "next/cache";
 
-async function getAlertCount(shopId: string): Promise<number> {
-  try {
-    const [[dormant], [deadlines]] = await Promise.all([
-      db.select({ c: sql<number>`count(*)::int` }).from(products)
-        .where(and(eq(products.shopId, shopId), inArray(products.status, ["en_stock", "en_vente"]), sql`created_at < NOW() - INTERVAL '30 days'`)),
-      db.select({ c: sql<number>`count(*)::int` }).from(sourcingRequests)
-        .where(and(eq(sourcingRequests.shopId, shopId), inArray(sourcingRequests.status, ["ouvert", "en_recherche"]), sql`deadline IS NOT NULL AND deadline <= NOW() + INTERVAL '7 days'`)),
-    ]);
-    return ((dormant?.c ?? 0) > 0 ? 1 : 0) + ((deadlines?.c ?? 0) > 0 ? 1 : 0);
-  } catch { return 0; }
-}
+const getAlertCount = unstable_cache(
+  async (shopId: string): Promise<number> => {
+    try {
+      const [[dormant], [deadlines]] = await Promise.all([
+        db.select({ c: sql<number>`count(*)::int` }).from(products)
+          .where(and(eq(products.shopId, shopId), inArray(products.status, ["en_stock", "en_vente"]), sql`created_at < NOW() - INTERVAL '30 days'`)),
+        db.select({ c: sql<number>`count(*)::int` }).from(sourcingRequests)
+          .where(and(eq(sourcingRequests.shopId, shopId), inArray(sourcingRequests.status, ["ouvert", "en_recherche"]), sql`deadline IS NOT NULL AND deadline <= NOW() + INTERVAL '7 days'`)),
+      ]);
+      return ((dormant?.c ?? 0) > 0 ? 1 : 0) + ((deadlines?.c ?? 0) > 0 ? 1 : 0);
+    } catch { return 0; }
+  },
+  ["alert-count"],
+  { revalidate: 300, tags: ["alerts"] }
+);
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   let role = "owner";
