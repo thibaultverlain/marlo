@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Package, ShoppingCart, Users, Search,
-  ShoppingBag, FileText, Calculator, Settings, Menu, X, BarChart3, Users2, ListTodo, Zap, ClipboardList, Truck, RotateCcw, Wallet,
+  ShoppingBag, FileText, Calculator, Settings, Menu, X, BarChart3, Users2, ListTodo, Zap, ClipboardList, Truck, RotateCcw,
 } from "lucide-react";
 import ThemeToggle from "./theme-toggle";
 import LogoutButton from "./logout-button";
@@ -35,7 +35,6 @@ const NAV_SECTIONS = [
   {
     label: "Gestion",
     items: [
-      { href: "/payouts", label: "Virements", icon: Wallet, perm: "accounting" },
       { href: "/invoices", label: "Factures", icon: FileText, perm: "invoices" },
       { href: "/accounting", label: "Comptabilite", icon: Calculator, perm: "accounting" },
     ],

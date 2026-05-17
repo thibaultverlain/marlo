@@ -361,32 +361,6 @@ export const documents = pgTable("documents", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-// ── Payouts (rapprochement virements) ────────────────
-
-export const payoutStatusEnum = pgEnum("payout_status", [
-  "en_attente", "recu", "partiel", "litige"
-]);
-
-export const payouts = pgTable("payouts", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  shopId: uuid("shop_id").references(() => shops.id).notNull(),
-  platform: text("platform").notNull(),
-  expectedAmount: decimal("expected_amount", { precision: 10, scale: 2 }).notNull(),
-  receivedAmount: decimal("received_amount", { precision: 10, scale: 2 }),
-  expectedDate: date("expected_date"),
-  receivedDate: date("received_date"),
-  status: payoutStatusEnum("status").notNull().default("en_attente"),
-  reference: text("reference"),
-  notes: text("notes"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
-export const payoutSales = pgTable("payout_sales", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  payoutId: uuid("payout_id").references(() => payouts.id).notNull(),
-  saleId: uuid("sale_id").references(() => sales.id).notNull(),
-});
-
 // ── Order groups (commandes groupees) ────────────────
 
 export const orderGroups = pgTable("order_groups", {
@@ -466,8 +440,6 @@ export type Template = typeof templates.$inferSelect;
 export type NewTemplate = typeof templates.$inferInsert;
 export type Document = typeof documents.$inferSelect;
 export type NewDocument = typeof documents.$inferInsert;
-export type Payout = typeof payouts.$inferSelect;
-export type NewPayout = typeof payouts.$inferInsert;
 export type OrderGroup = typeof orderGroups.$inferSelect;
 export type PriceHistory = typeof priceHistory.$inferSelect;
 export type Return = typeof returns.$inferSelect;
