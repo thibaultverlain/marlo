@@ -11,7 +11,7 @@ export default async function PayoutsPage() {
   ]);
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 page-enter">
+    <div className="max-w-5xl mx-auto space-y-6 page-enter">
       <PayoutsPageClient payouts={payouts} stats={stats} />
     </div>
   );
