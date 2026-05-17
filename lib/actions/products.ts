@@ -160,3 +160,38 @@ export async function deleteProductAction(id: string) {
   revalidatePath("/dashboard");
   redirect("/products");
 }
+
+export async function bulkDeleteProductsAction(ids: string[]) {
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return { error: "Aucun article selectionne" };
+  }
+  try {
+    const ctx = await getAuthContext();
+    await Promise.all(ids.map((id) => deleteProduct(id, ctx.shopId)));
+    revalidatePath("/products");
+    revalidatePath("/dashboard");
+    return { success: true, count: ids.length };
+  } catch (err) {
+    console.error("bulkDeleteProductsAction error:", err);
+    return { error: "Erreur lors de la suppression." };
+  }
+}
+
+export async function bulkUpdateStatusAction(ids: string[], status: string) {
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return { error: "Aucun article selectionne" };
+  }
+  const validStatus = ["en_stock", "en_vente", "reserve"];
+  if (!validStatus.includes(status)) {
+    return { error: "Statut invalide" };
+  }
+  try {
+    const ctx = await getAuthContext();
+    await Promise.all(ids.map((id) => updateProduct(id, { status: status as any })));
+    revalidatePath("/products");
+    return { success: true, count: ids.length };
+  } catch (err) {
+    console.error("bulkUpdateStatusAction error:", err);
+    return { error: "Erreur lors de la mise a jour." };
+  }
+}
