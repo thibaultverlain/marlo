@@ -89,7 +89,7 @@ export default function DocumentsPageClient({ documents }: { documents: Doc[] })
     <>
       <div className="flex items-start sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <Link href="/admin" className="w-9 h-9 flex items-center justify-center rounded-lg border border-[var(--color-border)] text-zinc-500 hover:text-zinc-300 transition-colors">
+          <Link href="/settings" className="w-9 h-9 flex items-center justify-center rounded-lg border border-[var(--color-border)] text-zinc-500 hover:text-zinc-300 transition-colors">
             <ArrowLeft size={18} />
           </Link>
           <div>

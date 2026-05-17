@@ -13,25 +13,45 @@ import NotificationBell from "./notification-bell";
 import ShopSwitcher from "./shop-switcher";
 import { MarloIcon, MarloWordmark } from "./marlo-logo";
 
-const NAV_ITEMS = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, alertKey: "dashboard", perm: "dashboard" },
-  { href: "/products", label: "Stock", icon: Package, alertKey: "products", perm: "products" },
-  { href: "/sales", label: "Ventes", icon: ShoppingCart, perm: "sales" },
-  { href: "/orders", label: "Commandes", icon: Truck, perm: "sales" },
-  { href: "/returns", label: "Retours", icon: RotateCcw, perm: "sales" },
-  { href: "/payouts", label: "Virements", icon: Wallet, perm: "accounting" },
-  { href: "/customers", label: "Clients", icon: Users, perm: "customers" },
-  { href: "/analytics", label: "Analytique", icon: BarChart3, perm: "analytics" },
-  { href: "/sourcing", label: "Sourcing", icon: Search, alertKey: "sourcing", perm: "sourcing" },
-  { href: "/personal-shopping", label: "Personal Shop", icon: ShoppingBag, perm: "personal_shopping" },
-  { href: "/tasks", label: "Taches", icon: ListTodo, perm: "tasks" },
-  { href: "/templates", label: "Templates", icon: ClipboardList, perm: "templates" },
-  { href: "/invoices", label: "Factures", icon: FileText, perm: "invoices" },
-  { href: "/accounting", label: "Comptabilite", icon: Calculator, perm: "accounting" },
+const NAV_SECTIONS = [
+  {
+    label: "Commerce",
+    items: [
+      { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, alertKey: "dashboard", perm: "dashboard" },
+      { href: "/products", label: "Stock", icon: Package, alertKey: "products", perm: "products" },
+      { href: "/sales", label: "Ventes", icon: ShoppingCart, perm: "sales" },
+      { href: "/orders", label: "Commandes", icon: Truck, perm: "sales" },
+      { href: "/returns", label: "Retours", icon: RotateCcw, perm: "sales" },
+    ],
+  },
+  {
+    label: "Clients",
+    items: [
+      { href: "/customers", label: "Clients", icon: Users, perm: "customers" },
+      { href: "/sourcing", label: "Sourcing", icon: Search, alertKey: "sourcing", perm: "sourcing" },
+      { href: "/personal-shopping", label: "Personal Shop", icon: ShoppingBag, perm: "personal_shopping" },
+    ],
+  },
+  {
+    label: "Gestion",
+    items: [
+      { href: "/payouts", label: "Virements", icon: Wallet, perm: "accounting" },
+      { href: "/invoices", label: "Factures", icon: FileText, perm: "invoices" },
+      { href: "/accounting", label: "Comptabilite", icon: Calculator, perm: "accounting" },
+    ],
+  },
+  {
+    label: "Outils",
+    items: [
+      { href: "/tasks", label: "Taches", icon: ListTodo, perm: "tasks" },
+      { href: "/templates", label: "Templates", icon: ClipboardList, perm: "templates" },
+      { href: "/analytics", label: "Analytique", icon: BarChart3, perm: "analytics" },
+    ],
+  },
 ];
 
 const BOTTOM_ITEMS = [
-  { href: "/admin", label: "Administration", icon: Settings, perm: "settings" },
+  { href: "/settings", label: "Reglages", icon: Settings, perm: "settings" },
   { href: "/team", label: "Equipe", icon: Users2, perm: "team" },
 ];
 
@@ -57,7 +77,12 @@ export default function Sidebar({
   const isOwner = role === "owner";
   const alertCount = initialAlertCount;
 
-  const visibleNav = NAV_ITEMS.filter((item) => isOwner || permissions.includes(item.perm));
+  const visibleSections = NAV_SECTIONS
+    .map((section) => ({
+      ...section,
+      items: section.items.filter((item) => isOwner || permissions.includes(item.perm)),
+    }))
+    .filter((section) => section.items.length > 0);
   const visibleBottom = BOTTOM_ITEMS.filter((item) => isOwner || permissions.includes(item.perm));
 
   useEffect(() => { setOpen(false); }, [pathname]);
@@ -96,32 +121,41 @@ export default function Sidebar({
 
         <div className="h-14 lg:hidden" />
 
-        <nav className="flex-1 px-3 py-2 space-y-[2px] overflow-y-auto">
-          {visibleNav.map((item) => {
-            const isActive = pathname.startsWith(item.href);
-            const Icon = item.icon;
-            const showBadge = item.alertKey === "dashboard" && alertCount > 0;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-2.5 px-3 py-[9px] lg:py-[8px] rounded-[10px] text-[13px] transition-all duration-200 ${
-                  isActive
-                    ? "font-semibold"
-                    : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-bg-hover)]"
-                }`}
-                style={isActive ? { background: "rgba(225, 29, 72, 0.08)", color: "var(--color-accent)" } : {}}
-              >
-                <Icon size={17} strokeWidth={isActive ? 1.8 : 1.5} />
-                <span className={`flex-1 ${isActive ? "font-semibold" : "font-normal"}`}>{item.label}</span>
-                {showBadge && (
-                  <span className="w-[18px] h-[18px] rounded-full bg-rose-400/90 text-[9px] font-bold text-black flex items-center justify-center">
-                    {alertCount}
-                  </span>
-                )}
-              </Link>
-            );
-          })}
+        <nav className="flex-1 px-3 py-2 overflow-y-auto">
+          {visibleSections.map((section, sIdx) => (
+            <div key={section.label} className={sIdx === 0 ? "" : "mt-4"}>
+              <div className="px-3 mb-1 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)] opacity-60">
+                {section.label}
+              </div>
+              <div className="space-y-[2px]">
+                {section.items.map((item) => {
+                  const isActive = pathname.startsWith(item.href);
+                  const Icon = item.icon;
+                  const showBadge = item.alertKey === "dashboard" && alertCount > 0;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`flex items-center gap-2.5 px-3 py-[9px] lg:py-[8px] rounded-[10px] text-[13px] transition-all duration-200 ${
+                        isActive
+                          ? "font-semibold"
+                          : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-bg-hover)]"
+                      }`}
+                      style={isActive ? { background: "rgba(225, 29, 72, 0.08)", color: "var(--color-accent)" } : {}}
+                    >
+                      <Icon size={17} strokeWidth={isActive ? 1.8 : 1.5} />
+                      <span className={`flex-1 ${isActive ? "font-semibold" : "font-normal"}`}>{item.label}</span>
+                      {showBadge && (
+                        <span className="w-[18px] h-[18px] rounded-full bg-rose-400/90 text-[9px] font-bold text-black flex items-center justify-center">
+                          {alertCount}
+                        </span>
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </nav>
 
         <div className="px-3 py-3 border-t border-[var(--color-border-subtle)] space-y-1">

@@ -27,7 +27,7 @@ export async function addDocumentAction(data: {
       mimeType: data.mimeType || null,
       expiresAt: data.expiresAt || null,
     });
-    revalidatePath("/admin/documents");
+    revalidatePath("/settings/documents");
     return { success: true };
   } catch (e: any) {
     return { error: e.message };
@@ -39,7 +39,7 @@ export async function deleteDocumentAction(id: string) {
 
   try {
     await deleteDocument(id, ctx.shopId);
-    revalidatePath("/admin/documents");
+    revalidatePath("/settings/documents");
     return { success: true };
   } catch (e: any) {
     return { error: e.message };
