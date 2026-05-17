@@ -16,7 +16,7 @@ export async function getPayouts(shopId: string): Promise<(Payout & { saleCount:
       reference: payouts.reference,
       notes: payouts.notes,
       createdAt: payouts.createdAt,
-      saleCount: sql<number>`count(ps.id)::int`,
+      saleCount: sql<number>`count(${payoutSales.id})::int`,
     })
     .from(payouts)
     .leftJoin(payoutSales, eq(payoutSales.payoutId, payouts.id))
