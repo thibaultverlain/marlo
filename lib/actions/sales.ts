@@ -136,3 +136,20 @@ export async function deleteSaleAction(saleId: string) {
   revalidatePath("/dashboard");
   redirect("/sales");
 }
+
+export async function bulkDeleteSalesAction(ids: string[]) {
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return { error: "Aucune vente selectionnee" };
+  }
+  const { deleteSale } = await import("@/lib/db/queries/sales");
+  try {
+    const ctx = await getAuthContext();
+    await Promise.all(ids.map((id) => deleteSale(id, ctx.shopId)));
+    revalidatePath("/sales");
+    revalidatePath("/dashboard");
+    return { success: true, count: ids.length };
+  } catch (err) {
+    console.error("bulkDeleteSalesAction error:", err);
+    return { error: "Erreur lors de la suppression." };
+  }
+}

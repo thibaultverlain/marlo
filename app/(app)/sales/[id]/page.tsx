@@ -60,9 +60,15 @@ export default async function SaleDetailPage({ params }: { params: Promise<{ id:
       {product && (
         <div className="card-static p-6">
           <div className="flex items-center gap-2 mb-4"><Package size={16} className="text-zinc-500" /><h2 className="text-[15px] font-semibold text-white">Article vendu</h2></div>
-          <Link href={`/products/${product.id}`} className="flex items-center gap-4 p-3 rounded-lg row-hover transition-colors -m-3">
-            <div className="w-14 h-14 rounded-lg bg-[var(--color-bg-hover)] flex items-center justify-center flex-shrink-0"><Package size={20} className="text-zinc-600" /></div>
-            <div className="flex-1"><p className="text-sm text-zinc-200">{product.title}</p><div className="flex items-center gap-2 mt-0.5"><span className="text-[11px] text-zinc-600 font-mono">{product.sku}</span><span className="text-zinc-700">·</span><span className="text-[11px] text-zinc-500">{product.brand}</span><span className="text-zinc-700">·</span><span className="text-[11px] text-zinc-500">Achat : {formatCurrency(product.purchasePrice)}</span></div></div>
+          <Link href={`/products/${product.id}`} className="block p-3 rounded-lg hover:bg-[var(--color-bg-hover)] transition-colors -m-3">
+            <p className="text-sm text-zinc-200">{product.title}</p>
+            <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+              <span className="text-[11px] text-zinc-600 font-mono">{product.sku}</span>
+              <span className="text-zinc-700">·</span>
+              <span className="text-[11px] text-zinc-500">{product.brand}</span>
+              <span className="text-zinc-700">·</span>
+              <span className="text-[11px] text-zinc-500">Achat : {formatCurrency(product.purchasePrice)}</span>
+            </div>
           </Link>
         </div>
       )}
