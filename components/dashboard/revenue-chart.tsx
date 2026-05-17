@@ -5,6 +5,7 @@ import { Calendar } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
+import CalendarPicker from "./calendar-picker";
 
 type DataPoint = { label: string; revenue: number };
 type Period = "year" | "month" | "week" | "day" | "custom";
@@ -103,24 +104,14 @@ export default function RevenueChart({ initialData }: { initialData?: DataPoint[
               <Calendar size={15} />
             </button>
             {showDatePicker && (
-              <div className="absolute right-0 top-full mt-2 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-xl shadow-xl shadow-black/30 p-4 z-50 w-[280px]">
-                <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-3">Periode personnalisee</p>
-                <div className="space-y-2">
-                  <div>
-                    <label className="text-[11px] text-zinc-500 block mb-1">Du</label>
-                    <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)}
-                      className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]" />
-                  </div>
-                  <div>
-                    <label className="text-[11px] text-zinc-500 block mb-1">Au</label>
-                    <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)}
-                      className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]" />
-                  </div>
-                  <button onClick={handleCustomDateSearch} disabled={!dateFrom || !dateTo}
-                    className="w-full mt-2 px-4 py-2 text-[13px] font-semibold text-[var(--color-text-inverse)] bg-rose-500 rounded-lg hover:bg-rose-400 transition disabled:opacity-50">
-                    Afficher
-                  </button>
-                </div>
+              <div className="absolute right-0 top-full mt-2 z-50">
+                <CalendarPicker
+                  dateFrom={dateFrom}
+                  dateTo={dateTo}
+                  onChange={(from, to) => { setDateFrom(from); setDateTo(to); }}
+                  onApply={handleCustomDateSearch}
+                  onClose={() => setShowDatePicker(false)}
+                />
               </div>
             )}
           </div>
