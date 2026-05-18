@@ -84,6 +84,48 @@ export async function updateSourcingStatusAction(id: string, newStatus: string) 
   }
 }
 
+export async function updateSourcingAction(id: string, formData: FormData) {
+  const raw = {
+    customerId: formData.get("customerId") as string,
+    description: formData.get("description") as string,
+    brand: formData.get("brand") as string,
+    model: formData.get("model") as string,
+    targetBudget: formData.get("targetBudget") as string,
+    commissionRate: formData.get("commissionRate") as string,
+    deadline: formData.get("deadline") as string,
+    notes: formData.get("notes") as string,
+  };
+
+  const parsed = sourcingSchema.safeParse(raw);
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Donnees invalides" };
+  }
+
+  try {
+    const rate = parsed.data.commissionRate
+      ? String(parseFloat(parsed.data.commissionRate) / 100)
+      : null;
+
+    await updateSourcingRequest(id, {
+      customerId: parsed.data.customerId,
+      description: parsed.data.description,
+      brand: parsed.data.brand || null,
+      model: parsed.data.model || null,
+      targetBudget: parsed.data.targetBudget || null,
+      commissionRate: rate,
+      deadline: parsed.data.deadline || null,
+      notes: parsed.data.notes || null,
+    });
+  } catch (err) {
+    console.error("updateSourcingAction:", err);
+    return { error: "Erreur lors de la mise a jour." };
+  }
+
+  revalidatePath("/sourcing");
+  revalidatePath(`/sourcing/${id}`);
+  return { success: true };
+}
+
 export async function linkProductToSourcingAction(
   sourcingId: string,
   productId: string,
