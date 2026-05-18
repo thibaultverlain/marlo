@@ -52,7 +52,7 @@ export async function getOrderCounts(shopId: string) {
   return rows[0] ?? { total: 0, aExpedier: 0, expedie: 0, livre: 0, retourne: 0, enAttentePaiement: 0 };
 }
 
-export async function updateShippingStatus(saleId: string, shopId: string, status: string, trackingNumber?: string) {
+export async function updateShippingStatus(saleId: string, shopId: string, status: string, trackingNumber?: string, restock: boolean = false) {
   const data: any = { shippingStatus: status };
   if (trackingNumber !== undefined) data.trackingNumber = trackingNumber;
   // Auto-update product status when shipped/delivered
@@ -62,6 +62,15 @@ export async function updateShippingStatus(saleId: string, shopId: string, statu
       const { updateProduct } = await import("./products");
       await updateProduct(sale.productId, { status: status === "livre" ? "livre" : "expedie" });
     }
+  }
+  // Handle return: restock product if requested + mark payment as refunded
+  if (status === "retourne") {
+    const [sale] = await db.select({ productId: sales.productId }).from(sales).where(eq(sales.id, saleId)).limit(1);
+    if (sale?.productId && restock) {
+      const { updateProduct } = await import("./products");
+      await updateProduct(sale.productId, { status: "en_stock" });
+    }
+    data.paymentStatus = "rembourse";
   }
   await db.update(sales).set(data).where(and(eq(sales.id, saleId), eq(sales.shopId, shopId)));
 }

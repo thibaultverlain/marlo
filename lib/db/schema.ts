@@ -393,26 +393,6 @@ export const priceHistory = pgTable("price_history", {
   reason: text("reason"),
 });
 
-// ── Returns ──────────────────────────────────────────
-
-export const returnStatusEnum = pgEnum("return_status", [
-  "en_cours", "recu", "rembourse", "refuse"
-]);
-
-export const returns = pgTable("returns", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  shopId: uuid("shop_id").references(() => shops.id).notNull(),
-  saleId: uuid("sale_id").references(() => sales.id).notNull(),
-  productId: uuid("product_id").references(() => products.id),
-  reason: text("reason").notNull(),
-  status: returnStatusEnum("status").notNull().default("en_cours"),
-  refundAmount: decimal("refund_amount", { precision: 10, scale: 2 }),
-  restockProduct: boolean("restock_product").default(true),
-  notes: text("notes"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  resolvedAt: timestamp("resolved_at"),
-});
-
 // ── Types ──────────────────────────────────────────────
 
 export type Product = typeof products.$inferSelect;
@@ -442,8 +422,6 @@ export type Document = typeof documents.$inferSelect;
 export type NewDocument = typeof documents.$inferInsert;
 export type OrderGroup = typeof orderGroups.$inferSelect;
 export type PriceHistory = typeof priceHistory.$inferSelect;
-export type Return = typeof returns.$inferSelect;
-export type NewReturn = typeof returns.$inferInsert;
 export type TeamRole = "owner" | "manager" | "seller";
 
 // All available permissions

@@ -58,3 +58,17 @@ export async function bulkUpdateShippingAction(ids: string[], status: string) {
     return { error: e.message };
   }
 }
+
+export async function declareReturnAction(saleId: string, restock: boolean) {
+  const ctx = await getAuthContext();
+  try {
+    await updateShippingStatus(saleId, ctx.shopId, "retourne", undefined, restock);
+    revalidatePath("/orders");
+    revalidatePath("/sales");
+    revalidatePath(`/sales/${saleId}`);
+    revalidatePath("/products");
+    return { success: true };
+  } catch (e: any) {
+    return { error: e.message };
+  }
+}

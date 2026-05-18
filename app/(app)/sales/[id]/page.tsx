@@ -11,6 +11,7 @@ import { formatCurrency, formatPercent, formatDate } from "@/lib/utils";
 import { CHANNELS } from "@/lib/data";
 import SaleActions from "@/components/sales/sale-actions";
 import SaleDeleteButton from "@/components/sales/sale-delete-button";
+import SaleReturnButton from "@/components/sales/sale-return-button";
 
 export const revalidate = 30;
 
@@ -95,6 +96,7 @@ export default async function SaleDetailPage({ params }: { params: Promise<{ id:
 
       {sale.notes && <div className="card-static p-6"><h2 className="text-[15px] font-semibold text-white mb-3">Notes</h2><p className="text-sm text-zinc-400 whitespace-pre-line">{sale.notes}</p></div>}
 
+      <SaleReturnButton saleId={sale.id} alreadyReturned={sale.shippingStatus === "retourne"} />
       <SaleDeleteButton saleId={sale.id} />
       <div className="pb-8" />
     </div>
