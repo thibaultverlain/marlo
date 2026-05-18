@@ -16,10 +16,12 @@ export async function getCustomerStats(shopId: string) {
     .select({
       total: sql<number>`count(*)::int`,
       vipCount: sql<number>`count(*) filter (where vip = true)::int`,
+      withOrders: sql<number>`count(*) filter (where total_orders > 0)::int`,
+      totalCA: sql<number>`coalesce(sum(total_spent), 0)::numeric`,
     })
     .from(customers)
     .where(eq(customers.shopId, shopId));
-  return rows[0] ?? { total: 0, vipCount: 0 };
+  return rows[0] ?? { total: 0, vipCount: 0, withOrders: 0, totalCA: 0 };
 }
 
 export async function createCustomer(data: NewCustomer): Promise<Customer> {

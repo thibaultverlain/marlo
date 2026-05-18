@@ -6,7 +6,7 @@ import { Save, AlertCircle, Star, X } from "lucide-react";
 import { createCustomerAction } from "@/lib/actions/customers";
 import { LUXURY_BRANDS } from "@/lib/data";
 
-const inputClass = "w-full px-3 py-2.5 text-[13px] bg-[var(--color-bg-raised)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500/50 focus:border-indigo-500/50 text-zinc-200 placeholder:text-zinc-600";
+const inputClass = "w-full px-3 py-2.5 text-[13px] bg-[var(--color-bg-raised)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-rose-500/50 focus:border-rose-500/50 text-zinc-200 placeholder:text-zinc-600";
 const labelClass = "block text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-1.5";
 
 export default function NewCustomerForm() {

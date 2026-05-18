@@ -66,3 +66,62 @@ export async function createCustomerAction(formData: FormData) {
   revalidatePath("/customers");
   redirect("/customers");
 }
+
+export async function updateCustomerAction(id: string, formData: FormData) {
+  const ctx = await getAuthContext();
+  const raw = {
+    firstName: formData.get("firstName") as string,
+    lastName: formData.get("lastName") as string,
+    email: formData.get("email") as string,
+    phone: formData.get("phone") as string | null,
+    instagram: formData.get("instagram") as string | null,
+    address: formData.get("address") as string | null,
+    city: formData.get("city") as string | null,
+    preferredBrands: formData.getAll("preferredBrands") as string[],
+    preferredSizes: formData.get("preferredSizes") as string | null,
+    budgetRange: formData.get("budgetRange") as string | null,
+    vip: formData.get("vip") === "on",
+    notes: formData.get("notes") as string | null,
+  };
+
+  const parsed = customerSchema.safeParse(raw);
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Donnees invalides" };
+  }
+
+  try {
+    await updateCustomer(id, {
+      firstName: parsed.data.firstName,
+      lastName: parsed.data.lastName,
+      email: parsed.data.email || null,
+      phone: parsed.data.phone ?? null,
+      instagram: parsed.data.instagram ?? null,
+      address: parsed.data.address ?? null,
+      city: parsed.data.city ?? null,
+      preferredBrands: parsed.data.preferredBrands ?? [],
+      preferredSizes: parsed.data.preferredSizes ?? null,
+      budgetRange: parsed.data.budgetRange ?? null,
+      vip: parsed.data.vip ?? false,
+      notes: parsed.data.notes ?? null,
+    });
+  } catch (err) {
+    console.error("updateCustomerAction error:", err);
+    return { error: "Erreur lors de la mise a jour." };
+  }
+
+  revalidatePath("/customers");
+  revalidatePath(`/customers/${id}`);
+  return { success: true };
+}
+
+export async function deleteCustomerAction(id: string) {
+  try {
+    const ctx = await getAuthContext();
+    await deleteCustomer(id, ctx.shopId);
+  } catch (err) {
+    console.error("deleteCustomerAction error:", err);
+    return { error: "Erreur lors de la suppression." };
+  }
+  revalidatePath("/customers");
+  redirect("/customers");
+}
