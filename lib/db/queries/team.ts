@@ -1,6 +1,6 @@
 import { db } from "@/lib/db/client";
 import { teamMembers, teamInvitations, shops, activityLog } from "@/lib/db/schema";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, sql } from "drizzle-orm";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 // ── Team Members ──────────────────────────────────────
@@ -43,7 +43,19 @@ export async function getTeamMemberWithEmail(shopId: string) {
     .where(eq(teamMembers.shopId, shopId))
     .orderBy(desc(teamMembers.joinedAt));
 
-  return members;
+  // Fetch emails from auth.users
+  if (members.length === 0) return [];
+  const userIds = members.map((m) => m.userId);
+  try {
+    const rows = await db.execute<{ id: string; email: string }>(
+      sql`SELECT id, email FROM auth.users WHERE id = ANY(${userIds}::uuid[])`
+    );
+    const emailMap = new Map<string, string>();
+    for (const r of rows) emailMap.set(r.id, r.email);
+    return members.map((m) => ({ ...m, email: emailMap.get(m.userId) ?? null }));
+  } catch {
+    return members.map((m) => ({ ...m, email: null }));
+  }
 }
 
 export async function removeMember(memberId: string, shopId: string) {

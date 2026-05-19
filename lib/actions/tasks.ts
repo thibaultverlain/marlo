@@ -92,6 +92,32 @@ export async function updateTaskStatusAction(taskId: string, status: "a_faire" |
   }
 }
 
+export async function updateTaskAction(taskId: string, data: {
+  title?: string;
+  description?: string | null;
+  priority?: "haute" | "normale" | "basse";
+  dueDate?: string | null;
+  assignedTo?: string | null;
+}) {
+  const ctx = await getAuthContext();
+  if (data.title !== undefined && !data.title.trim()) {
+    return { error: "Titre requis" };
+  }
+  try {
+    const update: any = {};
+    if (data.title !== undefined) update.title = data.title.trim();
+    if (data.description !== undefined) update.description = data.description || null;
+    if (data.priority !== undefined) update.priority = data.priority;
+    if (data.dueDate !== undefined) update.dueDate = data.dueDate || null;
+    if (data.assignedTo !== undefined) update.assignedTo = data.assignedTo || null;
+    await updateTask(taskId, update);
+    revalidatePath("/tasks");
+    return { success: true };
+  } catch (e: any) {
+    return { error: e.message };
+  }
+}
+
 export async function deleteTaskAction(taskId: string) {
   const ctx = await getAuthContext();
   try {
