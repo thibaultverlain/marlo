@@ -79,6 +79,36 @@ export async function updateMissionStatusAction(id: string, newStatus: string) {
   }
 }
 
+export async function updateMissionAction(id: string, formData: FormData) {
+  const raw = {
+    name: formData.get("name") as string,
+    eventDate: formData.get("eventDate") as string,
+    location: formData.get("location") as string,
+    notes: formData.get("notes") as string,
+  };
+
+  const parsed = missionSchema.safeParse(raw);
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Donnees invalides" };
+  }
+
+  try {
+    await updateMission(id, {
+      name: parsed.data.name,
+      eventDate: parsed.data.eventDate || null,
+      location: parsed.data.location || null,
+      notes: parsed.data.notes || null,
+    });
+  } catch (err) {
+    console.error("updateMissionAction:", err);
+    return { error: "Erreur lors de la mise a jour." };
+  }
+
+  revalidatePath("/personal-shopping");
+  revalidatePath(`/personal-shopping/${id}`);
+  return { success: true };
+}
+
 export async function deleteMissionAction(id: string) {
   try {
     const ctx = await getAuthContext();
