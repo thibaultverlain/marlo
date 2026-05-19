@@ -1,27 +1,124 @@
 import { getAuthContext } from "@/lib/auth/require-role";
 import Link from "next/link";
-import { FileText, Download } from "lucide-react";
+import { FileText, FileSpreadsheet, Flame, Wallet, AlertCircle, CheckCircle2 } from "lucide-react";
 import { getAllInvoices, getInvoiceStats } from "@/lib/db/queries/invoices";
 import { getShopSettings } from "@/lib/db/queries/settings";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils";
+import InvoicesListClient from "@/components/invoices/invoices-list-client";
+
 export const revalidate = 30;
-const SL: Record<string, { label: string; cl: string }> = { brouillon: { label: "Brouillon", cl: "bg-zinc-500/15 text-zinc-400" }, envoyee: { label: "Envoyée", cl: "bg-blue-500/15 text-blue-400" }, payee: { label: "Payée", cl: "bg-emerald-500/15 text-emerald-400" }, annulee: { label: "Annulée", cl: "bg-red-500/15 text-red-400" } };
 
 export default async function InvoicesPage() {
   const { shopId } = await getAuthContext();
-  const [invoices, stats, settings] = await Promise.all([getAllInvoices(shopId), getInvoiceStats(shopId), getShopSettings(shopId)]);
-  if (!settings) return (<div className="space-y-6 page-enter"><div><h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">Factures</h1></div><div className="bg-amber-500/[0.08] border border-amber-500/20 rounded-xl p-6"><h2 className="text-amber-300 font-semibold mb-2">Configuration requise</h2><p className="text-sm text-amber-400/80 mb-4">Configure tes informations légales dans Réglages avant d'émettre des factures.</p><Link href="/settings" className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors">Configurer</Link></div></div>);
+  const [invoices, stats, settings] = await Promise.all([
+    getAllInvoices(shopId),
+    getInvoiceStats(shopId),
+    getShopSettings(shopId),
+  ]);
+
+  if (!settings) {
+    return (
+      <div className="space-y-6 page-enter">
+        <div>
+          <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">Factures</h1>
+        </div>
+        <div className="bg-amber-500/[0.08] border border-amber-500/20 rounded-xl p-6">
+          <h2 className="text-amber-300 font-semibold mb-2">Configuration requise</h2>
+          <p className="text-sm text-amber-400/80 mb-4">
+            Configure tes informations legales dans Reglages avant d'emettre des factures.
+          </p>
+          <Link href="/settings" className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors">
+            Configurer
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 page-enter">
-      <div><h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">Factures</h1><p className="text-zinc-500 mt-1 text-sm">{stats.total} facture{stats.total > 1 ? "s" : ""} · {formatCurrency(stats.totalAmount)} facturés</p></div>
-      {stats.total > 0 && <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">{[{l:"Total",v:stats.total,icon:"FileText",ic:"text-zinc-400",bg:"bg-zinc-500/10"},{l:"Brouillons",v:stats.draft,icon:"FileText",ic:"text-zinc-400",bg:"bg-zinc-500/10"},{l:"Envoyees",v:stats.sent,icon:"FileText",ic:"text-blue-400",bg:"bg-blue-500/10"},{l:"Payees",v:stats.paid,icon:"FileText",ic:"text-emerald-400",bg:"bg-emerald-500/10"}].map((s) => <div key={s.l} className="kpi-card p-4 flex flex-col justify-between min-h-[100px]"><p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">{s.l}</p><p className={`text-[22px] font-bold mt-auto ${s.ic}`}>{s.v}</p></div>)}</div>}
-      {invoices.length === 0 ? <div className="card-static p-12 text-center"><FileText size={40} className="mx-auto text-zinc-700 mb-3" /><p className="text-zinc-500 text-sm">Aucune facture. Va sur une vente avec client pour en créer une.</p></div> : (
-        <div className="card-static overflow-hidden"><div className="divide-y divide-[var(--color-border)]">{invoices.map((inv) => { const st = SL[inv.status ?? "brouillon"]; return (
-          <div key={inv.id} className="flex items-center justify-between px-5 py-3.5 row-hover transition-colors">
-            <Link href={`/invoices/${inv.id}`} className="flex-1 flex items-center gap-4"><div className="w-10 h-10 rounded-lg bg-[var(--color-bg-hover)] flex items-center justify-center"><FileText size={16} className="text-zinc-500" /></div><div><p className="text-[13px] font-medium text-zinc-200">{inv.invoiceNumber}</p><div className="flex items-center gap-2 mt-0.5"><span className="text-[11px] text-zinc-500">{inv.customerName ?? "Sans client"}</span><span className="text-zinc-700">·</span><span className="text-[11px] text-zinc-600">{formatDate(inv.createdAt)}</span></div></div></Link>
-            <div className="flex items-center gap-4"><span className={`inline-flex px-2.5 py-1 rounded-md text-[11px] font-medium ${st.cl}`}>{st.label}</span><p className="text-[13px] font-medium text-white tabular-nums w-24 text-right">{formatCurrency(inv.amountTtc)}</p><a href={`/api/invoices/${inv.id}/pdf?download=1`} className="w-8 h-8 flex items-center justify-center rounded-lg text-zinc-600 hover:text-zinc-300 hover:bg-[var(--color-bg-hover)] transition-colors"><Download size={14} /></a></div>
-          </div>); })}</div></div>
+      <div className="flex items-start sm:items-center justify-between gap-3">
+        <div>
+          <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">Factures</h1>
+          <p className="text-zinc-500 mt-1 text-sm">
+            {stats.total} facture{stats.total > 1 ? "s" : ""} · {formatCurrency(stats.totalAmount)} factures
+          </p>
+        </div>
+        <a
+          href="/api/invoices/excel"
+          className="flex items-center gap-2 px-3 sm:px-4 py-2 text-[13px] font-medium text-zinc-400 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg hover:text-zinc-200 transition-colors"
+          title="Export Excel/CSV"
+        >
+          <FileSpreadsheet size={14} />
+          <span className="hidden sm:inline">Excel</span>
+        </a>
+      </div>
+
+      {/* KPIs */}
+      {stats.total > 0 && (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="kpi-card p-4 flex flex-col justify-between min-h-[100px]">
+            <div className="flex items-start justify-between">
+              <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Total</p>
+              <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center"><FileText size={16} className="text-blue-400" /></div>
+            </div>
+            <p className="text-[22px] font-bold text-white mt-auto">{stats.total}</p>
+          </div>
+          <div className="kpi-card p-4 flex flex-col justify-between min-h-[100px]">
+            <div className="flex items-start justify-between">
+              <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Total facture</p>
+              <div className="w-8 h-8 rounded-xl bg-violet-500/10 flex items-center justify-center"><Wallet size={16} className="text-violet-400" /></div>
+            </div>
+            <p className="text-[20px] font-bold text-white tabular-nums mt-auto">{formatCurrency(stats.totalAmount)}</p>
+          </div>
+          <div className="kpi-card p-4 flex flex-col justify-between min-h-[100px]">
+            <div className="flex items-start justify-between">
+              <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">A encaisser</p>
+              <div className="w-8 h-8 rounded-xl bg-amber-500/10 flex items-center justify-center"><AlertCircle size={16} className="text-amber-400" /></div>
+            </div>
+            <p className={`text-[20px] font-bold tabular-nums mt-auto ${stats.sent > 0 ? "text-amber-400" : "text-white"}`}>
+              {formatCurrency(stats.sentAmount + stats.draftAmount)}
+            </p>
+          </div>
+          <div className="kpi-card p-4 flex flex-col justify-between min-h-[100px]">
+            <div className="flex items-start justify-between">
+              <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Payees</p>
+              <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center"><CheckCircle2 size={16} className="text-emerald-400" /></div>
+            </div>
+            <p className="text-[20px] font-bold tabular-nums text-emerald-400 mt-auto">{formatCurrency(stats.paidAmount)}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Bandeau impayes > 30j */}
+      {stats.overdueCount > 0 && (
+        <div className="flex items-center gap-3 bg-red-500/[0.08] border border-red-500/20 rounded-xl px-4 py-3">
+          <div className="w-9 h-9 rounded-xl bg-red-500/15 flex items-center justify-center flex-shrink-0">
+            <Flame size={16} className="text-red-400" />
+          </div>
+          <div className="flex-1">
+            <p className="text-[13px] font-semibold text-red-300">
+              {stats.overdueCount} facture{stats.overdueCount > 1 ? "s" : ""} envoyee{stats.overdueCount > 1 ? "s" : ""} depuis plus de 30 jours sans paiement
+            </p>
+            <p className="text-[11px] text-red-400/70 mt-0.5">A relancer en priorite</p>
+          </div>
+        </div>
+      )}
+
+      {invoices.length === 0 ? (
+        <div className="card-static p-12 text-center">
+          <FileText size={40} className="mx-auto text-zinc-700 mb-3" />
+          <p className="text-zinc-500 text-sm">Aucune facture. Va sur une vente avec client pour en creer une.</p>
+        </div>
+      ) : (
+        <InvoicesListClient invoices={invoices.map((inv) => ({
+          id: inv.id,
+          invoiceNumber: inv.invoiceNumber,
+          customerName: inv.customerName,
+          status: inv.status,
+          amountTtc: inv.amountTtc,
+          createdAt: inv.createdAt,
+        }))} />
       )}
     </div>
   );
