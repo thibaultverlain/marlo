@@ -80,3 +80,28 @@ export async function deleteTemplateAction(id: string) {
     return { error: e.message };
   }
 }
+
+export async function duplicateTemplateAction(sourceId: string) {
+  const ctx = await getAuthContext();
+  if (ctx.role !== "owner") return { error: "Seul le proprietaire peut dupliquer" };
+
+  try {
+    const { getShopTemplates } = await import("@/lib/db/queries/templates");
+    const list = await getShopTemplates(ctx.shopId);
+    const source = list.find((t) => t.id === sourceId);
+    if (!source) return { error: "Template introuvable" };
+
+    await createTemplate({
+      shopId: ctx.shopId,
+      createdBy: ctx.userId,
+      type: source.type,
+      name: `${source.name} (copie)`,
+      content: source.content,
+      variables: source.variables ?? null,
+    });
+    revalidatePath("/templates");
+    return { success: true };
+  } catch (e: any) {
+    return { error: e.message };
+  }
+}

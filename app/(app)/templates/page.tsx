@@ -1,6 +1,8 @@
 import { getAuthContext, canAccess } from "@/lib/auth/require-role";
 import { getShopTemplates } from "@/lib/db/queries/templates";
+import { getInStockProducts } from "@/lib/db/queries/products";
 import TemplatesPageClient from "@/components/templates/templates-page-client";
+
 export const revalidate = 30;
 
 export default async function TemplatesPage() {
@@ -16,11 +18,27 @@ export default async function TemplatesPage() {
     );
   }
 
-  const templates = await getShopTemplates(ctx.shopId);
+  const [templates, products] = await Promise.all([
+    getShopTemplates(ctx.shopId),
+    getInStockProducts(ctx.shopId),
+  ]);
 
   return (
     <div className="max-w-5xl mx-auto space-y-6 page-enter">
-      <TemplatesPageClient templates={templates} isOwner={ctx.role === "owner"} />
+      <TemplatesPageClient
+        templates={templates}
+        isOwner={ctx.role === "owner"}
+        products={products.map((p) => ({
+          id: p.id,
+          sku: p.sku,
+          title: p.title,
+          brand: p.brand,
+          color: p.color,
+          size: p.size,
+          condition: p.condition,
+          targetPrice: p.targetPrice,
+        }))}
+      />
     </div>
   );
 }
