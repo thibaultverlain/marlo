@@ -18,11 +18,13 @@ async function fetchAnalyticsData(shopId: string) {
       db.select({
         revenue: sql<number>`coalesce(sum(sale_price), 0)::numeric`,
         margin: sql<number>`coalesce(sum(margin), 0)::numeric`,
+        avgMarginPct: sql<number>`coalesce(avg(margin_pct), 0)::numeric`,
         count: sql<number>`count(*)::int`,
       }).from(sales).where(and(eq(sales.shopId, shopId), gte(sales.soldAt, curStart))),
       db.select({
         revenue: sql<number>`coalesce(sum(sale_price), 0)::numeric`,
         margin: sql<number>`coalesce(sum(margin), 0)::numeric`,
+        avgMarginPct: sql<number>`coalesce(avg(margin_pct), 0)::numeric`,
         count: sql<number>`count(*)::int`,
       }).from(sales).where(and(eq(sales.shopId, shopId), gte(sales.soldAt, prevStart), sql`sold_at < ${curStart}`)),
     ]);
@@ -34,17 +36,15 @@ async function fetchAnalyticsData(shopId: string) {
       currentMargin: Number(curMonth?.margin ?? 0),
       previousMargin: Number(prevMonth?.margin ?? 0),
       marginChange: Number(prevMonth?.margin) > 0 ? ((Number(curMonth?.margin ?? 0) - Number(prevMonth.margin)) / Number(prevMonth.margin)) * 100 : 0,
+      currentMarginPct: Number(curMonth?.avgMarginPct ?? 0),
+      previousMarginPct: Number(prevMonth?.avgMarginPct ?? 0),
       currentCount: curMonth?.count ?? 0,
       previousCount: prevMonth?.count ?? 0,
     };
 
     const salesFilter = eq(sales.shopId, shopId);
 
-    const [velocityRows, seasonalityRows, topArticles, brandPerf, categoryPerf, channelMargin] = await Promise.all([
-      db.select({ brand: products.brand, category: products.category,
-        avgDays: sql<number>`coalesce(avg(extract(epoch from (s.sold_at - p.created_at)) / 86400), 0)::numeric`, count: sql<number>`count(*)::int` })
-        .from(sales).innerJoin(products, eq(sales.productId, products.id)).where(salesFilter)
-        .groupBy(products.brand, products.category).orderBy(sql`avg(extract(epoch from (s.sold_at - p.created_at)) / 86400)`).limit(15),
+    const [seasonalityRows, topArticles, brandPerf, categoryPerf, channelMargin, atRiskRows] = await Promise.all([
       db.select({ month: sql<number>`extract(month from sold_at)::int`, year: sql<number>`extract(year from sold_at)::int`,
         revenue: sql<number>`coalesce(sum(sale_price), 0)::numeric`, margin: sql<number>`coalesce(sum(margin), 0)::numeric`, count: sql<number>`count(*)::int` })
         .from(sales).where(salesFilter).groupBy(sql`extract(year from sold_at)`, sql`extract(month from sold_at)`)
@@ -61,16 +61,22 @@ async function fetchAnalyticsData(shopId: string) {
       db.select({ channel: sales.channel, avgMarginPct: sql<number>`coalesce(avg(margin_pct), 0)::numeric`,
         avgMargin: sql<number>`coalesce(avg(margin), 0)::numeric`, count: sql<number>`count(*)::int` })
         .from(sales).where(salesFilter).groupBy(sales.channel).orderBy(desc(sql`avg(margin_pct)`)),
+      // Stock a risque : articles > 60 jours en stock
+      db.select({ id: products.id, title: products.title, brand: products.brand, purchasePrice: products.purchasePrice,
+        daysInStock: sql<number>`extract(epoch from (NOW() - created_at)) / 86400::int` })
+        .from(products)
+        .where(and(eq(products.shopId, shopId), inArray(products.status, ["en_stock", "en_vente"]), sql`created_at < NOW() - INTERVAL '60 days'`))
+        .orderBy(sql`created_at`).limit(10),
     ]);
 
     return {
       comparison,
-      velocity: velocityRows.map((r) => ({ ...r, avgDays: Math.round(Number(r.avgDays)) })),
       seasonality: seasonalityRows.map((r) => ({ ...r, revenue: Number(r.revenue), margin: Number(r.margin) })),
       topArticles: topArticles.map((r) => ({ ...r, salePrice: Number(r.salePrice), margin: Number(r.margin), marginPct: Number(r.marginPct), purchasePrice: Number(r.purchasePrice) })),
       brandPerf: brandPerf.map((r) => ({ ...r, totalRevenue: Number(r.totalRevenue), totalMargin: Number(r.totalMargin), avgMarginPct: Number(r.avgMarginPct), avgVelocity: Math.round(Number(r.avgVelocity)) })),
       categoryPerf: categoryPerf.map((r) => ({ ...r, totalRevenue: Number(r.totalRevenue), totalMargin: Number(r.totalMargin), avgMarginPct: Number(r.avgMarginPct) })),
       channelMargin: channelMargin.map((r) => ({ ...r, avgMarginPct: Number(r.avgMarginPct), avgMargin: Number(r.avgMargin) })),
+      atRisk: atRiskRows.map((r) => ({ ...r, purchasePrice: Number(r.purchasePrice ?? 0), daysInStock: Math.round(Number(r.daysInStock)) })),
     };
   } catch (err) {
     console.error("Analytics SSR error:", err);
