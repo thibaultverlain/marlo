@@ -16,8 +16,7 @@ export default async function SettingsPage() {
         <p className="text-zinc-500 mt-1 text-sm">Informations legales et documents de la boutique</p>
       </div>
 
-      <SettingsForm initialData={settings} />
-
+      {/* Documents link moved to top for visibility */}
       <Link href="/settings/documents" className="block card-static p-5 hover:border-[var(--color-border-hover)] transition-all group">
         <div className="flex items-center gap-4">
           <div className="w-10 h-10 rounded-xl bg-violet-500/10 flex items-center justify-center flex-shrink-0">
@@ -30,6 +29,8 @@ export default async function SettingsPage() {
           <ChevronRight size={16} className="text-zinc-600 group-hover:text-zinc-400 transition-colors" />
         </div>
       </Link>
+
+      <SettingsForm initialData={settings} />
     </div>
   );
 }
