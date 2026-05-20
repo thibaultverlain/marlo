@@ -393,6 +393,35 @@ export const priceHistory = pgTable("price_history", {
   reason: text("reason"),
 });
 
+// ── Subscriptions (Stripe) ────────────────────────────
+
+export const subscriptionStatusEnum = pgEnum("subscription_status", [
+  "trialing", "active", "past_due", "canceled", "unpaid", "incomplete"
+]);
+
+export const subscriptionPlanEnum = pgEnum("subscription_plan", [
+  "mensuel", "annuel"
+]);
+
+export const shopSubscriptions = pgTable("shop_subscriptions", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  shopId: uuid("shop_id").references(() => shops.id, { onDelete: "cascade" }).notNull().unique(),
+  stripeCustomerId: text("stripe_customer_id").unique(),
+  stripeSubscriptionId: text("stripe_subscription_id").unique(),
+  status: subscriptionStatusEnum("status").notNull().default("trialing"),
+  plan: subscriptionPlanEnum("plan"),
+  trialEndsAt: timestamp("trial_ends_at"),
+  currentPeriodStart: timestamp("current_period_start"),
+  currentPeriodEnd: timestamp("current_period_end"),
+  cancelAtPeriodEnd: boolean("cancel_at_period_end").default(false),
+  canceledAt: timestamp("canceled_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export type ShopSubscription = typeof shopSubscriptions.$inferSelect;
+export type NewShopSubscription = typeof shopSubscriptions.$inferInsert;
+
 // ── Types ──────────────────────────────────────────────
 
 export type Product = typeof products.$inferSelect;

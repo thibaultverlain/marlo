@@ -92,7 +92,7 @@ export default function RevenueChart({ initialData }: { initialData?: DataPoint[
             {PERIOD_LABELS.map(({ key, label }) => (
               <button key={key} onClick={() => { setPeriod(key); setShowDatePicker(false); }}
                 className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-all duration-200 ${
-                  period === key ? "bg-[rgba(251,113,133,0.12)] text-rose-400" : "text-zinc-500 hover:text-zinc-300"
+                  period === key ? "bg-[rgba(225,29,72,0.12)] text-rose-400" : "text-zinc-500 hover:text-zinc-300"
                 }`}>{label}</button>
             ))}
           </div>

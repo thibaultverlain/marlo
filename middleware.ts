@@ -65,6 +65,8 @@ export async function middleware(request: NextRequest) {
   }
 
   addSecurityHeaders(supabaseResponse);
+  // Pass pathname to server components for paywall guard
+  supabaseResponse.headers.set("x-pathname", pathname);
   return supabaseResponse;
 }
 

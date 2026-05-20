@@ -48,6 +48,7 @@ export async function getRecentSales(shopId: string, limit: number = 5) {
     .select({
       id: sales.id, salePrice: sales.salePrice, margin: sales.margin,
       marginPct: sales.marginPct, channel: sales.channel, soldAt: sales.soldAt, notes: sales.notes,
+      shippingStatus: sales.shippingStatus, paymentStatus: sales.paymentStatus,
       productTitle: products.title,
     })
     .from(sales)

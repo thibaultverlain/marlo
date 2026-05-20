@@ -120,6 +120,14 @@ export const getAuthContext = cache(async (): Promise<AuthContext> => {
     role: "owner",
   });
 
+  // Create 14-day trial subscription
+  try {
+    const { createTrialSubscription } = await import("@/lib/db/queries/subscriptions");
+    await createTrialSubscription(newShop.id);
+  } catch (e) {
+    console.error("Failed to create trial subscription:", e);
+  }
+
   return {
     userId: user.id,
     shopId: newShop.id,

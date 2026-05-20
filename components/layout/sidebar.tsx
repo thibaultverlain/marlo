@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Package, ShoppingCart, Users, Search,
-  ShoppingBag, FileText, Calculator, Settings, Menu, X, BarChart3, Users2, ListTodo, Zap, ClipboardList, Truck,
+  ShoppingBag, FileText, Calculator, Settings, Menu, X, BarChart3, Users2, ListTodo, Zap, ClipboardList, Truck, CreditCard,
 } from "lucide-react";
 import ThemeToggle from "./theme-toggle";
 import LogoutButton from "./logout-button";
@@ -49,6 +49,7 @@ const NAV_SECTIONS = [
 ];
 
 const BOTTOM_ITEMS = [
+  { href: "/billing", label: "Abonnement", icon: CreditCard, perm: "settings" },
   { href: "/settings", label: "Reglages", icon: Settings, perm: "settings" },
   { href: "/team", label: "Equipe", icon: Users2, perm: "team" },
 ];
