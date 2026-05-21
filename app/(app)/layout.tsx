@@ -4,10 +4,6 @@ import { db } from "@/lib/db/client";
 import { products, sourcingRequests } from "@/lib/db/schema";
 import { sql, and, inArray, eq } from "drizzle-orm";
 import { unstable_cache } from "next/cache";
-import { redirect } from "next/navigation";
-import { headers } from "next/headers";
-import { getSubscriptionState } from "@/lib/db/queries/subscriptions";
-import TrialBanner from "@/components/billing/trial-banner";
 
 const getAlertCount = unstable_cache(
   async (shopId: string): Promise<number> => {
@@ -32,7 +28,6 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   let currentShopId = "";
   let currentShopName = "";
   let alertCount = 0;
-  let subState: any = null;
 
   try {
     const ctx = await getAuthContext();
@@ -46,18 +41,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       role: s.role,
     }));
     alertCount = await getAlertCount(ctx.shopId);
-    subState = await getSubscriptionState(ctx.shopId);
   } catch {}
-
-  // Paywall guard: if no access, redirect to paywall (unless already on billing pages)
-  if (subState && subState.isPaywalled) {
-    const hdrs = await headers();
-    const pathname = hdrs.get("x-pathname") ?? "";
-    // Allow billing pages always
-    if (!pathname.includes("/billing")) {
-      redirect("/billing/paywall");
-    }
-  }
 
   return (
     <div className="min-h-screen bg-[var(--color-bg)]">
@@ -71,7 +55,6 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       />
       <main className="lg:ml-[220px] min-h-screen pt-14 lg:pt-0">
         <div className="max-w-7xl mx-auto px-4 py-5 lg:px-8 lg:py-8">
-          {subState && <TrialBanner state={subState} />}
           {children}
         </div>
       </main>
