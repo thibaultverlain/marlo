@@ -2,19 +2,27 @@
 -- MIGRATION: Shop subscriptions (Stripe integration)
 -- ============================================================
 
-CREATE TYPE IF NOT EXISTS subscription_status AS ENUM (
-  'trialing',
-  'active',
-  'past_due',
-  'canceled',
-  'unpaid',
-  'incomplete'
-);
+DO $$ BEGIN
+  CREATE TYPE subscription_status AS ENUM (
+    'trialing',
+    'active',
+    'past_due',
+    'canceled',
+    'unpaid',
+    'incomplete'
+  );
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
 
-CREATE TYPE IF NOT EXISTS subscription_plan AS ENUM (
-  'mensuel',
-  'annuel'
-);
+DO $$ BEGIN
+  CREATE TYPE subscription_plan AS ENUM (
+    'mensuel',
+    'annuel'
+  );
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
 
 CREATE TABLE IF NOT EXISTS shop_subscriptions (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -41,14 +49,21 @@ CREATE INDEX IF NOT EXISTS idx_shop_subscriptions_customer ON shop_subscriptions
 -- RLS
 ALTER TABLE shop_subscriptions ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY shop_subscriptions_select ON shop_subscriptions
-  FOR SELECT USING (
-    shop_id IN (SELECT shop_id FROM team_members WHERE user_id = auth.uid())
-  );
+DO $$ BEGIN
+  CREATE POLICY shop_subscriptions_select ON shop_subscriptions
+    FOR SELECT USING (
+      shop_id IN (SELECT shop_id FROM team_members WHERE user_id = auth.uid())
+    );
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
 
--- Only service role can modify (webhooks)
-CREATE POLICY shop_subscriptions_modify ON shop_subscriptions
-  FOR ALL USING (false);
+DO $$ BEGIN
+  CREATE POLICY shop_subscriptions_modify ON shop_subscriptions
+    FOR ALL USING (false);
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
 
 -- ============================================================
 -- Init subscriptions for existing shops (start trial NOW)

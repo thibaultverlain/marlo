@@ -41,6 +41,10 @@ async function handleSubscriptionEvent(sub: Stripe.Subscription) {
 }
 
 export async function POST(request: NextRequest) {
+  if (!STRIPE_CONFIG.enabled) {
+    return NextResponse.json({ received: true, disabled: true });
+  }
+
   const body = await request.text();
   const signature = request.headers.get("stripe-signature");
 

@@ -1,7 +1,9 @@
 import Stripe from "stripe";
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  console.warn("STRIPE_SECRET_KEY is not set. Stripe features will fail.");
+const STRIPE_ENABLED = process.env.STRIPE_ENABLED === "true";
+
+if (STRIPE_ENABLED && !process.env.STRIPE_SECRET_KEY) {
+  console.warn("STRIPE_ENABLED=true but STRIPE_SECRET_KEY is not set.");
 }
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "sk_test_placeholder", {
@@ -10,6 +12,7 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "sk_test_place
 });
 
 export const STRIPE_CONFIG = {
+  enabled: STRIPE_ENABLED,
   priceMonthly: process.env.STRIPE_PRICE_MONTHLY ?? "",
   priceYearly: process.env.STRIPE_PRICE_YEARLY ?? "",
   webhookSecret: process.env.STRIPE_WEBHOOK_SECRET ?? "",
@@ -22,5 +25,7 @@ export const STRIPE_CONFIG = {
 };
 
 export function isShopBypassed(shopId: string): boolean {
+  // If Stripe is globally disabled, everyone is bypassed
+  if (!STRIPE_ENABLED) return true;
   return STRIPE_CONFIG.shopsBypassed.includes(shopId);
 }

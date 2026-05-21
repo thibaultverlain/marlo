@@ -15,6 +15,10 @@ function getAppUrl(): string {
 export async function createCheckoutSessionAction(plan: "mensuel" | "annuel") {
   const ctx = await getAuthContext();
 
+  if (!STRIPE_CONFIG.enabled) {
+    return { error: "Les paiements ne sont pas encore actives. Reviens bientot." };
+  }
+
   if (isShopBypassed(ctx.shopId)) {
     return { error: "Compte founder - pas besoin d'abonnement." };
   }
