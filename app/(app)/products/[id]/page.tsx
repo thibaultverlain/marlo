@@ -7,6 +7,7 @@ import { formatCurrency, formatPercent, formatDate, daysSince } from "@/lib/util
 import { PRODUCT_STATUSES, CHANNELS, CATEGORIES, CONDITIONS } from "@/lib/data";
 import ProductActions from "@/components/products/product-actions";
 import ProductPhotos from "@/components/products/product-photos";
+import ListingGeneratorTrigger from "@/components/products/listing-generator-trigger";
 
 export const revalidate = 30;
 
@@ -81,6 +82,8 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
           {product.serialNumber && <Row label="N° de série" value={product.serialNumber} />}
         </div>
       </div>
+
+      <ListingGeneratorTrigger productId={product.id} hasImages={(product.images ?? []).length > 0} />
 
       {product.listedOn && product.listedOn.length > 0 && (
         <div className="card-static p-6">
