@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, timestamp, decimal, integer, boolean, pgEnum, date, uniqueIndex } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, timestamp, decimal, integer, boolean, pgEnum, date, uniqueIndex, jsonb } from "drizzle-orm/pg-core";
 
 // ── Enums ──────────────────────────────────────────────
 
@@ -260,7 +260,37 @@ export const shops = pgTable("shops", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: text("name").notNull(),
   ownerId: uuid("owner_id").notNull(),
+  inboundEmailToken: uuid("inbound_email_token").defaultRandom().notNull().unique(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Idempotence pour le polling email : Message-Id deja traites.
+export const processedInboundEmails = pgTable("processed_inbound_emails", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  shopId: uuid("shop_id").references(() => shops.id).notNull(),
+  messageId: text("message_id").notNull().unique(),
+  saleId: uuid("sale_id"),
+  receivedAt: timestamp("received_at").defaultNow().notNull(),
+});
+
+// Credentials IMAP par shop (chiffres AES-256-GCM avant insertion).
+export const shopEmailCredentials = pgTable("shop_email_credentials", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  shopId: uuid("shop_id").references(() => shops.id).notNull().unique(),
+  imapHost: text("imap_host").notNull(),
+  imapPort: integer("imap_port").notNull().default(993),
+  imapUseTls: boolean("imap_use_tls").notNull().default(true),
+  imapUsername: text("imap_username").notNull(),
+  // Password encrypted: format "iv:authTag:ciphertext" (hex)
+  imapPasswordEncrypted: text("imap_password_encrypted").notNull(),
+  // Folder to scan, default INBOX
+  imapFolder: text("imap_folder").notNull().default("INBOX"),
+  active: boolean("active").notNull().default(true),
+  lastPollAt: timestamp("last_poll_at"),
+  lastPollStatus: text("last_poll_status"), // "ok" | "error: ..."
+  lastError: text("last_error"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const teamMembers = pgTable("team_members", {
@@ -393,6 +423,25 @@ export const priceHistory = pgTable("price_history", {
   reason: text("reason"),
 });
 
+// ── Authenticity checks ───────────────────────────────
+
+export const authenticityVerdictEnum = pgEnum("authenticity_verdict", [
+  "authentique", "suspect", "faux", "non_conclu"
+]);
+
+export const authenticityChecks = pgTable("authenticity_checks", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull(),
+  shopId: uuid("shop_id").references(() => shops.id),
+  productId: uuid("product_id").references(() => products.id),
+  brand: text("brand").notNull(),
+  model: text("model"),
+  points: jsonb("points").notNull().$type<Array<{ id: string; checked: boolean }>>(),
+  verdict: authenticityVerdictEnum("verdict").notNull().default("non_conclu"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // ── Types ──────────────────────────────────────────────
 
 export type Product = typeof products.$inferSelect;
@@ -422,13 +471,19 @@ export type Document = typeof documents.$inferSelect;
 export type NewDocument = typeof documents.$inferInsert;
 export type OrderGroup = typeof orderGroups.$inferSelect;
 export type PriceHistory = typeof priceHistory.$inferSelect;
+export type AuthenticityCheck = typeof authenticityChecks.$inferSelect;
+export type NewAuthenticityCheck = typeof authenticityChecks.$inferInsert;
+export type ProcessedInboundEmail = typeof processedInboundEmails.$inferSelect;
+export type NewProcessedInboundEmail = typeof processedInboundEmails.$inferInsert;
+export type ShopEmailCredentials = typeof shopEmailCredentials.$inferSelect;
+export type NewShopEmailCredentials = typeof shopEmailCredentials.$inferInsert;
 export type TeamRole = "owner" | "manager" | "seller";
 
 // All available permissions
 export const ALL_PERMISSIONS = [
   "dashboard", "products", "sales", "customers", "analytics",
   "sourcing", "personal_shopping", "tasks", "invoices",
-  "accounting", "templates", "documents",
+  "accounting", "templates", "documents", "authentification",
   "team", "settings",
 ] as const;
 export type Permission = typeof ALL_PERMISSIONS[number];

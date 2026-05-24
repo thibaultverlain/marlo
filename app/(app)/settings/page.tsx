@@ -2,13 +2,19 @@ import Link from "next/link";
 import { FolderOpen, ChevronRight } from "lucide-react";
 import { getAuthContext } from "@/lib/auth/require-role";
 import { getShopSettings } from "@/lib/db/queries/settings";
+import { getCredentialsByShop } from "@/lib/db/queries/email-credentials";
 import SettingsForm from "@/components/settings/settings-form";
+import EmailPollingCard from "@/components/settings/email-polling-card";
 
 export const revalidate = 30;
 
 export default async function SettingsPage() {
-  const { shopId } = await getAuthContext();
-  const settings = await getShopSettings(shopId);
+  const { shopId, role } = await getAuthContext();
+  const [settings, emailCreds] = await Promise.all([
+    getShopSettings(shopId),
+    getCredentialsByShop(shopId),
+  ]);
+
   return (
     <div className="max-w-3xl mx-auto space-y-6 page-enter">
       <div>
@@ -16,7 +22,6 @@ export default async function SettingsPage() {
         <p className="text-zinc-500 mt-1 text-sm">Informations legales et documents de la boutique</p>
       </div>
 
-      {/* Documents link moved to top for visibility */}
       <Link href="/settings/documents" className="block card-static p-5 hover:border-[var(--color-border-hover)] transition-all group">
         <div className="flex items-center gap-4">
           <div className="w-10 h-10 rounded-xl bg-violet-500/10 flex items-center justify-center flex-shrink-0">
@@ -29,6 +34,8 @@ export default async function SettingsPage() {
           <ChevronRight size={16} className="text-zinc-600 group-hover:text-zinc-400 transition-colors" />
         </div>
       </Link>
+
+      {role === "owner" && <EmailPollingCard initial={emailCreds ?? null} />}
 
       <SettingsForm initialData={settings} />
     </div>

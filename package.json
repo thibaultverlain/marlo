@@ -25,6 +25,8 @@
     "react-hook-form": "^7.72.1",
     "recharts": "^3.0.0",
     "@imgly/background-removal": "^1.5.5",
+    "imapflow": "^1.0.181",
+    "mailparser": "^3.7.1",
     "uuid": "^13.0.0",
     "web-push": "^3.6.7",
     "zod": "^4.3.6"
@@ -34,6 +36,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/mailparser": "^3.4.5",
     "@types/uuid": "^10.0.0",
     "@types/web-push": "^3.6.4",
     "drizzle-kit": "^0.31.10",

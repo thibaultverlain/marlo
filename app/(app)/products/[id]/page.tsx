@@ -8,6 +8,7 @@ import { PRODUCT_STATUSES, CHANNELS, CATEGORIES, CONDITIONS } from "@/lib/data";
 import ProductActions from "@/components/products/product-actions";
 import ProductPhotos from "@/components/products/product-photos";
 import ListingGeneratorTrigger from "@/components/products/listing-generator-trigger";
+import AuthCheckTrigger from "@/components/products/auth-check-trigger";
 
 export const revalidate = 30;
 
@@ -84,6 +85,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
       </div>
 
       <ListingGeneratorTrigger productId={product.id} hasImages={(product.images ?? []).length > 0} />
+      <AuthCheckTrigger brand={product.brand} productId={product.id} />
 
       {product.listedOn && product.listedOn.length > 0 && (
         <div className="card-static p-6">
