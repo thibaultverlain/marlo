@@ -7,6 +7,7 @@ import { eq, and, inArray, desc } from "drizzle-orm";
 import { daysSince, formatCurrency } from "@/lib/utils";
 import { getAuthContext } from "@/lib/auth/require-role";
 import ProductsList from "@/components/products/products-list";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export const revalidate = 30;
 
@@ -148,18 +149,17 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       </div>
 
       {productList.length === 0 ? (
-        <div className="card-static p-12 text-center">
-          <Package size={40} className="mx-auto text-zinc-700 mb-3" />
-          <p className="text-zinc-500 mb-4 text-sm">
-            {view === "stock" ? "Aucun article en stock" : view === "sold" ? "Aucun article vendu" : "Aucun article"}
-          </p>
-          <Link
-            href="/products/new"
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-[var(--color-text-inverse)] bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors"
-          >
-            <Plus size={14} />
-            Ajouter
-          </Link>
+        <div className="card-static">
+          <EmptyState
+            icon={Package}
+            title={view === "stock" ? "Aucun article en stock" : view === "sold" ? "Aucun article vendu" : "Aucun article"}
+            description={view === "stock"
+              ? "Ajoute ton premier article pour commencer a tracker ton stock et tes marges."
+              : view === "sold"
+              ? "Les articles vendus apparaitront ici une fois que tu auras enregistre des ventes."
+              : "Ton catalogue est vide pour le moment."}
+            action={view !== "sold" ? { href: "/products/new", label: "Ajouter un article" } : undefined}
+          />
         </div>
       ) : (
         <ProductsList

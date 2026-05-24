@@ -386,6 +386,63 @@ select option { background-color: var(--color-bg-card); color: var(--color-text)
   background-color: var(--color-bg-card-hover);
 }
 
+/* ── Tables zebra + density ──────────────────────────────── */
+/* Application : <table class="data-table"> ou wrap <tbody class="data-tbody"> */
+.data-table tbody tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.012);
+}
+[data-theme="light"] .data-table tbody tr:nth-child(even) {
+  background-color: rgba(0, 0, 0, 0.018);
+}
+.data-table tbody tr {
+  transition: background-color 0.12s ease;
+}
+.data-table tbody tr:hover {
+  background-color: var(--color-bg-hover) !important;
+}
+
+/* Headers de tableaux */
+.data-thead {
+  background: var(--color-bg-raised);
+  border-bottom: 1px solid var(--color-border);
+}
+.data-thead th {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+  padding: 10px 16px;
+  text-align: left;
+}
+
+/* ╔══════════════════════════════════════════════════════════════╗
+   ║  SKELETONS - placeholders pendant le loading                 ║
+   ╚══════════════════════════════════════════════════════════════╝ */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-card) 0%,
+    var(--color-bg-hover) 50%,
+    var(--color-bg-card) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius-sm);
+}
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.skeleton-text {
+  display: inline-block;
+  height: 0.9em;
+  vertical-align: middle;
+}
+.skeleton-circle {
+  border-radius: 999px;
+}
+
 /* ── Section header ──────────────────────────────────────── */
 .section-title {
   font-size: 16px;

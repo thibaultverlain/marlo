@@ -67,7 +67,7 @@ export default function VelocityTable({
   return (
     <div className="card-static overflow-hidden">
       <div className="overflow-x-auto">
-        <table className="w-full text-[13px]">
+        <table className="w-full text-[13px] data-table">
           <thead className="bg-[var(--color-bg-raised)] border-b border-[var(--color-border)]">
             <tr className="text-left">
               <Th>{groupBy === "brand" ? "Marque" : groupBy === "category" ? "Categorie" : "Canal"}</Th>

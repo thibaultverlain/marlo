@@ -1,5 +1,5 @@
 import {
-  TrendingUp, Package, AlertTriangle, Truck, ShoppingCart, Percent,
+  TrendingUp, Package, Truck, ShoppingCart,
   Plus, Flame, ListTodo, Search,
 } from "lucide-react";
 import Link from "next/link";
@@ -13,6 +13,9 @@ import { getActiveSourcingCount } from "@/lib/db/queries/sourcing";
 import { getAuthContext } from "@/lib/auth/require-role";
 import { CHANNELS } from "@/lib/data";
 import RevenueChart from "@/components/dashboard/revenue-chart";
+import MonthlyGoalCard from "@/components/dashboard/monthly-goal-card";
+import ActionBar, { type Action } from "@/components/dashboard/action-bar";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export const dynamic = "force-dynamic";
 
@@ -123,64 +126,29 @@ export default async function DashboardPage() {
 
   const today = new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date());
 
-  // Today actions cards
-  const actionCards = [
-    {
-      key: "tasks_overdue",
-      show: todayActions.tasksOverdue > 0,
-      icon: Flame,
-      iconBg: "bg-red-500/10",
-      iconColor: "text-red-400",
-      label: "Taches en retard",
-      count: todayActions.tasksOverdue,
-      href: "/tasks?filter=open",
-      borderColor: "border-red-500/15",
+  // A faire — actions urgentes du jour, classees par gravite
+  const actions: Action[] = [
+    todayActions.tasksOverdue > 0 && {
+      key: "tasks_overdue", icon: Flame, label: "Taches en retard",
+      count: todayActions.tasksOverdue, href: "/tasks?filter=open", tone: "danger" as const,
     },
-    {
-      key: "tasks_today",
-      show: todayActions.tasksToday > 0,
-      icon: ListTodo,
-      iconBg: "bg-amber-500/10",
-      iconColor: "text-amber-400",
-      label: "Taches aujourd'hui",
-      count: todayActions.tasksToday,
-      href: "/tasks?filter=open",
-      borderColor: "border-amber-500/15",
+    pendingShipments > 0 && {
+      key: "shipments", icon: Truck, label: "Colis a expedier",
+      count: pendingShipments, href: "/orders?status=a_expedier", tone: "warning" as const,
     },
-    {
-      key: "shipments",
-      show: pendingShipments > 0,
-      icon: Truck,
-      iconBg: "bg-amber-500/10",
-      iconColor: "text-amber-400",
-      label: "Colis a expedier",
-      count: pendingShipments,
-      href: "/orders?status=a_expedier",
-      borderColor: "border-amber-500/15",
+    todayActions.sourcingUrgent > 0 && {
+      key: "sourcing_urgent", icon: Search, label: "Sourcings urgents",
+      count: todayActions.sourcingUrgent, href: "/sourcing", tone: "warning" as const,
     },
-    {
-      key: "sourcing_urgent",
-      show: todayActions.sourcingUrgent > 0,
-      icon: Search,
-      iconBg: "bg-rose-500/10",
-      iconColor: "text-rose-400",
-      label: "Sourcings urgents",
-      count: todayActions.sourcingUrgent,
-      href: "/sourcing",
-      borderColor: "border-rose-500/15",
+    todayActions.tasksToday > 0 && {
+      key: "tasks_today", icon: ListTodo, label: "Taches du jour",
+      count: todayActions.tasksToday, href: "/tasks?filter=open", tone: "accent" as const,
     },
-    {
-      key: "dormant",
-      show: dormant > 0,
-      icon: Package,
-      iconBg: "bg-zinc-500/10",
-      iconColor: "text-zinc-400",
-      label: "Articles dormants",
-      count: dormant,
-      href: "/products?status=en_vente",
-      borderColor: "border-zinc-500/15",
+    dormant > 0 && {
+      key: "dormant", icon: Package, label: "Articles dormants",
+      count: dormant, href: "/products/dormants", tone: "neutral" as const,
     },
-  ].filter((c) => c.show);
+  ].filter((a): a is Action => Boolean(a));
 
   return (
     <div className="space-y-5 page-enter">
@@ -219,104 +187,63 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* Row 1: Featured CA + 3 KPIs */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
-        {/* Featured CA total */}
-        <div className="lg:col-span-5 kpi-featured p-6">
-          <div className="flex items-start justify-between">
-            <p className="text-[13px] font-medium text-zinc-400">Chiffre d'affaires total</p>
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-              <TrendingUp size={20} className="text-emerald-400" />
-            </div>
-          </div>
-          <p className="text-[40px] font-bold tabular-nums tracking-tight leading-none gradient-text mt-3">{formatCurrency(totalRevenue)}</p>
-          <p className="text-[12px] text-zinc-500 mt-2">{totalCount} vente{totalCount > 1 ? "s" : ""}</p>
-          <div className="flex gap-8 mt-5 pt-4 border-t border-white/[0.04]">
-            <div>
-              <p className="text-[10px] text-zinc-500 uppercase tracking-wider">Ce mois</p>
-              <div className="flex items-baseline gap-2 mt-1">
-                <span className="text-[14px] text-zinc-300 tabular-nums font-medium">{formatCurrency(currentMonthRevenue)}</span>
-                {prevMonthRevenue > 0 && (
-                  <span className={monthChange >= 0 ? "text-emerald-400 text-[12px] font-semibold" : "text-red-400 text-[12px] font-semibold"}>
-                    {monthChange >= 0 ? "+" : ""}{monthChange.toFixed(0)}%
-                  </span>
-                )}
-              </div>
-            </div>
-            <div>
-              <p className="text-[10px] text-zinc-500 uppercase tracking-wider">Aujourd'hui</p>
-              <div className="flex items-baseline gap-2 mt-1">
-                <span className="text-[14px] text-zinc-300 tabular-nums font-medium">{formatCurrency(todayRevenue)}</span>
-                <span className="text-zinc-500 text-[12px]">{todayCount} vente{todayCount > 1 ? "s" : ""}</span>
-              </div>
-            </div>
-          </div>
-        </div>
+      {/* ───────────────────────────────────────────
+          HIERARCHIE :
+          1. FOCUS principal — Objectif mensuel (la carte hero)
+          2. A FAIRE — barre compacte avec les urgences du jour
+          3. CHART — graphe CA (le second focus)
+          4. KPIs secondaires — discrets, en bas
+          5. Recent sales — recap
+         ─────────────────────────────────────────── */}
 
-        {/* 3 KPI cards principaux */}
-        <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div className="kpi-card p-4 flex flex-col justify-between min-h-[120px]">
-            <div className="flex items-start justify-between">
-              <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Marge totale</p>
-              <div className="w-9 h-9 rounded-xl bg-rose-500/10 flex items-center justify-center"><TrendingUp size={18} className="text-rose-400" /></div>
-            </div>
-            <div className="mt-auto">
-              <p className="text-[22px] font-bold tabular-nums text-white">{formatCurrency(totalMargin)}</p>
-              <p className="text-[11px] text-zinc-500 mt-1">{avgMarginPct.toFixed(0)}% en moyenne</p>
-            </div>
+      {/* 1. Focus : Objectif mensuel */}
+      <MonthlyGoalCard
+        currentMonthRevenue={currentMonthRevenue}
+        previousMonthRevenue={prevMonthRevenue}
+        monthCount={monthCount}
+      />
+
+      {/* 2. A faire — barre compacte */}
+      <ActionBar actions={actions} />
+
+      {/* 3. Chart — second focus */}
+      <RevenueChart initialData={chartData} />
+
+      {/* 4. KPIs secondaires — discrets */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="card-static p-4">
+          <div className="flex items-start justify-between mb-3">
+            <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">CA total</p>
+            <TrendingUp size={14} className="text-emerald-400" />
           </div>
-          <div className="kpi-card p-4 flex flex-col justify-between min-h-[120px]">
-            <div className="flex items-start justify-between">
-              <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Stock</p>
-              <div className="w-9 h-9 rounded-xl bg-rose-500/10 flex items-center justify-center"><Package size={18} className="text-rose-400" /></div>
-            </div>
-            <div className="mt-auto">
-              <p className="text-[22px] font-bold tabular-nums text-white">{inStock}</p>
-              <p className="text-[11px] text-zinc-500 mt-1">{formatCurrency(stockValue)}</p>
-            </div>
+          <p className="text-xl font-bold tabular-nums text-white">{formatCurrency(totalRevenue)}</p>
+          <p className="text-[11px] text-zinc-500 mt-1">{totalCount} vente{totalCount > 1 ? "s" : ""} au total</p>
+        </div>
+        <div className="card-static p-4">
+          <div className="flex items-start justify-between mb-3">
+            <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">Marge totale</p>
+            <TrendingUp size={14} className="text-rose-400" />
           </div>
-          <div className="kpi-card p-4 flex flex-col justify-between min-h-[120px]">
-            <div className="flex items-start justify-between">
-              <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Ventes ce mois</p>
-              <div className="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center"><ShoppingCart size={18} className="text-emerald-400" /></div>
-            </div>
-            <div className="mt-auto">
-              <p className="text-[22px] font-bold tabular-nums text-white">{monthCount}</p>
-              <p className="text-[11px] text-zinc-500 mt-1">{formatCurrency(currentMonthRevenue)}</p>
-            </div>
+          <p className="text-xl font-bold tabular-nums text-emerald-400">{formatCurrency(totalMargin)}</p>
+          <p className="text-[11px] text-zinc-500 mt-1">{avgMarginPct.toFixed(0)}% en moyenne</p>
+        </div>
+        <div className="card-static p-4">
+          <div className="flex items-start justify-between mb-3">
+            <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">Stock</p>
+            <Package size={14} className="text-zinc-400" />
           </div>
+          <p className="text-xl font-bold tabular-nums text-white">{inStock}</p>
+          <p className="text-[11px] text-zinc-500 mt-1">{formatCurrency(stockValue)} immobilises</p>
+        </div>
+        <div className="card-static p-4">
+          <div className="flex items-start justify-between mb-3">
+            <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">Aujourd'hui</p>
+            <ShoppingCart size={14} className="text-emerald-400" />
+          </div>
+          <p className="text-xl font-bold tabular-nums text-white">{formatCurrency(todayRevenue)}</p>
+          <p className="text-[11px] text-zinc-500 mt-1">{todayCount} vente{todayCount > 1 ? "s" : ""}</p>
         </div>
       </div>
-
-      {/* A faire aujourd'hui - cards cliquables */}
-      {actionCards.length > 0 && (
-        <div>
-          <h2 className="text-[13px] font-semibold text-zinc-400 mb-2.5 uppercase tracking-wider">
-            A faire {actionCards.length > 0 && <span className="text-rose-400">({actionCards.length})</span>}
-          </h2>
-          <div className="grid grid-cols-2 lg:grid-cols-5 gap-2.5">
-            {actionCards.map((a) => {
-              const Icon = a.icon;
-              return (
-                <Link
-                  key={a.key}
-                  href={a.href}
-                  className={`card-static p-3 hover:bg-[var(--color-bg-hover)] transition-all border ${a.borderColor} group`}
-                >
-                  <div className={`w-8 h-8 rounded-lg ${a.iconBg} flex items-center justify-center mb-2`}>
-                    <Icon size={14} className={a.iconColor} />
-                  </div>
-                  <p className="text-[20px] font-bold text-white tabular-nums leading-none">{a.count}</p>
-                  <p className="text-[10px] text-zinc-500 mt-1 truncate">{a.label}</p>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Chart */}
-      <RevenueChart initialData={chartData} />
 
       {/* Recent sales */}
       <div className="card-static overflow-hidden">
@@ -326,12 +253,16 @@ export default async function DashboardPage() {
         </div>
 
         {recentSales.length === 0 ? (
-          <div className="px-5 py-10 text-center">
-            <p className="text-zinc-500 text-sm">Aucune vente enregistree</p>
-          </div>
+          <EmptyState
+            icon={ShoppingCart}
+            title="Aucune vente enregistree"
+            description="Enregistre ta premiere vente pour commencer a tracker ton chiffre d'affaires et tes marges."
+            action={{ href: "/sales/new", label: "Nouvelle vente" }}
+            variant="inline"
+          />
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-[13px]">
+            <table className="w-full text-[13px] data-table">
               <thead>
                 <tr className="text-[11px] text-zinc-500 uppercase tracking-wider border-b border-[var(--color-border)]">
                   <th className="text-left px-5 py-3 font-medium">Article</th>
