@@ -101,19 +101,19 @@ export default function AnalyticsClient({ initialData }: { initialData: any }) {
               <p className="text-[13px] font-semibold text-white">Vitesse de vente</p>
               <p className="text-[11px] text-zinc-500 mt-0.5 truncate">Combien de jours par marque, categorie, canal</p>
             </div>
-            <ChevronRight size={14} className="text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+            <ChevronRight size={14} className="text-zinc-500 group-hover:text-zinc-400 transition-colors" />
           </div>
         </Link>
         <Link href="/analytics/best-sellers" className="block card-static p-4 hover:border-[var(--color-border-hover)] transition-all group">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-yellow-500/10 flex items-center justify-center flex-shrink-0">
-              <Trophy size={16} className="text-yellow-400" />
+            <div className="w-9 h-9 rounded-xl bg-amber-500/10 flex items-center justify-center flex-shrink-0">
+              <Trophy size={16} className="text-amber-400" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-[13px] font-semibold text-white">Best sellers</p>
               <p className="text-[11px] text-zinc-500 mt-0.5 truncate">Top marques, categories et produits par rotation</p>
             </div>
-            <ChevronRight size={14} className="text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+            <ChevronRight size={14} className="text-zinc-500 group-hover:text-zinc-400 transition-colors" />
           </div>
         </Link>
       </div>
@@ -124,7 +124,7 @@ export default function AnalyticsClient({ initialData }: { initialData: any }) {
           <div className="kpi-card p-4 flex flex-col justify-between min-h-[110px]">
             <div className="flex items-start justify-between">
               <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">CA ce mois</p>
-              <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center"><ShoppingCart size={15} className="text-blue-400" /></div>
+              <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center"><ShoppingCart size={15} className="text-emerald-400" /></div>
             </div>
             <div className="mt-auto">
               <p className="text-[22px] font-bold tabular-nums text-white">{formatCurrency(data.comparison.currentRevenue)}</p>
@@ -152,18 +152,18 @@ export default function AnalyticsClient({ initialData }: { initialData: any }) {
           <div className="kpi-card p-4 flex flex-col justify-between min-h-[110px]">
             <div className="flex items-start justify-between">
               <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Marge moyenne</p>
-              <div className="w-8 h-8 rounded-xl bg-cyan-500/10 flex items-center justify-center"><Percent size={15} className="text-cyan-400" /></div>
+              <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center"><Percent size={15} className="text-emerald-400" /></div>
             </div>
             <p className="text-[22px] font-bold tabular-nums text-white mt-auto">{formatPercent(data.comparison.currentMarginPct ?? 0)}</p>
           </div>
           <div className="kpi-card p-4 flex flex-col justify-between min-h-[110px]">
             <div className="flex items-start justify-between">
               <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Ventes ce mois</p>
-              <div className="w-8 h-8 rounded-xl bg-violet-500/10 flex items-center justify-center"><BarChart3 size={15} className="text-violet-400" /></div>
+              <div className="w-8 h-8 rounded-xl bg-rose-500/10 flex items-center justify-center"><BarChart3 size={15} className="text-rose-400" /></div>
             </div>
             <div className="mt-auto">
               <p className="text-[22px] font-bold tabular-nums text-white">{data.comparison.currentCount}</p>
-              <p className="text-[11px] text-zinc-600 mt-0.5">vs {data.comparison.previousCount} mois dernier</p>
+              <p className="text-[11px] text-zinc-500 mt-0.5">vs {data.comparison.previousCount} mois dernier</p>
             </div>
           </div>
         </div>
@@ -247,7 +247,7 @@ export default function AnalyticsClient({ initialData }: { initialData: any }) {
               </tbody>
             </table>
           </div>
-        ) : <p className="text-zinc-600 text-sm">Pas de donnees</p>}
+        ) : <p className="text-zinc-500 text-sm">Pas de donnees</p>}
       </div>
 
       {/* Two columns: Category perf + Channel margin */}
@@ -270,7 +270,7 @@ export default function AnalyticsClient({ initialData }: { initialData: any }) {
                 </BarChart>
               </ResponsiveContainer>
             </div>
-          ) : <p className="text-zinc-600 text-sm">Pas de donnees</p>}
+          ) : <p className="text-zinc-500 text-sm">Pas de donnees</p>}
         </div>
 
         <div className="card-static p-6">
@@ -285,21 +285,21 @@ export default function AnalyticsClient({ initialData }: { initialData: any }) {
                     <div className="flex justify-between items-center mb-1.5">
                       <span className="text-sm text-zinc-300">{label}</span>
                       <div className="flex items-center gap-3">
-                        <span className="text-[11px] text-zinc-600">{c.count} vente{c.count > 1 ? "s" : ""}</span>
+                        <span className="text-[11px] text-zinc-500">{c.count} vente{c.count > 1 ? "s" : ""}</span>
                         <span className="text-sm font-medium text-white tabular-nums">{formatPercent(c.avgMarginPct)}</span>
                       </div>
                     </div>
                     <div className="w-full h-2 bg-[var(--color-bg-hover)] rounded-full overflow-hidden">
                       <div className="h-full rounded-full bg-gradient-to-r from-rose-500 to-rose-400" style={{ width: `${pct}%` }} />
                     </div>
-                    <p className="text-[10px] text-zinc-600 mt-1">
+                    <p className="text-[10px] text-zinc-500 mt-1">
                       Marge moy. : {formatCurrency(c.avgMargin)} par vente
                     </p>
                   </div>
                 );
               })}
             </div>
-          ) : <p className="text-zinc-600 text-sm">Pas de donnees</p>}
+          ) : <p className="text-zinc-500 text-sm">Pas de donnees</p>}
         </div>
       </div>
 
@@ -329,7 +329,7 @@ export default function AnalyticsClient({ initialData }: { initialData: any }) {
               </div>
             ))}
           </div>
-        ) : <p className="text-zinc-600 text-sm">Pas de donnees</p>}
+        ) : <p className="text-zinc-500 text-sm">Pas de donnees</p>}
       </div>
 
       <div className="pb-8" />

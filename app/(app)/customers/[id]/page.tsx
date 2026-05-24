@@ -139,14 +139,14 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
           <div className="kpi-card p-4 flex flex-col justify-between min-h-[100px]">
             <div className="flex items-start justify-between">
               <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Commandes</p>
-              <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center"><ShoppingCart size={15} className="text-blue-400" /></div>
+              <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center"><ShoppingCart size={15} className="text-emerald-400" /></div>
             </div>
             <p className="text-[20px] font-bold text-white mt-auto">{metrics.count}</p>
           </div>
           <div className="kpi-card p-4 flex flex-col justify-between min-h-[100px]">
             <div className="flex items-start justify-between">
               <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Panier moyen</p>
-              <div className="w-8 h-8 rounded-xl bg-violet-500/10 flex items-center justify-center"><Package size={15} className="text-violet-400" /></div>
+              <div className="w-8 h-8 rounded-xl bg-rose-500/10 flex items-center justify-center"><Package size={15} className="text-rose-400" /></div>
             </div>
             <p className="text-[20px] font-bold text-white tabular-nums mt-auto">{formatCurrency(metrics.avgBasket)}</p>
           </div>
@@ -157,7 +157,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             </div>
             <div className="mt-auto">
               <p className="text-[20px] font-bold text-white">{metrics.frequencyDays ? `${metrics.frequencyDays}j` : "—"}</p>
-              {metrics.frequencyDays && <p className="text-[10px] text-zinc-600 mt-0.5">entre chaque achat</p>}
+              {metrics.frequencyDays && <p className="text-[10px] text-zinc-500 mt-0.5">entre chaque achat</p>}
             </div>
           </div>
         </div>
@@ -195,30 +195,30 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
           <div className="space-y-2.5 text-sm">
             {customer.email && (
               <a href={`mailto:${customer.email}`} className="flex items-center gap-2.5 group">
-                <Mail size={14} className="text-zinc-600 flex-shrink-0" />
+                <Mail size={14} className="text-zinc-500 flex-shrink-0" />
                 <span className="text-zinc-300 group-hover:text-rose-400 transition-colors truncate">{customer.email}</span>
               </a>
             )}
             {customer.phone && (
               <a href={`tel:${customer.phone}`} className="flex items-center gap-2.5 group">
-                <Phone size={14} className="text-zinc-600 flex-shrink-0" />
+                <Phone size={14} className="text-zinc-500 flex-shrink-0" />
                 <span className="text-zinc-300 group-hover:text-rose-400 transition-colors">{customer.phone}</span>
               </a>
             )}
             {customer.instagram && (
               <a href={`https://instagram.com/${customer.instagram.replace("@", "")}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2.5 group">
-                <AtSign size={14} className="text-zinc-600 flex-shrink-0" />
+                <AtSign size={14} className="text-zinc-500 flex-shrink-0" />
                 <span className="text-zinc-300 group-hover:text-rose-400 transition-colors">{customer.instagram}</span>
               </a>
             )}
             {customer.address && (
               <div className="flex items-start gap-2.5">
-                <MapPin size={14} className="text-zinc-600 flex-shrink-0 mt-0.5" />
+                <MapPin size={14} className="text-zinc-500 flex-shrink-0 mt-0.5" />
                 <span className="text-zinc-300">{customer.address}</span>
               </div>
             )}
             {!customer.email && !customer.phone && !customer.instagram && !customer.address && (
-              <p className="text-[12px] text-zinc-600">Aucun contact renseigne</p>
+              <p className="text-[12px] text-zinc-500">Aucun contact renseigne</p>
             )}
           </div>
         </div>
@@ -250,7 +250,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
           <h2 className="text-[15px] font-semibold text-white mb-4">Preferences</h2>
           {customer.preferredBrands && customer.preferredBrands.length > 0 && (
             <div className="mb-4">
-              <p className="text-[11px] font-medium text-zinc-600 uppercase tracking-wider mb-2">Marques favorites</p>
+              <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-2">Marques favorites</p>
               <div className="flex gap-1.5 flex-wrap">
                 {customer.preferredBrands.map((b) => (
                   <span key={b} className="px-2.5 py-1 bg-[var(--color-bg-hover)] rounded text-xs text-zinc-300">{b}</span>
@@ -261,13 +261,13 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
             {customer.preferredSizes && (
               <div>
-                <p className="text-[11px] font-medium text-zinc-600 uppercase tracking-wider">Tailles</p>
+                <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Tailles</p>
                 <p className="text-zinc-300 mt-0.5">{customer.preferredSizes}</p>
               </div>
             )}
             {customer.budgetRange && (
               <div>
-                <p className="text-[11px] font-medium text-zinc-600 uppercase tracking-wider">Budget</p>
+                <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Budget</p>
                 <p className="text-zinc-300 mt-0.5">{customer.budgetRange}</p>
               </div>
             )}
@@ -281,14 +281,14 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
           <h2 className="text-[15px] font-semibold text-white flex items-center gap-2">
             <ShoppingCart size={15} className="text-zinc-500" />
             Historique d'achats
-            <span className="text-[11px] text-zinc-600 font-normal ml-1">({salesHistory.length})</span>
+            <span className="text-[11px] text-zinc-500 font-normal ml-1">({salesHistory.length})</span>
           </h2>
         </div>
 
         {salesHistory.length === 0 ? (
           <div className="p-10 text-center">
             <Package size={32} className="mx-auto text-zinc-700 mb-2" />
-            <p className="text-sm text-zinc-600 mb-4">Aucun achat enregistre</p>
+            <p className="text-sm text-zinc-500 mb-4">Aucun achat enregistre</p>
             <Link href={`/sales/new?customerId=${customer.id}`} className="inline-flex items-center gap-2 px-4 py-2 text-[13px] font-semibold text-white bg-rose-500 rounded-lg hover:bg-rose-400 transition-colors">
               <ShoppingCart size={13} />
               Enregistrer une vente
@@ -307,7 +307,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                       <span className="text-zinc-700">·</span>
                       <span className="text-[11px] text-zinc-500">{channelLabel}</span>
                       <span className="text-zinc-700">·</span>
-                      <span className="text-[11px] text-zinc-600">{formatDate(sale.soldAt)}</span>
+                      <span className="text-[11px] text-zinc-500">{formatDate(sale.soldAt)}</span>
                     </div>
                   </div>
                   <div className="text-right flex-shrink-0">

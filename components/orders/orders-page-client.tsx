@@ -44,7 +44,7 @@ type Counts = {
 
 const SHIPPING_STATUS = {
   a_expedier: { label: "A expedier", icon: Package, cl: "text-amber-400 bg-amber-500/10 border-amber-500/20" },
-  expedie: { label: "Expedie", icon: Truck, cl: "text-blue-400 bg-blue-500/10 border-blue-500/20" },
+  expedie: { label: "Expedie", icon: Truck, cl: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" },
   livre: { label: "Livre", icon: CheckCircle2, cl: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" },
   retourne: { label: "Retourne", icon: RotateCcw, cl: "text-red-400 bg-red-500/10 border-red-500/20" },
 } as const;
@@ -194,7 +194,7 @@ export default function OrdersPageClient({
         <p className="text-zinc-500 mt-1 text-sm">
           {counts.aExpedier > 0 && <span className="text-amber-400 font-medium">{counts.aExpedier} a expedier</span>}
           {counts.aExpedier > 0 && counts.expedie > 0 && " · "}
-          {counts.expedie > 0 && <span className="text-blue-400">{counts.expedie} en transit</span>}
+          {counts.expedie > 0 && <span className="text-emerald-400">{counts.expedie} en transit</span>}
         </p>
       </div>
 
@@ -210,7 +210,7 @@ export default function OrdersPageClient({
         <div className="kpi-card p-4 flex flex-col justify-between min-h-[100px]">
           <div className="flex items-start justify-between">
             <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">En transit</p>
-            <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center"><Truck size={16} className="text-blue-400" /></div>
+            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center"><Truck size={16} className="text-emerald-400" /></div>
           </div>
           <p className="text-[22px] font-bold tabular-nums text-white mt-auto">{counts.expedie}</p>
         </div>
@@ -265,13 +265,13 @@ export default function OrdersPageClient({
       {/* Search + sort */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600" />
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
           <input
             type="text"
             placeholder="Rechercher (article, marque, SKU, client, tracking)..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-[13px] bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-rose-500/50 text-zinc-200 placeholder:text-zinc-600"
+            className="w-full pl-9 pr-4 py-2 text-[13px] bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-rose-500/50 text-zinc-200 placeholder:text-zinc-500"
           />
         </div>
         <div className="relative">
@@ -352,7 +352,7 @@ export default function OrdersPageClient({
                 onChange={toggleSelectAll}
                 className="w-3.5 h-3.5 rounded border-[var(--color-border)] bg-[var(--color-bg)] text-rose-500 focus:ring-rose-500 focus:ring-1"
               />
-              <span className="ml-3 text-[11px] text-zinc-600 uppercase tracking-wider font-semibold">
+              <span className="ml-3 text-[11px] text-zinc-500 uppercase tracking-wider font-semibold">
                 Tout selectionner ({filtered.length})
               </span>
             </div>
@@ -414,14 +414,14 @@ export default function OrdersPageClient({
                         </>
                       )}
                       <span className="text-zinc-700">·</span>
-                      <span className="text-zinc-600">{relativeDate(order.soldAt)}</span>
+                      <span className="text-zinc-500">{relativeDate(order.soldAt)}</span>
                     </div>
                     {order.trackingNumber && !isEditingThis && (
                       <div className="flex items-center gap-1.5 mt-1.5">
-                        <span className="text-[10px] text-zinc-600">Suivi :</span>
-                        <code className="text-[11px] text-blue-400 font-mono">{order.trackingNumber}</code>
+                        <span className="text-[10px] text-zinc-500">Suivi :</span>
+                        <code className="text-[11px] text-emerald-400 font-mono">{order.trackingNumber}</code>
                         <button onClick={(e) => { e.preventDefault(); handleCopy(order.trackingNumber!, order.id); }}
-                          className="p-0.5 rounded hover:bg-[var(--color-bg-hover)] text-zinc-600 hover:text-zinc-300 transition">
+                          className="p-0.5 rounded hover:bg-[var(--color-bg-hover)] text-zinc-500 hover:text-zinc-300 transition">
                           {copied === order.id ? <Check size={10} className="text-emerald-400" /> : <Copy size={10} />}
                         </button>
                       </div>
@@ -463,7 +463,7 @@ export default function OrdersPageClient({
                     <input type="text" placeholder="Numero de suivi (optionnel)" value={trackingInput}
                       onChange={(e) => setTrackingInput(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleTrackingSave(order.id)}
-                      className="flex-1 min-w-[180px] bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-[13px] text-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-rose-500/50 font-mono"
+                      className="flex-1 min-w-[180px] bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg px-3 py-1.5 text-[13px] text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-rose-500/50 font-mono"
                       autoFocus />
                     <button onClick={() => handleTrackingSave(order.id)} disabled={isPending}
                       className="px-3 py-1.5 text-[12px] font-semibold text-[var(--color-text-inverse)] bg-rose-500 rounded-lg hover:bg-rose-400 transition disabled:opacity-50">

@@ -24,7 +24,7 @@ type Req = {
 };
 
 const STATUS_MAP: Record<string, { label: string; cl: string; icon: any }> = {
-  ouvert: { label: "Ouvert", cl: "bg-blue-500/15 text-blue-400 border-blue-500/20", icon: Search },
+  ouvert: { label: "Ouvert", cl: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20", icon: Search },
   en_recherche: { label: "En recherche", cl: "bg-amber-500/15 text-amber-400 border-amber-500/20", icon: Clock },
   trouve: { label: "Trouve", cl: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20", icon: CheckCircle },
   achete: { label: "Achete", cl: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20", icon: Package },
@@ -117,13 +117,13 @@ export default function SourcingListClient({ requests }: { requests: Req[] }) {
       {/* Search + sort */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600" />
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
           <input
             type="text"
             placeholder="Rechercher (description, marque, modele, client)..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-[13px] bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-rose-500/50 text-zinc-200 placeholder:text-zinc-600"
+            className="w-full pl-9 pr-4 py-2 text-[13px] bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-rose-500/50 text-zinc-200 placeholder:text-zinc-500"
           />
         </div>
         <div className="relative">
@@ -163,7 +163,7 @@ export default function SourcingListClient({ requests }: { requests: Req[] }) {
       ) : (
         <div className="card-static overflow-hidden">
           <div className="px-5 py-2.5 border-b border-[var(--color-border)] bg-[var(--color-bg)]/30">
-            <span className="text-[11px] text-zinc-600 uppercase tracking-wider font-semibold">
+            <span className="text-[11px] text-zinc-500 uppercase tracking-wider font-semibold">
               {filtered.length} resultat{filtered.length > 1 ? "s" : ""}
             </span>
           </div>
@@ -223,7 +223,7 @@ export default function SourcingListClient({ requests }: { requests: Req[] }) {
                       {req.deadline && !isUrgent && !isWarning && !isOverdue && (
                         <>
                           <span className="text-zinc-700">·</span>
-                          <span className="text-zinc-600">Deadline {formatDate(req.deadline)}</span>
+                          <span className="text-zinc-500">Deadline {formatDate(req.deadline)}</span>
                         </>
                       )}
                     </div>

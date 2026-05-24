@@ -27,7 +27,7 @@ const STATUS_CONFIG = {
 const PRIORITY_CONFIG = {
   haute: { label: "Haute", icon: ArrowUp, cl: "text-red-400" },
   normale: { label: "Normale", icon: ArrowRight, cl: "text-zinc-500" },
-  basse: { label: "Basse", icon: ArrowDown, cl: "text-zinc-600" },
+  basse: { label: "Basse", icon: ArrowDown, cl: "text-zinc-500" },
 } as const;
 
 const SORT_OPTIONS = [
@@ -205,14 +205,14 @@ export default function TasksPageClient({
         <div className="kpi-card p-4 flex flex-col justify-between min-h-[100px]">
           <div className="flex items-start justify-between">
             <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">En cours</p>
-            <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center"><Circle size={16} className="text-blue-400" /></div>
+            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center"><Circle size={16} className="text-emerald-400" /></div>
           </div>
           <p className="text-[22px] font-bold tabular-nums text-white mt-auto">{counts.open}</p>
         </div>
         <div className="kpi-card p-4 flex flex-col justify-between min-h-[100px]">
           <div className="flex items-start justify-between">
             <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Mes taches</p>
-            <div className="w-8 h-8 rounded-xl bg-violet-500/10 flex items-center justify-center"><ListTodo size={16} className="text-violet-400" /></div>
+            <div className="w-8 h-8 rounded-xl bg-rose-500/10 flex items-center justify-center"><ListTodo size={16} className="text-rose-400" /></div>
           </div>
           <p className="text-[22px] font-bold tabular-nums text-white mt-auto">{counts.mine}</p>
         </div>
@@ -263,7 +263,7 @@ export default function TasksPageClient({
             placeholder="Ex: Expedier la commande Gucci Jordaan"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg px-4 py-2.5 text-sm text-[var(--color-text)] placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-rose-500/50"
+            className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg px-4 py-2.5 text-sm text-[var(--color-text)] placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-rose-500/50"
             autoFocus
             onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleCreate()}
           />
@@ -272,7 +272,7 @@ export default function TasksPageClient({
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={2}
-            className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg px-4 py-2.5 text-sm text-[var(--color-text)] placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-rose-500/50 resize-none"
+            className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg px-4 py-2.5 text-sm text-[var(--color-text)] placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-rose-500/50 resize-none"
           />
           <div className="flex flex-wrap gap-2">
             <select
@@ -342,13 +342,13 @@ export default function TasksPageClient({
       {/* Search + secondary filters + sort */}
       <div className="flex flex-col sm:flex-row gap-2">
         <div className="relative flex-1">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600" />
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
           <input
             type="text"
             placeholder="Rechercher..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-[13px] bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-rose-500/50 text-zinc-200 placeholder:text-zinc-600"
+            className="w-full pl-9 pr-4 py-2 text-[13px] bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-rose-500/50 text-zinc-200 placeholder:text-zinc-500"
           />
         </div>
         <div className="flex gap-2 flex-wrap">
@@ -469,7 +469,7 @@ export default function TasksPageClient({
                     ) : (
                       <>
                         <div className="flex items-center gap-2">
-                          <p className={`text-[13px] font-medium ${done ? "line-through text-zinc-600" : "text-zinc-200"}`}>
+                          <p className={`text-[13px] font-medium ${done ? "line-through text-zinc-500" : "text-zinc-200"}`}>
                             {task.title}
                           </p>
                           {task.priority === "haute" && !done && <PriorityIcon size={12} className={pr.cl} />}
@@ -485,7 +485,7 @@ export default function TasksPageClient({
                             </span>
                           )}
                           {task.assignedTo && (
-                            <span className="text-[11px] text-zinc-600 flex items-center gap-1">
+                            <span className="text-[11px] text-zinc-500 flex items-center gap-1">
                               · {memberLabel(task.assignedTo, currentUserId, members)}
                             </span>
                           )}
@@ -509,13 +509,13 @@ export default function TasksPageClient({
                             onClick={() => task.status === "a_faire" ? handleStatusChange(task.id, "en_cours") : handleStatusChange(task.id, "a_faire")}
                             disabled={isPending}
                             title={task.status === "a_faire" ? "Marquer en cours" : "Revenir a faire"}
-                            className="p-1.5 rounded hover:bg-[var(--color-bg-hover)] text-zinc-600 hover:text-zinc-300 transition"
+                            className="p-1.5 rounded hover:bg-[var(--color-bg-hover)] text-zinc-500 hover:text-zinc-300 transition"
                           >
                             <Clock size={13} />
                           </button>
                           <button onClick={() => startEditing(task)} disabled={isPending}
                             title="Modifier"
-                            className="p-1.5 rounded hover:bg-[var(--color-bg-hover)] text-zinc-600 hover:text-zinc-300 transition">
+                            className="p-1.5 rounded hover:bg-[var(--color-bg-hover)] text-zinc-500 hover:text-zinc-300 transition">
                             <Edit2 size={13} />
                           </button>
                         </>

@@ -110,7 +110,7 @@ export default async function BestSellersPage({ searchParams }: { searchParams: 
             <p className="text-[14px] font-semibold text-white">Voir la vitesse de vente</p>
             <p className="text-[12px] text-zinc-500 mt-0.5">Detail par marque, categorie et canal</p>
           </div>
-          <ChevronRight size={16} className="text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+          <ChevronRight size={16} className="text-zinc-500 group-hover:text-zinc-400 transition-colors" />
         </div>
       </Link>
     </div>

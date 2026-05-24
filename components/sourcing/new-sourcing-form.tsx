@@ -6,7 +6,7 @@ import { createSourcingAction } from "@/lib/actions/sourcing";
 import { formatCurrency } from "@/lib/utils";
 import { LUXURY_BRANDS } from "@/lib/data";
 
-const inputClass = "w-full px-3 py-2.5 text-[13px] bg-[var(--color-bg-raised)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-rose-500/50 focus:border-rose-500/50 text-zinc-200 placeholder:text-zinc-600";
+const inputClass = "w-full px-3 py-2.5 text-[13px] bg-[var(--color-bg-raised)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-rose-500/50 focus:border-rose-500/50 text-zinc-200 placeholder:text-zinc-500";
 const labelClass = "block text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-1.5";
 
 export default function NewSourcingForm({ customers }: { customers: { id: string; name: string; vip: boolean }[] }) {
@@ -36,8 +36,8 @@ export default function NewSourcingForm({ customers }: { customers: { id: string
           <div><label className={labelClass}>Modèle</label><input type="text" value={form.model} onChange={(e) => updateField("model", e.target.value)} placeholder="Birkin 25..." className={inputClass} /></div>
         </div>
         <div className="border-t border-[var(--color-border)] pt-5"><h3 className="text-sm font-semibold text-zinc-300 mb-4">Budget et commission</h3><div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div><label className={labelClass}>Budget max</label><div className="relative"><input type="number" step="0.01" value={form.targetBudget} onChange={(e) => updateField("targetBudget", e.target.value)} placeholder="0" className={`${inputClass} pr-8`} /><span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zinc-600">€</span></div></div>
-          <div><label className={labelClass}>Commission</label><div className="relative"><input type="number" step="0.5" value={form.commissionRate} onChange={(e) => updateField("commissionRate", e.target.value)} className={`${inputClass} pr-8`} /><span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zinc-600">%</span></div></div>
+          <div><label className={labelClass}>Budget max</label><div className="relative"><input type="number" step="0.01" value={form.targetBudget} onChange={(e) => updateField("targetBudget", e.target.value)} placeholder="0" className={`${inputClass} pr-8`} /><span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zinc-500">€</span></div></div>
+          <div><label className={labelClass}>Commission</label><div className="relative"><input type="number" step="0.5" value={form.commissionRate} onChange={(e) => updateField("commissionRate", e.target.value)} className={`${inputClass} pr-8`} /><span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zinc-500">%</span></div></div>
         </div>{commPreview!==null&&<div className="mt-3 p-3 bg-rose-500/[0.08] border border-rose-500/20 rounded-lg text-sm text-rose-300">Commission estimée : <span className="font-semibold">{formatCurrency(commPreview)}</span></div>}</div>
         <div><label className={labelClass}>Deadline</label><input type="date" value={form.deadline} onChange={(e) => updateField("deadline", e.target.value)} className={inputClass} /></div>
         <div><label className={labelClass}>Notes</label><textarea value={form.notes} onChange={(e) => updateField("notes", e.target.value)} rows={3} placeholder="Précisions..." className={`${inputClass} resize-none`} /></div>

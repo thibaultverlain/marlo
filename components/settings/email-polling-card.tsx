@@ -199,7 +199,7 @@ export default function EmailPollingCard({
               required
               defaultValue={initial?.imapUsername}
               placeholder="marlo.ventes@gmail.com"
-              className="w-full px-3 py-2.5 text-[13px] bg-[var(--color-bg-raised)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-zinc-200 placeholder:text-zinc-600"
+              className="w-full px-3 py-2.5 text-[13px] bg-[var(--color-bg-raised)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-zinc-200 placeholder:text-zinc-500"
             />
           </Field>
           <Field label="Mot de passe (App Password)" htmlFor="password">
@@ -210,7 +210,7 @@ export default function EmailPollingCard({
                 type={showPassword ? "text" : "password"}
                 required
                 placeholder={initial ? "Laisser vide pour ne pas changer" : "xxxx xxxx xxxx xxxx"}
-                className="w-full px-3 py-2.5 pr-10 text-[13px] bg-[var(--color-bg-raised)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-zinc-200 placeholder:text-zinc-600"
+                className="w-full px-3 py-2.5 pr-10 text-[13px] bg-[var(--color-bg-raised)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-zinc-200 placeholder:text-zinc-500"
               />
               <button
                 type="button"
@@ -234,7 +234,7 @@ export default function EmailPollingCard({
               defaultValue={initial?.imapHost ?? preset?.host}
               key={preset?.host ?? "custom"}
               placeholder="imap.gmail.com"
-              className="w-full px-3 py-2.5 text-[13px] bg-[var(--color-bg-raised)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-zinc-200 placeholder:text-zinc-600"
+              className="w-full px-3 py-2.5 text-[13px] bg-[var(--color-bg-raised)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-zinc-200 placeholder:text-zinc-500"
             />
           </Field>
           <Field label="Port" htmlFor="imapPort">
@@ -245,7 +245,7 @@ export default function EmailPollingCard({
               required
               defaultValue={initial?.imapPort ?? preset?.port ?? 993}
               key={`port-${preset?.port ?? "custom"}`}
-              className="w-full px-3 py-2.5 text-[13px] bg-[var(--color-bg-raised)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-zinc-200 placeholder:text-zinc-600"
+              className="w-full px-3 py-2.5 text-[13px] bg-[var(--color-bg-raised)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-zinc-200 placeholder:text-zinc-500"
             />
           </Field>
           <Field label="Dossier" htmlFor="imapFolder">
@@ -254,7 +254,7 @@ export default function EmailPollingCard({
               name="imapFolder"
               type="text"
               defaultValue={initial?.imapFolder ?? "INBOX"}
-              className="w-full px-3 py-2.5 text-[13px] bg-[var(--color-bg-raised)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-zinc-200 placeholder:text-zinc-600"
+              className="w-full px-3 py-2.5 text-[13px] bg-[var(--color-bg-raised)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-zinc-200 placeholder:text-zinc-500"
             />
           </Field>
         </div>

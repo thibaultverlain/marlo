@@ -20,8 +20,8 @@ type SortKey = "days" | "purchase" | "target" | "potential_loss" | "brand";
 
 const SEVERITY_CONFIG = {
   watch:    { icon: Snowflake,     color: "text-zinc-400",    bg: "bg-zinc-500/8 border-zinc-500/20",    label: "Recent" },
-  warm:     { icon: AlertTriangle, color: "text-yellow-400",  bg: "bg-yellow-500/10 border-yellow-500/25", label: "Tiede" },
-  hot:      { icon: Flame,         color: "text-orange-400",  bg: "bg-orange-500/10 border-orange-500/25", label: "Chaud" },
+  warm:     { icon: AlertTriangle, color: "text-amber-400",  bg: "bg-amber-500/10 border-amber-500/25", label: "Tiede" },
+  hot:      { icon: Flame,         color: "text-amber-400",  bg: "bg-amber-500/10 border-amber-500/25", label: "Chaud" },
   critical: { icon: Skull,         color: "text-red-400",     bg: "bg-red-500/10 border-red-500/25",      label: "Critique" },
 };
 
@@ -141,7 +141,7 @@ export default function DormantsList({ products }: { products: Product[] }) {
       {/* Liste */}
       <div className="space-y-2">
         {/* Header desktop */}
-        <div className="hidden lg:grid grid-cols-[2fr_1fr_1fr_1fr_2fr_auto] gap-3 px-4 py-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
+        <div className="hidden lg:grid grid-cols-[2fr_1fr_1fr_1fr_2fr_auto] gap-3 px-4 py-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
           <SortHeader k="brand" current={sortKey} dir={sortDir} onClick={() => toggleSort("brand")}>Produit</SortHeader>
           <SortHeader k="days" current={sortKey} dir={sortDir} onClick={() => toggleSort("days")}>Jours</SortHeader>
           <SortHeader k="purchase" current={sortKey} dir={sortDir} onClick={() => toggleSort("purchase")}>Achete</SortHeader>
@@ -200,29 +200,29 @@ function DormantRow({ product }: { product: EnrichedProduct }) {
 
         {/* Jours */}
         <div>
-          <p className="text-[10px] text-zinc-600 uppercase tracking-wider lg:hidden">Jours en stock</p>
+          <p className="text-[10px] text-zinc-500 uppercase tracking-wider lg:hidden">Jours en stock</p>
           <p className={`text-[14px] font-bold ${cfg.color} tabular-nums`}>{product._days}j</p>
         </div>
 
         {/* Prix achat */}
         <div>
-          <p className="text-[10px] text-zinc-600 uppercase tracking-wider lg:hidden">Achete</p>
+          <p className="text-[10px] text-zinc-500 uppercase tracking-wider lg:hidden">Achete</p>
           <p className="text-[13px] text-zinc-300 tabular-nums">{formatCurrency(Number(product.purchasePrice))}</p>
         </div>
 
         {/* Prix cible */}
         <div>
-          <p className="text-[10px] text-zinc-600 uppercase tracking-wider lg:hidden">Prix cible</p>
+          <p className="text-[10px] text-zinc-500 uppercase tracking-wider lg:hidden">Prix cible</p>
           <p className="text-[13px] text-zinc-300 tabular-nums">{product.targetPrice ? formatCurrency(Number(product.targetPrice)) : "—"}</p>
         </div>
 
         {/* Suggestion */}
         <div>
-          <p className="text-[10px] text-zinc-600 uppercase tracking-wider lg:hidden">Suggestion</p>
+          <p className="text-[10px] text-zinc-500 uppercase tracking-wider lg:hidden">Suggestion</p>
           {hasSuggestion ? (
             <div>
               <p className="text-[12px] text-zinc-300">
-                <span className="line-through text-zinc-600 mr-1.5">{formatCurrency(Number(product.targetPrice))}</span>
+                <span className="line-through text-zinc-500 mr-1.5">{formatCurrency(Number(product.targetPrice))}</span>
                 <span className="font-semibold text-emerald-400 tabular-nums">
                   {formatCurrency(product._suggestion.suggestedPrice!)}
                 </span>

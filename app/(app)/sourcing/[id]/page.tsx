@@ -40,7 +40,7 @@ export default async function SourcingDetailPage({ params }: { params: Promise<{
             <ArrowLeft size={18} />
           </Link>
           <div className="min-w-0 flex-1">
-            <p className="text-[11px] text-zinc-600">Creee le {formatDate(req.createdAt)}</p>
+            <p className="text-[11px] text-zinc-500">Creee le {formatDate(req.createdAt)}</p>
             <h1 className="text-xl lg:text-2xl font-bold text-white tracking-tight">{req.description}</h1>
           </div>
         </div>
@@ -66,7 +66,7 @@ export default async function SourcingDetailPage({ params }: { params: Promise<{
         <div className="kpi-card p-4 flex flex-col justify-between min-h-[100px]">
           <div className="flex items-start justify-between">
             <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Budget cible</p>
-            <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center"><Target size={15} className="text-blue-400" /></div>
+            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center"><Target size={15} className="text-emerald-400" /></div>
           </div>
           <p className="text-[22px] font-bold tabular-nums text-white mt-auto">
             {req.targetBudget ? formatCurrency(req.targetBudget) : "—"}
@@ -105,7 +105,7 @@ export default async function SourcingDetailPage({ params }: { params: Promise<{
             </p>
             {days !== null && isActive && (
               <p className={`text-[11px] mt-0.5 ${
-                isOverdue ? "text-red-400" : isUrgent ? "text-red-400" : isWarning ? "text-amber-400" : "text-zinc-600"
+                isOverdue ? "text-red-400" : isUrgent ? "text-red-400" : isWarning ? "text-amber-400" : "text-zinc-500"
               }`}>
                 {isOverdue ? `J+${Math.abs(days)}` : `J-${days}`}
               </p>
@@ -138,13 +138,13 @@ export default async function SourcingDetailPage({ params }: { params: Promise<{
           <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-sm">
             {req.brand && (
               <div>
-                <p className="text-[11px] font-medium text-zinc-600 uppercase tracking-wider">Marque</p>
+                <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Marque</p>
                 <p className="text-zinc-300 mt-0.5">{req.brand}</p>
               </div>
             )}
             {req.model && (
               <div>
-                <p className="text-[11px] font-medium text-zinc-600 uppercase tracking-wider">Modele</p>
+                <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Modele</p>
                 <p className="text-zinc-300 mt-0.5">{req.model}</p>
               </div>
             )}

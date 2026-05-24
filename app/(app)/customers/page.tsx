@@ -43,7 +43,7 @@ export default async function CustomersPage() {
           <div className="kpi-card p-4 flex flex-col justify-between min-h-[100px]">
             <div className="flex items-start justify-between">
               <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Total clients</p>
-              <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center"><Users size={16} className="text-blue-400" /></div>
+              <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center"><Users size={16} className="text-emerald-400" /></div>
             </div>
             <p className="text-[22px] font-bold tabular-nums text-white mt-auto">{stats.total}</p>
           </div>

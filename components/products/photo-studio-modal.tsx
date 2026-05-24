@@ -313,7 +313,7 @@ export default function PhotoStudioModal({
               </div>
               <p className="text-[14px] font-semibold text-white mb-1">Charge une photo</p>
               <p className="text-[12px] text-zinc-500">Article photographie chez toi, fond importe peu</p>
-              <p className="text-[10px] text-zinc-600 mt-3">JPG, PNG · 10MB max</p>
+              <p className="text-[10px] text-zinc-500 mt-3">JPG, PNG · 10MB max</p>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -329,7 +329,7 @@ export default function PhotoStudioModal({
               <Loader2 size={36} className="text-rose-400 animate-spin inline-block" />
               <p className="text-[14px] font-semibold text-white mt-4">Detection precise de l'objet...</p>
               <p className="text-[12px] text-zinc-500 mt-1">Modele haute qualite, ca prend 5 a 10 secondes</p>
-              <p className="text-[10px] text-zinc-600 mt-3">Premiere utilisation : telechargement du modele (~80MB)</p>
+              <p className="text-[10px] text-zinc-500 mt-3">Premiere utilisation : telechargement du modele (~80MB)</p>
             </div>
           )}
 
@@ -364,7 +364,7 @@ export default function PhotoStudioModal({
                       />
                     ))}
                   </div>
-                  <p className="text-[10px] text-zinc-600 mt-1.5">{BACKGROUNDS.find((b) => b.id === bg)?.label}</p>
+                  <p className="text-[10px] text-zinc-500 mt-1.5">{BACKGROUNDS.find((b) => b.id === bg)?.label}</p>
                 </div>
 
                 <div>

@@ -18,7 +18,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
           <ArrowLeft size={18} />
         </Link>
         <div>
-          <p className="text-[11px] text-zinc-600 font-mono">{product.sku}</p>
+          <p className="text-[11px] text-zinc-500 font-mono">{product.sku}</p>
           <h1 className="text-2xl font-bold text-white tracking-tight">Modifier l'article</h1>
         </div>
       </div>

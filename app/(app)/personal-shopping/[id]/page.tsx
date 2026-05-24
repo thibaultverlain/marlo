@@ -50,7 +50,7 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
             <ArrowLeft size={18} />
           </Link>
           <div className="min-w-0 flex-1">
-            <p className="text-[11px] text-zinc-600">Mission personal shopping</p>
+            <p className="text-[11px] text-zinc-500">Mission personal shopping</p>
             <h1 className="text-xl lg:text-2xl font-bold text-white tracking-tight">{mission.name}</h1>
             <div className="flex items-center gap-3 mt-1 text-[11px] text-zinc-500 flex-wrap">
               {mission.eventDate && (
@@ -94,14 +94,14 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
         <div className="kpi-card p-4 flex flex-col justify-between min-h-[100px]">
           <div className="flex items-start justify-between">
             <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Articles</p>
-            <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center"><Package size={15} className="text-blue-400" /></div>
+            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center"><Package size={15} className="text-emerald-400" /></div>
           </div>
           <p className="text-[22px] font-bold text-white mt-auto">{items.length}</p>
         </div>
         <div className="kpi-card p-4 flex flex-col justify-between min-h-[100px]">
           <div className="flex items-start justify-between">
             <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Total achete</p>
-            <div className="w-8 h-8 rounded-xl bg-violet-500/10 flex items-center justify-center"><TrendingUp size={15} className="text-violet-400" /></div>
+            <div className="w-8 h-8 rounded-xl bg-rose-500/10 flex items-center justify-center"><TrendingUp size={15} className="text-rose-400" /></div>
           </div>
           <p className="text-[22px] font-bold text-white tabular-nums mt-auto">{formatCurrency(mission.totalPurchased)}</p>
         </div>

@@ -6,7 +6,7 @@ import { addPsItemAction, deletePsItemAction, updateMissionStatusAction, deleteM
 import { generateInvoiceFromMissionAction } from "@/lib/actions/invoices";
 import { formatCurrency } from "@/lib/utils";
 
-const inputClass = "w-full px-3 py-2.5 text-[13px] bg-[var(--color-bg-raised)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500/50 text-zinc-200 placeholder:text-zinc-600";
+const inputClass = "w-full px-3 py-2.5 text-[13px] bg-[var(--color-bg-raised)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500/50 text-zinc-200 placeholder:text-zinc-500";
 type CustomerOption = { id: string; name: string; vip: boolean };
 type ItemRow = { id: string; customerId: string; description: string; brand: string|null; purchasePrice: number; commissionAmount: number|null; invoiced: boolean|null };
 type CustomerGroup = { customerId: string; customerName: string; items: ItemRow[]; total: number; commission: number };
@@ -44,7 +44,7 @@ export default function MissionDetailClient({missionId,missionStatus,customerGro
             <div className="divide-y divide-[var(--color-border)]">{g.items.map((item)=>(
               <div key={item.id} className="flex items-center justify-between px-5 py-3">
                 <div className="flex-1 min-w-0"><p className="text-[13px] text-zinc-200">{item.description}</p>{item.brand&&<p className="text-[11px] text-zinc-500 mt-0.5">{item.brand}</p>}</div>
-                <div className="text-right flex items-center gap-4"><div><p className="text-[13px] font-medium text-zinc-200 tabular-nums">{formatCurrency(item.purchasePrice)}</p>{item.commissionAmount&&<p className="text-[11px] text-rose-400 tabular-nums">+{formatCurrency(item.commissionAmount)}</p>}</div>{canAdd&&<button onClick={()=>handleDeleteItem(item.id)} disabled={isPending} className="text-zinc-600 hover:text-red-400 transition-colors"><Trash2 size={14}/></button>}</div>
+                <div className="text-right flex items-center gap-4"><div><p className="text-[13px] font-medium text-zinc-200 tabular-nums">{formatCurrency(item.purchasePrice)}</p>{item.commissionAmount&&<p className="text-[11px] text-rose-400 tabular-nums">+{formatCurrency(item.commissionAmount)}</p>}</div>{canAdd&&<button onClick={()=>handleDeleteItem(item.id)} disabled={isPending} className="text-zinc-500 hover:text-red-400 transition-colors"><Trash2 size={14}/></button>}</div>
               </div>
             ))}</div>
           </div>

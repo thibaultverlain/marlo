@@ -9,7 +9,7 @@ export const revalidate = 30;
 
 const STATUS_MAP: Record<string, { label: string; cl: string }> = {
   brouillon: { label: "Brouillon", cl: "bg-zinc-500/15 text-zinc-400 border-zinc-500/20" },
-  envoyee: { label: "Envoyee", cl: "bg-blue-500/15 text-blue-400 border-blue-500/20" },
+  envoyee: { label: "Envoyee", cl: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20" },
   payee: { label: "Payee", cl: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20" },
   annulee: { label: "Annulee", cl: "bg-red-500/15 text-red-400 border-red-500/20" },
 };
@@ -28,7 +28,7 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
           <ArrowLeft size={18} />
         </Link>
         <div className="flex-1 min-w-0">
-          <p className="text-[11px] text-zinc-600">Emise le {formatDate(invoice.createdAt)}</p>
+          <p className="text-[11px] text-zinc-500">Emise le {formatDate(invoice.createdAt)}</p>
           <div className="flex items-center gap-3 flex-wrap">
             <h1 className="text-xl lg:text-2xl font-bold text-white tracking-tight">Facture {invoice.invoiceNumber}</h1>
             <span className={`inline-flex px-2.5 py-1 rounded-md text-[11px] font-medium border ${st.cl}`}>
@@ -53,7 +53,7 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
         <div className="kpi-card p-4 flex flex-col justify-between min-h-[100px]">
           <div className="flex items-start justify-between">
             <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Client</p>
-            <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center"><User size={15} className="text-blue-400" /></div>
+            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center"><User size={15} className="text-emerald-400" /></div>
           </div>
           {customer ? (
             <Link href={`/customers/${customer.id}`} className="mt-auto hover:text-rose-400 transition-colors">
@@ -71,7 +71,7 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
           </div>
           <div className="mt-auto">
             <p className="text-[22px] font-bold text-white tabular-nums">{formatCurrency(invoice.amountTtc)}</p>
-            {invoice.vatMention && <p className="text-[10px] text-zinc-600 mt-0.5">{invoice.vatMention}</p>}
+            {invoice.vatMention && <p className="text-[10px] text-zinc-500 mt-0.5">{invoice.vatMention}</p>}
           </div>
         </div>
         <div className="kpi-card p-4 flex flex-col justify-between min-h-[100px]">
@@ -91,14 +91,14 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
       {sale && (
         <Link href={`/sales/${sale.id}`} className="block card-static p-4 hover:border-[var(--color-border-hover)] transition-all group">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-violet-500/10 flex items-center justify-center flex-shrink-0">
-              <ShoppingCart size={18} className="text-violet-400" />
+            <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center flex-shrink-0">
+              <ShoppingCart size={18} className="text-rose-400" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-[12px] text-zinc-500">Vente associee</p>
               <p className="text-[13px] font-medium text-white mt-0.5">{formatCurrency(sale.salePrice)} · {formatDate(sale.soldAt)}</p>
             </div>
-            <ExternalLink size={14} className="text-zinc-600 group-hover:text-rose-400 transition-colors" />
+            <ExternalLink size={14} className="text-zinc-500 group-hover:text-rose-400 transition-colors" />
           </div>
         </Link>
       )}

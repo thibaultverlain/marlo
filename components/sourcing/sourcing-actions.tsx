@@ -6,7 +6,7 @@ import { updateSourcingStatusAction, linkProductToSourcingAction, deleteSourcing
 import { generateInvoiceFromSourcingAction } from "@/lib/actions/invoices";
 import { formatCurrency } from "@/lib/utils";
 
-const inputClass = "w-full px-3 py-2.5 text-[13px] bg-[var(--color-bg-raised)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500/50 text-zinc-200 placeholder:text-zinc-600";
+const inputClass = "w-full px-3 py-2.5 text-[13px] bg-[var(--color-bg-raised)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500/50 text-zinc-200 placeholder:text-zinc-500";
 type ProductOption = { id: string; title: string; sku: string; purchasePrice: number; targetPrice: number | null };
 const NS: Record<string, { next: string; label: string }[]> = { ouvert: [{ next: "en_recherche", label: "Commencer la recherche" },{ next: "annule", label: "Annuler" }], en_recherche: [{ next: "annule", label: "Annuler" }], trouve: [{ next: "achete", label: "Acheté" },{ next: "annule", label: "Annuler" }], achete: [{ next: "livre", label: "Livré" }], livre: [{ next: "facture", label: "Générer la facture" }], facture: [], annule: [] };
 

@@ -162,9 +162,9 @@ export default function AuthChecklist({
               >
                 <div className="flex items-center gap-2">
                   <span className="text-[13px] font-semibold text-white">{CATEGORY_LABELS[cat]}</span>
-                  <span className="text-[11px] text-zinc-600">{catChecked}/{pts.length}</span>
+                  <span className="text-[11px] text-zinc-500">{catChecked}/{pts.length}</span>
                 </div>
-                {isExpanded ? <ChevronUp size={14} className="text-zinc-600" /> : <ChevronDown size={14} className="text-zinc-600" />}
+                {isExpanded ? <ChevronUp size={14} className="text-zinc-500" /> : <ChevronDown size={14} className="text-zinc-500" />}
               </button>
 
               {isExpanded && (
@@ -282,7 +282,7 @@ function ReferencePhoto({ src, alt }: { src: string; alt: string }) {
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center py-8 gap-2 text-zinc-600">
+      <div className="flex flex-col items-center justify-center py-8 gap-2 text-zinc-500">
         <ImageOff size={24} />
         <p className="text-[11px]">Photo de reference a ajouter dans {src}</p>
       </div>

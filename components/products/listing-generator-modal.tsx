@@ -158,7 +158,7 @@ export default function ListingGeneratorModal({
                 Generer
               </button>
 
-              <p className="text-[10px] text-zinc-600 mt-3 text-center">
+              <p className="text-[10px] text-zinc-500 mt-3 text-center">
                 {hasImages && useImages ? "Avec analyse photo : 10-20 secondes" : "Sans analyse photo : 3-5 secondes"}
               </p>
             </>

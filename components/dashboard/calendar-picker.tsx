@@ -140,7 +140,7 @@ export default function CalendarPicker({
       {/* Day headers */}
       <div className="grid grid-cols-7 gap-0.5 mb-1">
         {DAYS.map((d, i) => (
-          <div key={i} className="text-center text-[10px] font-semibold text-zinc-600 uppercase tracking-wider py-1">{d}</div>
+          <div key={i} className="text-center text-[10px] font-semibold text-zinc-500 uppercase tracking-wider py-1">{d}</div>
         ))}
       </div>
 

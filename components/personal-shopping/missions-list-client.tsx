@@ -21,7 +21,7 @@ type Mission = {
 };
 
 const STATUS_MAP: Record<string, { label: string; cl: string }> = {
-  planifie: { label: "Planifiee", cl: "bg-blue-500/15 text-blue-400 border-blue-500/20" },
+  planifie: { label: "Planifiee", cl: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20" },
   en_cours: { label: "En cours", cl: "bg-amber-500/15 text-amber-400 border-amber-500/20" },
   termine: { label: "Terminee", cl: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20" },
   facture: { label: "Facturee", cl: "bg-zinc-500/15 text-zinc-400 border-zinc-500/20" },
@@ -112,13 +112,13 @@ export default function MissionsListClient({ missions }: { missions: Mission[] }
       {/* Search + sort */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600" />
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
           <input
             type="text"
             placeholder="Rechercher (nom, lieu)..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-[13px] bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-rose-500/50 text-zinc-200 placeholder:text-zinc-600"
+            className="w-full pl-9 pr-4 py-2 text-[13px] bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-rose-500/50 text-zinc-200 placeholder:text-zinc-500"
           />
         </div>
         <div className="relative">
@@ -158,7 +158,7 @@ export default function MissionsListClient({ missions }: { missions: Mission[] }
       ) : (
         <div className="card-static overflow-hidden">
           <div className="px-5 py-2.5 border-b border-[var(--color-border)] bg-[var(--color-bg)]/30">
-            <span className="text-[11px] text-zinc-600 uppercase tracking-wider font-semibold">
+            <span className="text-[11px] text-zinc-500 uppercase tracking-wider font-semibold">
               {filtered.length} resultat{filtered.length > 1 ? "s" : ""}
             </span>
           </div>

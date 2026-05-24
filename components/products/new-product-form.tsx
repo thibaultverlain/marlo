@@ -8,7 +8,7 @@ import { LUXURY_BRANDS, CATEGORIES, CONDITIONS, CHANNELS } from "@/lib/data";
 import { CURRENCIES, convertToEur } from "@/lib/currency";
 import { createProductAction } from "@/lib/actions/products";
 
-const inputClass = "w-full px-3 py-2.5 text-[13px] bg-[var(--color-bg-raised)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500/50 focus:border-indigo-500/50 text-zinc-200 placeholder:text-zinc-600";
+const inputClass = "w-full px-3 py-2.5 text-[13px] bg-[var(--color-bg-raised)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500/50 focus:border-indigo-500/50 text-zinc-200 placeholder:text-zinc-500";
 const labelClass = "block text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-1.5";
 
 export default function NewProductForm() {
@@ -123,13 +123,13 @@ export default function NewProductForm() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label className={labelClass}>Prix article *</label>
-              <div className="relative"><input type="number" step="0.01" required value={form.purchasePrice} onChange={(e) => updateField("purchasePrice", e.target.value)} placeholder="0.00" className={`${inputClass} pr-8`} /><span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zinc-600">{CURRENCIES.find(c => c.code === form.purchaseCurrency)?.symbol ?? "€"}</span></div>
+              <div className="relative"><input type="number" step="0.01" required value={form.purchasePrice} onChange={(e) => updateField("purchasePrice", e.target.value)} placeholder="0.00" className={`${inputClass} pr-8`} /><span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zinc-500">{CURRENCIES.find(c => c.code === form.purchaseCurrency)?.symbol ?? "€"}</span></div>
             </div>
             <div>
               <label className={labelClass}>
                 {form.purchaseSource === "vinted" ? "Frais protection" : form.purchaseSource === "vente_privee" ? "Frais port + taxe" : "Frais additionnels"}
               </label>
-              <div className="relative"><input type="number" step="0.01" value={form.purchaseFees} onChange={(e) => updateField("purchaseFees", e.target.value)} placeholder="0.00" className={`${inputClass} pr-8`} /><span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zinc-600">€</span></div>
+              <div className="relative"><input type="number" step="0.01" value={form.purchaseFees} onChange={(e) => updateField("purchaseFees", e.target.value)} placeholder="0.00" className={`${inputClass} pr-8`} /><span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zinc-500">€</span></div>
             </div>
             <div>
               <label className={labelClass}>Devise</label>
@@ -151,7 +151,7 @@ export default function NewProductForm() {
           {/* Target price */}
           <div className="mt-4">
             <label className={labelClass}>Prix de vente visé</label>
-            <div className="relative"><input type="number" step="0.01" value={form.targetPrice} onChange={(e) => updateField("targetPrice", e.target.value)} placeholder="0.00" className={`${inputClass} pr-8`} /><span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zinc-600">€</span></div>
+            <div className="relative"><input type="number" step="0.01" value={form.targetPrice} onChange={(e) => updateField("targetPrice", e.target.value)} placeholder="0.00" className={`${inputClass} pr-8`} /><span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zinc-500">€</span></div>
           </div>
           {marginPreview && (
             <div className="mt-3 flex items-center gap-4 p-3 bg-emerald-500/[0.08] border border-emerald-500/20 rounded-lg">
@@ -172,7 +172,7 @@ export default function NewProductForm() {
               { value: "en_stock", label: "En stock", dot: "bg-emerald-400", active: "bg-emerald-500/12 text-emerald-400 border-emerald-500/30" },
               { value: "en_vente", label: "En vente", dot: "bg-rose-400", active: "bg-rose-500/12 text-rose-400 border-rose-500/30" },
               { value: "reserve", label: "Réservé", dot: "bg-amber-400", active: "bg-amber-500/12 text-amber-400 border-amber-500/30" },
-              { value: "expedie", label: "Expédié", dot: "bg-orange-400", active: "bg-orange-500/12 text-orange-400 border-orange-500/30" },
+              { value: "expedie", label: "Expédié", dot: "bg-amber-400", active: "bg-amber-500/12 text-amber-400 border-amber-500/30" },
             ].map((s) => (
               <button key={s.value} type="button" onClick={() => updateField("status", s.value)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-medium rounded-lg border transition-all duration-200 ${form.status === s.value ? s.active : "bg-transparent text-zinc-500 border-[var(--color-border)] hover:border-zinc-600"}`}>

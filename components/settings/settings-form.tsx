@@ -8,11 +8,11 @@ import {
 import { saveShopSettingsAction } from "@/lib/actions/settings";
 import type { ShopSettings } from "@/lib/db/schema";
 
-const inputClass = "w-full px-3 py-2.5 text-[13px] bg-[var(--color-bg-raised)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-rose-500/50 focus:border-rose-500/50 text-zinc-200 placeholder:text-zinc-600";
+const inputClass = "w-full px-3 py-2.5 text-[13px] bg-[var(--color-bg-raised)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-rose-500/50 focus:border-rose-500/50 text-zinc-200 placeholder:text-zinc-500";
 const labelClass = "block text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-1.5";
 
 function FieldHelp({ children }: { children: React.ReactNode }) {
-  return <p className="text-[10px] text-zinc-600 mt-1">{children}</p>;
+  return <p className="text-[10px] text-zinc-500 mt-1">{children}</p>;
 }
 
 // Validation
@@ -227,7 +227,7 @@ export default function SettingsForm({ initialData }: { initialData: ShopSetting
       {/* Adresse */}
       <div className="bg-[var(--color-bg-card)] rounded-[14px] border border-[var(--color-border)] shadow-[var(--shadow-card)] p-6 space-y-5">
         <h2 className="text-[15px] font-semibold text-white flex items-center gap-2">
-          <MapPin size={15} className="text-blue-400" />
+          <MapPin size={15} className="text-emerald-400" />
           Adresse
         </h2>
         <div>
@@ -253,7 +253,7 @@ export default function SettingsForm({ initialData }: { initialData: ShopSetting
       {/* Contact public */}
       <div className="bg-[var(--color-bg-card)] rounded-[14px] border border-[var(--color-border)] shadow-[var(--shadow-card)] p-6 space-y-5">
         <h2 className="text-[15px] font-semibold text-white flex items-center gap-2">
-          <Phone size={15} className="text-violet-400" />
+          <Phone size={15} className="text-rose-400" />
           Contact public
         </h2>
         <p className="text-[11px] text-zinc-500 -mt-2">Information visible sur tes factures</p>
@@ -342,7 +342,7 @@ export default function SettingsForm({ initialData }: { initialData: ShopSetting
       {/* Facturation */}
       <div className="bg-[var(--color-bg-card)] rounded-[14px] border border-[var(--color-border)] shadow-[var(--shadow-card)] p-6 space-y-5">
         <h2 className="text-[15px] font-semibold text-white flex items-center gap-2">
-          <Receipt size={15} className="text-cyan-400" />
+          <Receipt size={15} className="text-emerald-400" />
           Facturation
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

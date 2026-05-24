@@ -31,23 +31,23 @@ export default async function SaleDetailPage({ params }: { params: Promise<{ id:
     <div className="max-w-3xl mx-auto space-y-6 page-enter">
       <div className="flex items-center gap-4">
         <Link href="/sales" className="w-9 h-9 flex items-center justify-center rounded-lg border border-[var(--color-border)] text-zinc-500 hover:text-zinc-300 transition-colors"><ArrowLeft size={18} /></Link>
-        <div className="flex-1"><p className="text-[11px] text-zinc-600">Vente du {formatDate(sale.soldAt)}</p><h1 className="text-2xl font-bold text-white tracking-tight">{product?.title ?? "Article supprimé"}</h1></div>
+        <div className="flex-1"><p className="text-[11px] text-zinc-500">Vente du {formatDate(sale.soldAt)}</p><h1 className="text-2xl font-bold text-white tracking-tight">{product?.title ?? "Article supprimé"}</h1></div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div className="kpi-card p-5 flex flex-col justify-between min-h-[110px]">
           <div className="flex items-start justify-between">
             <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Prix de vente</p>
-            <div className="w-9 h-9 rounded-xl bg-blue-500/10 flex items-center justify-center"><ShoppingCart size={17} className="text-blue-400" /></div>
+            <div className="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center"><ShoppingCart size={17} className="text-emerald-400" /></div>
           </div>
-          <div className="mt-auto"><p className="text-[24px] font-bold text-white tabular-nums">{formatCurrency(sale.salePrice)}</p><p className="text-[11px] text-zinc-600 mt-0.5">sur {channelLabel}</p></div>
+          <div className="mt-auto"><p className="text-[24px] font-bold text-white tabular-nums">{formatCurrency(sale.salePrice)}</p><p className="text-[11px] text-zinc-500 mt-0.5">sur {channelLabel}</p></div>
         </div>
         <div className="kpi-card p-5 flex flex-col justify-between min-h-[110px]">
           <div className="flex items-start justify-between">
             <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Revenu net</p>
-            <div className="w-9 h-9 rounded-xl bg-violet-500/10 flex items-center justify-center"><TrendingUp size={17} className="text-violet-400" /></div>
+            <div className="w-9 h-9 rounded-xl bg-rose-500/10 flex items-center justify-center"><TrendingUp size={17} className="text-rose-400" /></div>
           </div>
-          <div className="mt-auto"><p className="text-[24px] font-bold text-white tabular-nums">{formatCurrency(sale.netRevenue)}</p><p className="text-[11px] text-zinc-600 mt-0.5">Apres {formatCurrency(sale.platformFees)} de frais</p></div>
+          <div className="mt-auto"><p className="text-[24px] font-bold text-white tabular-nums">{formatCurrency(sale.netRevenue)}</p><p className="text-[11px] text-zinc-500 mt-0.5">Apres {formatCurrency(sale.platformFees)} de frais</p></div>
         </div>
         <div className="kpi-card p-5 flex flex-col justify-between min-h-[110px]">
           <div className="flex items-start justify-between">
@@ -64,7 +64,7 @@ export default async function SaleDetailPage({ params }: { params: Promise<{ id:
           <Link href={`/products/${product.id}`} className="block p-3 rounded-lg hover:bg-[var(--color-bg-hover)] transition-colors -m-3">
             <p className="text-sm text-zinc-200">{product.title}</p>
             <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-              <span className="text-[11px] text-zinc-600 font-mono">{product.sku}</span>
+              <span className="text-[11px] text-zinc-500 font-mono">{product.sku}</span>
               <span className="text-zinc-700">·</span>
               <span className="text-[11px] text-zinc-500">{product.brand}</span>
               <span className="text-zinc-700">·</span>
@@ -91,7 +91,7 @@ export default async function SaleDetailPage({ params }: { params: Promise<{ id:
             <div><p className="text-sm text-zinc-200">{invoice.invoiceNumber}</p><p className="text-[11px] text-zinc-500 mt-0.5">Émise le {formatDate(invoice.createdAt)} · {formatCurrency(invoice.amountTtc)}</p></div>
             <Link href={`/invoices/${invoice.id}`} className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-rose-400 hover:bg-rose-400/10 rounded-lg transition-colors"><Eye size={14} />Voir</Link>
           </div>
-        ) : customer ? <><p className="text-sm text-zinc-500 mb-4">Aucune facture.</p><SaleActions saleId={sale.id} /></> : <p className="text-sm text-zinc-600">Ajoute un client pour facturer.</p>}
+        ) : customer ? <><p className="text-sm text-zinc-500 mb-4">Aucune facture.</p><SaleActions saleId={sale.id} /></> : <p className="text-sm text-zinc-500">Ajoute un client pour facturer.</p>}
       </div>
 
       {sale.notes && <div className="card-static p-6"><h2 className="text-[15px] font-semibold text-white mb-3">Notes</h2><p className="text-sm text-zinc-400 whitespace-pre-line">{sale.notes}</p></div>}

@@ -26,7 +26,7 @@ export default function TopProductsList({ products }: { products: TopProductRow[
             href={`/products/${p.productId}`}
             className="flex items-center gap-3 p-4 hover:bg-[var(--color-bg-hover)] transition-colors group"
           >
-            <span className="w-6 text-[11px] font-mono text-zinc-600">{idx + 1}</span>
+            <span className="w-6 text-[11px] font-mono text-zinc-500">{idx + 1}</span>
             <div className="flex-1 min-w-0">
               <p className="text-[13px] font-semibold text-white truncate group-hover:text-rose-300 transition-colors">
                 {p.title}

@@ -39,16 +39,16 @@ export default async function DormantsPage() {
       {/* Stats cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <StatCard
-          icon={<AlertTriangle size={14} className="text-yellow-400" />}
+          icon={<AlertTriangle size={14} className="text-amber-400" />}
           label="30-60 jours"
           value={stats.bucket30}
-          accent="text-yellow-400"
+          accent="text-amber-400"
         />
         <StatCard
-          icon={<Flame size={14} className="text-orange-400" />}
+          icon={<Flame size={14} className="text-amber-400" />}
           label="60-90 jours"
           value={stats.bucket60}
-          accent="text-orange-400"
+          accent="text-amber-400"
         />
         <StatCard
           icon={<Skull size={14} className="text-red-400" />}
@@ -87,7 +87,7 @@ function StatCard({
         <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">{label}</p>
       </div>
       <p className={`text-xl font-bold tabular-nums ${accent}`}>{value}</p>
-      {subtitle && <p className="text-[10px] text-zinc-600 mt-1">{subtitle}</p>}
+      {subtitle && <p className="text-[10px] text-zinc-500 mt-1">{subtitle}</p>}
     </div>
   );
 }

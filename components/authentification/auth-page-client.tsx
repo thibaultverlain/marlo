@@ -121,27 +121,27 @@ export default function AuthPageClient({
                       <span className="text-[14px] font-semibold text-white">{brandLabel}</span>
                       {modelLabel && (
                         <>
-                          <ChevronRight size={12} className="text-zinc-600" />
+                          <ChevronRight size={12} className="text-zinc-500" />
                           <span className="text-[13px] text-zinc-400">{modelLabel}</span>
                         </>
                       )}
                       {product && (
                         <>
-                          <ChevronRight size={12} className="text-zinc-600" />
+                          <ChevronRight size={12} className="text-zinc-500" />
                           <span className="text-[12px] text-zinc-500 truncate">{product.title}</span>
                         </>
                       )}
                     </div>
                     <div className="flex items-center gap-3 mt-0.5">
                       <span className={`text-[12px] font-medium ${cfg.color}`}>{cfg.label}</span>
-                      <span className="text-[11px] text-zinc-600">{checkedCount}/{points.length} points</span>
+                      <span className="text-[11px] text-zinc-500">{checkedCount}/{points.length} points</span>
                       <span className="text-[11px] text-zinc-700">{formatDate(c.createdAt)}</span>
                     </div>
                   </div>
                   <button
                     onClick={() => handleDelete(c.id)}
                     disabled={deleting === c.id}
-                    className="p-1.5 rounded-lg text-zinc-600 hover:text-red-400 hover:bg-red-500/10 transition-all"
+                    className="p-1.5 rounded-lg text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition-all"
                   >
                     <Trash2 size={14} />
                   </button>

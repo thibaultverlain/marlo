@@ -69,7 +69,7 @@ export default async function VelocityPage({ searchParams }: { searchParams: Pro
       {/* Overview cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <OverviewCard
-          icon={<Package size={14} className="text-violet-400" />}
+          icon={<Package size={14} className="text-rose-400" />}
           label="Ventes totales"
           value={overview.totalSales}
           subtitle={`${overview.matchedSales} avec produit lie`}
@@ -81,7 +81,7 @@ export default async function VelocityPage({ searchParams }: { searchParams: Pro
           subtitle="Entre achat et vente"
         />
         <OverviewCard
-          icon={<Tag size={14} className="text-cyan-400" />}
+          icon={<Tag size={14} className="text-emerald-400" />}
           label="CA periode"
           value={formatCurrency(overview.totalRevenue)}
         />
@@ -126,14 +126,14 @@ export default async function VelocityPage({ searchParams }: { searchParams: Pro
         className="block card-static p-5 hover:border-[var(--color-border-hover)] transition-all group"
       >
         <div className="flex items-center gap-4">
-          <div className="w-10 h-10 rounded-xl bg-yellow-500/10 flex items-center justify-center">
-            <Tag size={18} className="text-yellow-400" />
+          <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
+            <Tag size={18} className="text-amber-400" />
           </div>
           <div className="flex-1">
             <p className="text-[14px] font-semibold text-white">Voir les best sellers</p>
             <p className="text-[12px] text-zinc-500 mt-0.5">Classement des marques et produits qui tournent le mieux</p>
           </div>
-          <ChevronRight size={16} className="text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+          <ChevronRight size={16} className="text-zinc-500 group-hover:text-zinc-400 transition-colors" />
         </div>
       </Link>
     </div>
@@ -153,7 +153,7 @@ function OverviewCard({ icon, label, value, subtitle }: {
         <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">{label}</p>
       </div>
       <p className="text-xl font-bold tabular-nums text-white">{value}</p>
-      {subtitle && <p className="text-[10px] text-zinc-600 mt-1">{subtitle}</p>}
+      {subtitle && <p className="text-[10px] text-zinc-500 mt-1">{subtitle}</p>}
     </div>
   );
 }

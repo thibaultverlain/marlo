@@ -60,14 +60,14 @@ export default async function InvoicesPage() {
           <div className="kpi-card p-4 flex flex-col justify-between min-h-[100px]">
             <div className="flex items-start justify-between">
               <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Total</p>
-              <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center"><FileText size={16} className="text-blue-400" /></div>
+              <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center"><FileText size={16} className="text-emerald-400" /></div>
             </div>
             <p className="text-[22px] font-bold text-white mt-auto">{stats.total}</p>
           </div>
           <div className="kpi-card p-4 flex flex-col justify-between min-h-[100px]">
             <div className="flex items-start justify-between">
               <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Total facture</p>
-              <div className="w-8 h-8 rounded-xl bg-violet-500/10 flex items-center justify-center"><Wallet size={16} className="text-violet-400" /></div>
+              <div className="w-8 h-8 rounded-xl bg-rose-500/10 flex items-center justify-center"><Wallet size={16} className="text-rose-400" /></div>
             </div>
             <p className="text-[20px] font-bold text-white tabular-nums mt-auto">{formatCurrency(stats.totalAmount)}</p>
           </div>

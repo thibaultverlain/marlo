@@ -48,16 +48,16 @@ export default async function PersonalShoppingPage() {
           <div className="kpi-card p-4 flex flex-col justify-between min-h-[100px]">
             <div className="flex items-start justify-between">
               <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Total</p>
-              <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center"><ShoppingBag size={16} className="text-blue-400" /></div>
+              <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center"><ShoppingBag size={16} className="text-emerald-400" /></div>
             </div>
             <p className="text-[22px] font-bold tabular-nums text-white mt-auto">{stats.total}</p>
           </div>
           <div className="kpi-card p-4 flex flex-col justify-between min-h-[100px]">
             <div className="flex items-start justify-between">
               <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">A venir</p>
-              <div className="w-8 h-8 rounded-xl bg-violet-500/10 flex items-center justify-center"><Calendar size={16} className="text-violet-400" /></div>
+              <div className="w-8 h-8 rounded-xl bg-rose-500/10 flex items-center justify-center"><Calendar size={16} className="text-rose-400" /></div>
             </div>
-            <p className={`text-[22px] font-bold tabular-nums mt-auto ${upcoming > 0 ? "text-violet-400" : "text-white"}`}>{upcoming}</p>
+            <p className={`text-[22px] font-bold tabular-nums mt-auto ${upcoming > 0 ? "text-rose-400" : "text-white"}`}>{upcoming}</p>
           </div>
           <div className="kpi-card p-4 flex flex-col justify-between min-h-[100px]">
             <div className="flex items-start justify-between">

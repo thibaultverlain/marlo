@@ -60,7 +60,7 @@ function LoginForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="contact@maisonroselin.com"
-          className="w-full px-4 py-3 text-[14px] bg-[#18181b] border border-[rgba(255,255,255,0.07)] rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500/50 focus:border-indigo-500/50 text-zinc-200 placeholder:text-zinc-600"
+          className="w-full px-4 py-3 text-[14px] bg-[#18181b] border border-[rgba(255,255,255,0.07)] rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500/50 focus:border-indigo-500/50 text-zinc-200 placeholder:text-zinc-500"
           autoComplete="email"
         />
       </div>
@@ -75,7 +75,7 @@ function LoginForm() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="••••••••"
-          className="w-full px-4 py-3 text-[14px] bg-[#18181b] border border-[rgba(255,255,255,0.07)] rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500/50 focus:border-indigo-500/50 text-zinc-200 placeholder:text-zinc-600"
+          className="w-full px-4 py-3 text-[14px] bg-[#18181b] border border-[rgba(255,255,255,0.07)] rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500/50 focus:border-indigo-500/50 text-zinc-200 placeholder:text-zinc-500"
           autoComplete="current-password"
         />
       </div>

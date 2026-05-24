@@ -28,8 +28,8 @@ type ProductSlim = {
 const TYPE_CONFIG = {
   favoris: { label: "Messages favoris", short: "Favoris", icon: MessageSquare, iconClass: "text-rose-400", bgClass: "bg-rose-500/10" },
   litiges: { label: "Messages litiges", short: "Litiges", icon: AlertTriangle, iconClass: "text-red-400", bgClass: "bg-red-500/10" },
-  sourcing: { label: "Sourcing / PS", short: "Sourcing", icon: Search, iconClass: "text-violet-400", bgClass: "bg-violet-500/10" },
-  communaute: { label: "Communaute privee", short: "Communaute", icon: Users, iconClass: "text-blue-400", bgClass: "bg-blue-500/10" },
+  sourcing: { label: "Sourcing / PS", short: "Sourcing", icon: Search, iconClass: "text-rose-400", bgClass: "bg-rose-500/10" },
+  communaute: { label: "Communaute privee", short: "Communaute", icon: Users, iconClass: "text-emerald-400", bgClass: "bg-emerald-500/10" },
   annonces: { label: "Annonces plateforme", short: "Annonces", icon: FileText, iconClass: "text-amber-400", bgClass: "bg-amber-500/10" },
 } as const;
 
@@ -175,7 +175,7 @@ export default function TemplatesPageClient({
           <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">Templates</h1>
           <p className="text-zinc-500 mt-1 text-sm">
             {templates.length} template{templates.length > 1 ? "s" : ""}
-            {!isOwner && <span className="ml-2 text-zinc-600"><Lock size={10} className="inline mb-0.5" /> Lecture seule</span>}
+            {!isOwner && <span className="ml-2 text-zinc-500"><Lock size={10} className="inline mb-0.5" /> Lecture seule</span>}
           </p>
         </div>
         {isOwner && (
@@ -212,10 +212,10 @@ export default function TemplatesPageClient({
             })}
           </div>
           <input type="text" placeholder="Nom du template" value={name} onChange={(e) => setName(e.target.value)}
-            className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-rose-500/50" autoFocus />
+            className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-rose-500/50" autoFocus />
           <textarea placeholder={"Contenu du template...\nUtilise {marque}, {modele}, {prix}, {taille}, {couleur}, {etat}, {reference} comme variables"}
             value={content} onChange={(e) => setContent(e.target.value)} rows={8}
-            className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-rose-500/50 resize-none font-mono leading-relaxed" />
+            className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-rose-500/50 resize-none font-mono leading-relaxed" />
           {extractVariables(content).length > 0 && (
             <div className="flex flex-wrap gap-1.5">
               <span className="text-[11px] text-zinc-500 self-center">Variables detectees :</span>
@@ -258,13 +258,13 @@ export default function TemplatesPageClient({
 
       {/* Search */}
       <div className="relative">
-        <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600" />
+        <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
         <input
           type="text"
           placeholder="Rechercher (nom, contenu)..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-9 pr-4 py-2 text-[13px] bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-rose-500/50 text-zinc-200 placeholder:text-zinc-600"
+          className="w-full pl-9 pr-4 py-2 text-[13px] bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-rose-500/50 text-zinc-200 placeholder:text-zinc-500"
         />
       </div>
 
@@ -294,9 +294,9 @@ export default function TemplatesPageClient({
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <p className="text-[14px] font-medium text-white">{t.name}</p>
-                        <span className="text-[10px] text-zinc-600 bg-zinc-800/60 px-1.5 py-0.5 rounded">{cfg.short}</span>
+                        <span className="text-[10px] text-zinc-500 bg-zinc-800/60 px-1.5 py-0.5 rounded">{cfg.short}</span>
                         {vars.length > 0 && (
-                          <span className="text-[10px] text-zinc-600">{vars.length} variable{vars.length > 1 ? "s" : ""}</span>
+                          <span className="text-[10px] text-zinc-500">{vars.length} variable{vars.length > 1 ? "s" : ""}</span>
                         )}
                       </div>
                       <pre className={`text-[12px] text-zinc-400 mt-2 whitespace-pre-wrap font-mono leading-relaxed ${isExpanded ? "" : "max-h-[80px] overflow-hidden"}`}>
@@ -364,7 +364,7 @@ export default function TemplatesPageClient({
                               value={productSearch}
                               onChange={(e) => setProductSearch(e.target.value)}
                               autoFocus
-                              className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded px-3 py-1.5 text-[12px] text-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-rose-500/50 mb-2"
+                              className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded px-3 py-1.5 text-[12px] text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-rose-500/50 mb-2"
                             />
                             <div className="max-h-[180px] overflow-y-auto space-y-0.5">
                               {filteredProducts.length === 0 ? (

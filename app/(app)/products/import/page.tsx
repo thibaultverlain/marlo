@@ -78,9 +78,9 @@ export default function ImportPage() {
 
       <label className="block bg-[var(--color-bg-card)] rounded-xl border-2 border-dashed border-[var(--color-border)] p-8 text-center cursor-pointer hover:border-indigo-500/50 transition-all">
         <input type="file" accept=".csv" onChange={handleFile} className="hidden" />
-        <Upload size={32} className="mx-auto text-zinc-600" />
+        <Upload size={32} className="mx-auto text-zinc-500" />
         <p className="text-sm text-zinc-300 mt-2 font-medium">{fileName || "Cliquer pour choisir"}</p>
-        <p className="text-[11px] text-zinc-600 mt-1">CSV uniquement</p>
+        <p className="text-[11px] text-zinc-500 mt-1">CSV uniquement</p>
       </label>
 
       {parseError && <div className="flex items-start gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-sm text-red-400"><AlertCircle size={16} className="flex-shrink-0 mt-0.5" /><span>{parseError}</span></div>}

@@ -10,9 +10,9 @@ import { addDocumentAction, deleteDocumentAction } from "@/lib/actions/documents
 import type { Doc } from "@/lib/db/queries/documents";
 
 const CATEGORIES = [
-  { value: "legal", label: "Documents legaux", icon: Building2, iconClass: "text-blue-400", bgClass: "bg-blue-500/10" },
+  { value: "legal", label: "Documents legaux", icon: Building2, iconClass: "text-emerald-400", bgClass: "bg-emerald-500/10" },
   { value: "insurance", label: "Assurances", icon: Shield, iconClass: "text-emerald-400", bgClass: "bg-emerald-500/10" },
-  { value: "contracts", label: "Contrats", icon: FileCheck, iconClass: "text-violet-400", bgClass: "bg-violet-500/10" },
+  { value: "contracts", label: "Contrats", icon: FileCheck, iconClass: "text-rose-400", bgClass: "bg-rose-500/10" },
   { value: "banking", label: "Banque", icon: Landmark, iconClass: "text-amber-400", bgClass: "bg-amber-500/10" },
   { value: "other", label: "Autre", icon: FolderOpen, iconClass: "text-zinc-400", bgClass: "bg-zinc-500/10" },
 ];
@@ -128,7 +128,7 @@ export default function DocumentsPageClient({ documents }: { documents: Doc[] })
           </div>
 
           <input type="text" placeholder="Nom du document (ex: Kbis 2025)" value={name} onChange={(e) => setName(e.target.value)}
-            className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]" autoFocus />
+            className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]" autoFocus />
 
           {/* File upload zone */}
           <div
@@ -156,9 +156,9 @@ export default function DocumentsPageClient({ documents }: { documents: Doc[] })
               </div>
             ) : (
               <>
-                <Upload size={24} className="mx-auto text-zinc-600 mb-2" />
+                <Upload size={24} className="mx-auto text-zinc-500 mb-2" />
                 <p className="text-[13px] text-zinc-400">Cliquez pour choisir un fichier</p>
-                <p className="text-[11px] text-zinc-600 mt-1">PDF, images, Word, Excel - Max 10 Mo</p>
+                <p className="text-[11px] text-zinc-500 mt-1">PDF, images, Word, Excel - Max 10 Mo</p>
               </>
             )}
           </div>
@@ -219,9 +219,9 @@ export default function DocumentsPageClient({ documents }: { documents: Doc[] })
                   <p className="text-[13px] font-medium text-white truncate">{doc.name}</p>
                   <div className="flex items-center gap-2 mt-0.5">
                     <span className="text-[11px] text-zinc-500">{cat.label}</span>
-                    {doc.fileSize && <span className="text-[11px] text-zinc-600">{formatSize(doc.fileSize)}</span>}
+                    {doc.fileSize && <span className="text-[11px] text-zinc-500">{formatSize(doc.fileSize)}</span>}
                     {doc.expiresAt && (
-                      <span className={`text-[11px] ${expired ? "text-red-400" : "text-zinc-600"}`}>
+                      <span className={`text-[11px] ${expired ? "text-red-400" : "text-zinc-500"}`}>
                         {expired ? "Expire" : `Exp. ${new Date(doc.expiresAt).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}`}
                       </span>
                     )}
@@ -229,11 +229,11 @@ export default function DocumentsPageClient({ documents }: { documents: Doc[] })
                 </div>
                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
                   <a href={doc.fileUrl} target="_blank" rel="noopener noreferrer"
-                    className="p-2 rounded-lg text-zinc-600 hover:text-zinc-300 hover:bg-white/[0.03] transition" title="Ouvrir">
+                    className="p-2 rounded-lg text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.03] transition" title="Ouvrir">
                     <ExternalLink size={14} />
                   </a>
                   <button onClick={() => handleDelete(doc.id)} disabled={isPending}
-                    className="p-2 rounded-lg text-zinc-600 hover:text-red-400 hover:bg-red-500/10 transition" title="Supprimer">
+                    className="p-2 rounded-lg text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition" title="Supprimer">
                     <Trash2 size={14} />
                   </button>
                 </div>

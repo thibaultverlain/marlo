@@ -151,12 +151,12 @@ export default async function DashboardPage() {
       key: "shipments",
       show: pendingShipments > 0,
       icon: Truck,
-      iconBg: "bg-orange-500/10",
-      iconColor: "text-orange-400",
+      iconBg: "bg-amber-500/10",
+      iconColor: "text-amber-400",
       label: "Colis a expedier",
       count: pendingShipments,
       href: "/orders?status=a_expedier",
-      borderColor: "border-orange-500/15",
+      borderColor: "border-amber-500/15",
     },
     {
       key: "sourcing_urgent",
@@ -233,7 +233,7 @@ export default async function DashboardPage() {
           <p className="text-[12px] text-zinc-500 mt-2">{totalCount} vente{totalCount > 1 ? "s" : ""}</p>
           <div className="flex gap-8 mt-5 pt-4 border-t border-white/[0.04]">
             <div>
-              <p className="text-[10px] text-zinc-600 uppercase tracking-wider">Ce mois</p>
+              <p className="text-[10px] text-zinc-500 uppercase tracking-wider">Ce mois</p>
               <div className="flex items-baseline gap-2 mt-1">
                 <span className="text-[14px] text-zinc-300 tabular-nums font-medium">{formatCurrency(currentMonthRevenue)}</span>
                 {prevMonthRevenue > 0 && (
@@ -244,10 +244,10 @@ export default async function DashboardPage() {
               </div>
             </div>
             <div>
-              <p className="text-[10px] text-zinc-600 uppercase tracking-wider">Aujourd'hui</p>
+              <p className="text-[10px] text-zinc-500 uppercase tracking-wider">Aujourd'hui</p>
               <div className="flex items-baseline gap-2 mt-1">
                 <span className="text-[14px] text-zinc-300 tabular-nums font-medium">{formatCurrency(todayRevenue)}</span>
-                <span className="text-zinc-600 text-[12px]">{todayCount} vente{todayCount > 1 ? "s" : ""}</span>
+                <span className="text-zinc-500 text-[12px]">{todayCount} vente{todayCount > 1 ? "s" : ""}</span>
               </div>
             </div>
           </div>
@@ -262,27 +262,27 @@ export default async function DashboardPage() {
             </div>
             <div className="mt-auto">
               <p className="text-[22px] font-bold tabular-nums text-white">{formatCurrency(totalMargin)}</p>
-              <p className="text-[11px] text-zinc-600 mt-1">{avgMarginPct.toFixed(0)}% en moyenne</p>
+              <p className="text-[11px] text-zinc-500 mt-1">{avgMarginPct.toFixed(0)}% en moyenne</p>
             </div>
           </div>
           <div className="kpi-card p-4 flex flex-col justify-between min-h-[120px]">
             <div className="flex items-start justify-between">
               <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Stock</p>
-              <div className="w-9 h-9 rounded-xl bg-violet-500/10 flex items-center justify-center"><Package size={18} className="text-violet-400" /></div>
+              <div className="w-9 h-9 rounded-xl bg-rose-500/10 flex items-center justify-center"><Package size={18} className="text-rose-400" /></div>
             </div>
             <div className="mt-auto">
               <p className="text-[22px] font-bold tabular-nums text-white">{inStock}</p>
-              <p className="text-[11px] text-zinc-600 mt-1">{formatCurrency(stockValue)}</p>
+              <p className="text-[11px] text-zinc-500 mt-1">{formatCurrency(stockValue)}</p>
             </div>
           </div>
           <div className="kpi-card p-4 flex flex-col justify-between min-h-[120px]">
             <div className="flex items-start justify-between">
               <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Ventes ce mois</p>
-              <div className="w-9 h-9 rounded-xl bg-cyan-500/10 flex items-center justify-center"><ShoppingCart size={18} className="text-cyan-400" /></div>
+              <div className="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center"><ShoppingCart size={18} className="text-emerald-400" /></div>
             </div>
             <div className="mt-auto">
               <p className="text-[22px] font-bold tabular-nums text-white">{monthCount}</p>
-              <p className="text-[11px] text-zinc-600 mt-1">{formatCurrency(currentMonthRevenue)}</p>
+              <p className="text-[11px] text-zinc-500 mt-1">{formatCurrency(currentMonthRevenue)}</p>
             </div>
           </div>
         </div>
@@ -327,13 +327,13 @@ export default async function DashboardPage() {
 
         {recentSales.length === 0 ? (
           <div className="px-5 py-10 text-center">
-            <p className="text-zinc-600 text-sm">Aucune vente enregistree</p>
+            <p className="text-zinc-500 text-sm">Aucune vente enregistree</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-[13px]">
               <thead>
-                <tr className="text-[11px] text-zinc-600 uppercase tracking-wider border-b border-[var(--color-border)]">
+                <tr className="text-[11px] text-zinc-500 uppercase tracking-wider border-b border-[var(--color-border)]">
                   <th className="text-left px-5 py-3 font-medium">Article</th>
                   <th className="text-left px-4 py-3 font-medium hidden sm:table-cell">Canal</th>
                   <th className="text-left px-4 py-3 font-medium hidden md:table-cell">Statut</th>
@@ -353,7 +353,7 @@ export default async function DashboardPage() {
                       <td className="px-5 py-3">
                         <Link href={`/sales/${sale.id}`} className="block">
                           <p className="text-zinc-200 font-medium truncate max-w-[200px] sm:max-w-[300px]">{sale.productTitle ?? sale.notes ?? "Article"}</p>
-                          <p className="text-[11px] text-zinc-600 mt-0.5">{new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short" }).format(new Date(sale.soldAt))}</p>
+                          <p className="text-[11px] text-zinc-500 mt-0.5">{new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short" }).format(new Date(sale.soldAt))}</p>
                         </Link>
                       </td>
                       <td className="px-4 py-3 hidden sm:table-cell text-zinc-400">
@@ -362,7 +362,7 @@ export default async function DashboardPage() {
                       <td className="px-4 py-3 hidden md:table-cell">
                         <div className="flex items-center gap-1.5">
                           {shipStatus === "a_expedier" && <span className="inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-500/15 text-amber-400">A expedier</span>}
-                          {shipStatus === "expedie" && <span className="inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-500/15 text-blue-400">Expedie</span>}
+                          {shipStatus === "expedie" && <span className="inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-500/15 text-emerald-300">Expedie</span>}
                           {shipStatus === "livre" && <span className="inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-500/15 text-emerald-400">Livre</span>}
                           {shipStatus === "retourne" && <span className="inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium bg-red-500/15 text-red-400">Retourne</span>}
                           {payStatus === "en_attente" && <span className="inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium bg-rose-500/15 text-rose-400">Paiement</span>}

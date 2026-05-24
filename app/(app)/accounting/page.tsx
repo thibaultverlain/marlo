@@ -69,7 +69,7 @@ export default async function AccountingPage({ searchParams }: { searchParams: P
           <div className="mt-auto">
             <p className="text-[22px] font-bold text-white tabular-nums">{formatCurrency(stats.revenue)}</p>
             <div className="flex items-center gap-2 mt-0.5">
-              <p className="text-[11px] text-zinc-600">{stats.salesCount} vente{stats.salesCount > 1 ? "s" : ""}</p>
+              <p className="text-[11px] text-zinc-500">{stats.salesCount} vente{stats.salesCount > 1 ? "s" : ""}</p>
               {revenueEvolution !== null && (
                 <span className={`text-[10px] font-medium ${revenueEvolution >= 0 ? "text-emerald-400" : "text-red-400"}`}>
                   {revenueEvolution >= 0 ? "+" : ""}{revenueEvolution.toFixed(0)}% vs {year - 1}
@@ -86,7 +86,7 @@ export default async function AccountingPage({ searchParams }: { searchParams: P
           </div>
           <div className="mt-auto">
             <p className="text-[22px] font-bold text-white tabular-nums">{formatCurrency(stats.expenses)}</p>
-            <p className="text-[11px] text-zinc-600">{stats.expensesCount} ligne{stats.expensesCount > 1 ? "s" : ""}</p>
+            <p className="text-[11px] text-zinc-500">{stats.expensesCount} ligne{stats.expensesCount > 1 ? "s" : ""}</p>
           </div>
         </div>
 
@@ -112,7 +112,7 @@ export default async function AccountingPage({ searchParams }: { searchParams: P
         <div className="kpi-card p-4 flex flex-col justify-between min-h-[110px]">
           <div className="flex items-start justify-between">
             <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Marge nette</p>
-            <div className="w-8 h-8 rounded-xl bg-cyan-500/10 flex items-center justify-center"><Percent size={15} className="text-cyan-400" /></div>
+            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center"><Percent size={15} className="text-emerald-400" /></div>
           </div>
           <p className={`text-[22px] font-bold tabular-nums mt-auto ${marginPct >= 0 ? "text-white" : "text-red-400"}`}>
             {marginPct.toFixed(1)}%

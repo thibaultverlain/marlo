@@ -10,9 +10,9 @@ type SortKey = keyof Pick<VelocityRow, "salesCount" | "avgDaysToSell" | "medianD
 
 const SPEED_BUCKETS = [
   { max: 7,   label: "Lightning",  color: "text-emerald-400", bg: "bg-emerald-500/10" },
-  { max: 14,  label: "Rapide",     color: "text-cyan-400",    bg: "bg-cyan-500/10" },
+  { max: 14,  label: "Rapide",     color: "text-emerald-400",    bg: "bg-emerald-500/10" },
   { max: 30,  label: "Normal",     color: "text-zinc-400",    bg: "bg-zinc-500/10" },
-  { max: 60,  label: "Lent",       color: "text-yellow-400",  bg: "bg-yellow-500/10" },
+  { max: 60,  label: "Lent",       color: "text-amber-400",  bg: "bg-amber-500/10" },
   { max: 9999,label: "Tres lent",  color: "text-red-400",     bg: "bg-red-500/10" },
 ];
 
@@ -100,7 +100,7 @@ export default function VelocityTable({
                   </td>
                   <td className="px-4 py-3 tabular-nums text-zinc-300 font-medium">{formatCurrency(row.totalRevenue)}</td>
                   <td className="px-4 py-3 tabular-nums">
-                    <span className={row.avgMarginPct >= 30 ? "text-emerald-400" : row.avgMarginPct >= 10 ? "text-yellow-400" : "text-red-400"}>
+                    <span className={row.avgMarginPct >= 30 ? "text-emerald-400" : row.avgMarginPct >= 10 ? "text-amber-400" : "text-red-400"}>
                       {row.avgMarginPct.toFixed(1)}%
                     </span>
                   </td>

@@ -102,7 +102,7 @@ export default function RevenueChart({ initialData }: { initialData?: DataPoint[
           <div className="relative">
             <button onClick={() => { setShowDatePicker(!showDatePicker); if (!showDatePicker) setPeriod("custom"); }}
               className={`w-8 h-8 flex items-center justify-center rounded-lg transition-all ${
-                period === "custom" ? "bg-rose-500/10 text-rose-400" : "text-zinc-600 hover:text-zinc-300 hover:bg-white/[0.03]"
+                period === "custom" ? "bg-rose-500/10 text-rose-400" : "text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.03]"
               }`} title="Date personnalisee">
               <Calendar size={15} />
             </button>

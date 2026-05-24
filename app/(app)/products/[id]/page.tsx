@@ -36,7 +36,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
           <ArrowLeft size={18} />
         </Link>
         <div className="flex-1">
-          <p className="text-[11px] text-zinc-600 font-mono">{product.sku}</p>
+          <p className="text-[11px] text-zinc-500 font-mono">{product.sku}</p>
           <h1 className="text-2xl font-bold text-white tracking-tight">{product.title}</h1>
         </div>
         {status && (
@@ -127,14 +127,14 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                 <div>
                   <p className="text-[12px] text-zinc-400">
                     {entry.oldPrice ? (
-                      <span>{formatCurrency(entry.oldPrice)} <span className="text-zinc-600">→</span> <span className="text-white">{formatCurrency(entry.newPrice)}</span></span>
+                      <span>{formatCurrency(entry.oldPrice)} <span className="text-zinc-500">→</span> <span className="text-white">{formatCurrency(entry.newPrice)}</span></span>
                     ) : (
                       <span>Prix initial : <span className="text-white">{formatCurrency(entry.newPrice)}</span></span>
                     )}
                   </p>
-                  {entry.reason && <p className="text-[11px] text-zinc-600 mt-0.5">{entry.reason}</p>}
+                  {entry.reason && <p className="text-[11px] text-zinc-500 mt-0.5">{entry.reason}</p>}
                 </div>
-                <span className="text-[11px] text-zinc-600">{formatDate(entry.changedAt)}</span>
+                <span className="text-[11px] text-zinc-500">{formatDate(entry.changedAt)}</span>
               </div>
             ))}
           </div>
@@ -150,7 +150,7 @@ function Row({ label, value }: { label: string; value: string | null | undefined
   if (!value) return null;
   return (
     <div>
-      <dt className="text-[11px] font-medium text-zinc-600 uppercase tracking-wider">{label}</dt>
+      <dt className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">{label}</dt>
       <dd className="text-zinc-300 mt-0.5">{value}</dd>
     </div>
   );

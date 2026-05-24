@@ -94,13 +94,13 @@ export default function CustomersListClient({ customers }: { customers: Customer
       {/* Search + sort */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600" />
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
           <input
             type="text"
             placeholder="Rechercher (nom, email, ville, instagram)..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-[13px] bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-rose-500/50 text-zinc-200 placeholder:text-zinc-600"
+            className="w-full pl-9 pr-4 py-2 text-[13px] bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-rose-500/50 text-zinc-200 placeholder:text-zinc-500"
           />
         </div>
         <div className="relative">
@@ -140,7 +140,7 @@ export default function CustomersListClient({ customers }: { customers: Customer
       ) : (
         <div className="card-static overflow-hidden">
           <div className="px-5 py-2.5 border-b border-[var(--color-border)] bg-[var(--color-bg)]/30">
-            <span className="text-[11px] text-zinc-600 uppercase tracking-wider font-semibold">
+            <span className="text-[11px] text-zinc-500 uppercase tracking-wider font-semibold">
               {filtered.length} resultat{filtered.length > 1 ? "s" : ""}
             </span>
           </div>
@@ -169,7 +169,7 @@ export default function CustomersListClient({ customers }: { customers: Customer
                 </div>
                 <div className="text-right flex-shrink-0">
                   <p className="text-[13px] font-medium text-zinc-200 tabular-nums">{formatCurrency(c.totalSpent)}</p>
-                  <p className="text-[11px] text-zinc-600">{c.totalOrders ?? 0} cmd{(c.totalOrders ?? 0) > 1 ? "s" : ""}</p>
+                  <p className="text-[11px] text-zinc-500">{c.totalOrders ?? 0} cmd{(c.totalOrders ?? 0) > 1 ? "s" : ""}</p>
                 </div>
               </Link>
             ))}

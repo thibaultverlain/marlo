@@ -118,14 +118,14 @@ export default async function SalesPage({ searchParams }: { searchParams: Promis
           <div className="kpi-card p-4 flex flex-col justify-between min-h-[110px]">
             <div className="flex items-start justify-between">
               <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Chiffre d'affaires</p>
-              <div className="w-9 h-9 rounded-xl bg-blue-500/10 flex items-center justify-center"><ShoppingCart size={17} className="text-blue-400" /></div>
+              <div className="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center"><ShoppingCart size={17} className="text-emerald-400" /></div>
             </div>
             <p className="text-[22px] font-bold tabular-nums text-white mt-auto">{formatCurrency(totalRevenue)}</p>
           </div>
           <div className="kpi-card p-4 flex flex-col justify-between min-h-[110px]">
             <div className="flex items-start justify-between">
               <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Revenu net</p>
-              <div className="w-9 h-9 rounded-xl bg-violet-500/10 flex items-center justify-center"><Wallet size={17} className="text-violet-400" /></div>
+              <div className="w-9 h-9 rounded-xl bg-rose-500/10 flex items-center justify-center"><Wallet size={17} className="text-rose-400" /></div>
             </div>
             <p className="text-[22px] font-bold tabular-nums text-white mt-auto">{formatCurrency(totalNetRevenue)}</p>
           </div>
@@ -139,7 +139,7 @@ export default async function SalesPage({ searchParams }: { searchParams: Promis
           <div className="kpi-card p-4 flex flex-col justify-between min-h-[110px]">
             <div className="flex items-start justify-between">
               <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Marge moyenne</p>
-              <div className="w-9 h-9 rounded-xl bg-cyan-500/10 flex items-center justify-center"><Percent size={17} className="text-cyan-400" /></div>
+              <div className="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center"><Percent size={17} className="text-emerald-400" /></div>
             </div>
             <p className="text-[22px] font-bold tabular-nums text-white mt-auto">{formatPercent(avgMarginPct)}</p>
           </div>

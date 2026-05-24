@@ -14,13 +14,14 @@ type Notif = {
   createdAt: string;
 };
 
+// Palette resserree : chaque type de notif map sur rose/emerald/amber/red selon sens
 const TYPE_CONFIG: Record<string, { icon: React.ElementType; iconClass: string; bgClass: string }> = {
-  task_assigned: { icon: ListTodo, iconClass: "text-blue-400", bgClass: "bg-blue-500/10" },
+  task_assigned: { icon: ListTodo, iconClass: "text-rose-400", bgClass: "bg-rose-500/10" },
   sale_recorded: { icon: ShoppingCart, iconClass: "text-emerald-400", bgClass: "bg-emerald-500/10" },
-  member_joined: { icon: Users2, iconClass: "text-violet-400", bgClass: "bg-violet-500/10" },
+  member_joined: { icon: Users2, iconClass: "text-rose-400", bgClass: "bg-rose-500/10" },
   dormant_stock: { icon: Package, iconClass: "text-amber-400", bgClass: "bg-amber-500/10" },
   deadline_soon: { icon: AlertTriangle, iconClass: "text-red-400", bgClass: "bg-red-500/10" },
-  invoice_created: { icon: FileText, iconClass: "text-cyan-400", bgClass: "bg-cyan-500/10" },
+  invoice_created: { icon: FileText, iconClass: "text-emerald-400", bgClass: "bg-emerald-500/10" },
   automation: { icon: Zap, iconClass: "text-amber-400", bgClass: "bg-amber-500/10" },
 };
 
@@ -145,7 +146,7 @@ export default function NotificationBell() {
             {notifs.length === 0 ? (
               <div className="p-8 text-center">
                 <Bell size={28} className="mx-auto text-zinc-700 mb-2" />
-                <p className="text-sm text-zinc-600">Aucune notification</p>
+                <p className="text-sm text-zinc-500">Aucune notification</p>
               </div>
             ) : (
               <div className="divide-y divide-[var(--color-border)]">
@@ -173,7 +174,7 @@ export default function NotificationBell() {
                         {n.body && (
                           <p className="text-[11px] text-zinc-500 truncate mt-0.5">{n.body}</p>
                         )}
-                        <p className="text-[10px] text-zinc-600 mt-1">{timeAgo(n.createdAt)}</p>
+                        <p className="text-[10px] text-zinc-500 mt-1">{timeAgo(n.createdAt)}</p>
                       </div>
                       {!n.read && (
                         <button

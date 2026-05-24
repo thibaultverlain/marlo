@@ -37,7 +37,7 @@ const ROLE_LABELS: Record<string, string> = {
 
 const ROLE_COLORS: Record<string, string> = {
   owner: "bg-amber-500/15 text-amber-400 border-amber-500/20",
-  manager: "bg-blue-500/15 text-blue-400 border-blue-500/20",
+  manager: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
   seller: "bg-zinc-500/15 text-zinc-400 border-zinc-500/20",
 };
 
@@ -245,7 +245,7 @@ export default function TeamPageClient({
         <div className="kpi-card p-4 flex flex-col justify-between min-h-[100px]">
           <div className="flex items-start justify-between">
             <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Membres</p>
-            <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center"><Users2 size={16} className="text-blue-400" /></div>
+            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center"><Users2 size={16} className="text-emerald-400" /></div>
           </div>
           <p className="text-[22px] font-bold tabular-nums text-white mt-auto">{members.length}</p>
         </div>
@@ -319,9 +319,9 @@ export default function TeamPageClient({
 
         {/* Roles help */}
         {showRoleHelp && (
-          <div className="mb-4 p-3 rounded-lg bg-blue-500/[0.05] border border-blue-500/15 text-[11px] text-blue-300/80 space-y-1.5">
+          <div className="mb-4 p-3 rounded-lg bg-emerald-500/[0.05] border border-emerald-500/15 text-[11px] text-emerald-300/80 space-y-1.5">
             <p><span className="inline-flex items-center gap-1 font-semibold text-amber-400"><ShieldCheck size={10} /> Proprietaire</span> · Acces total a tout, ne peut pas etre modifie.</p>
-            <p><span className="inline-flex items-center gap-1 font-semibold text-blue-400"><Shield size={10} /> Manager</span> · Acces a Dashboard, Stock, Ventes, Clients, Analytique, Sourcing, PS, Taches, Templates, Factures. Pas comptabilite, equipe, reglages.</p>
+            <p><span className="inline-flex items-center gap-1 font-semibold text-emerald-400"><Shield size={10} /> Manager</span> · Acces a Dashboard, Stock, Ventes, Clients, Analytique, Sourcing, PS, Taches, Templates, Factures. Pas comptabilite, equipe, reglages.</p>
             <p><span className="inline-flex items-center gap-1 font-semibold text-zinc-400"><User size={10} /> Vendeur</span> · Acces a Dashboard, Stock, Ventes, Taches. Permissions ajustables individuellement.</p>
           </div>
         )}
@@ -331,7 +331,7 @@ export default function TeamPageClient({
           <div className="mb-5 p-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)]">
             <div className="flex flex-col sm:flex-row gap-3">
               <input type="email" placeholder="email@exemple.com" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)}
-                className="flex-1 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-rose-500/50"
+                className="flex-1 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-rose-500/50"
                 onKeyDown={(e) => e.key === "Enter" && handleInvite()} />
               <div className="flex gap-2">
                 <select value={inviteRole} onChange={(e) => setInviteRole(e.target.value as "manager" | "seller")}
@@ -345,7 +345,7 @@ export default function TeamPageClient({
                 </button>
               </div>
             </div>
-            <p className="text-[10px] text-zinc-600 mt-2">Le lien sera copie automatiquement. Validite : 7 jours.</p>
+            <p className="text-[10px] text-zinc-500 mt-2">Le lien sera copie automatiquement. Validite : 7 jours.</p>
           </div>
         )}
 
@@ -376,7 +376,7 @@ export default function TeamPageClient({
                       <p className="text-[11px] text-zinc-500 truncate">
                         {m.email ?? `ID ${m.userId.substring(0, 8)}`}
                       </p>
-                      <p className="text-[10px] text-zinc-600">
+                      <p className="text-[10px] text-zinc-500">
                         {isOwner ? "Acces total" : `${perms.length} permission${perms.length > 1 ? "s" : ""}`} · Depuis {new Date(m.joinedAt).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}
                       </p>
                     </div>
@@ -430,7 +430,7 @@ export default function TeamPageClient({
                             }`}>
                               {checked && <Check size={10} className="text-white" />}
                             </div>
-                            <Icon size={13} className={checked ? "text-white" : "text-zinc-600"} />
+                            <Icon size={13} className={checked ? "text-white" : "text-zinc-500"} />
                             <p className={`text-[11px] font-medium truncate ${checked ? "text-white" : "text-zinc-500"}`}>{p.label}</p>
                           </button>
                         );
@@ -469,7 +469,7 @@ export default function TeamPageClient({
                       {ROLE_LABELS[inv.role]}
                     </span>
                   </div>
-                  <p className="text-[10px] text-zinc-600 mt-0.5">
+                  <p className="text-[10px] text-zinc-500 mt-0.5">
                     Expire le {new Date(inv.expiresAt).toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}
                   </p>
                 </div>
@@ -511,7 +511,7 @@ export default function TeamPageClient({
                     {a.details && <span className="text-zinc-400 ml-1">{a.details}</span>}
                   </div>
                 </div>
-                <span className="text-zinc-600 text-[10px] flex-shrink-0">{timeAgo(a.createdAt)}</span>
+                <span className="text-zinc-500 text-[10px] flex-shrink-0">{timeAgo(a.createdAt)}</span>
               </div>
             ))}
           </div>

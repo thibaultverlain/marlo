@@ -9,7 +9,7 @@ import { formatCurrency } from "@/lib/utils";
 import { LUXURY_BRANDS } from "@/lib/data";
 import type { SourcingRequest } from "@/lib/db/schema";
 
-const inputClass = "w-full px-3 py-2.5 text-[13px] bg-[var(--color-bg-raised)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-rose-500/50 focus:border-rose-500/50 text-zinc-200 placeholder:text-zinc-600";
+const inputClass = "w-full px-3 py-2.5 text-[13px] bg-[var(--color-bg-raised)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-rose-500/50 focus:border-rose-500/50 text-zinc-200 placeholder:text-zinc-500";
 const labelClass = "block text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-1.5";
 
 export default function EditSourcingForm({
@@ -118,7 +118,7 @@ export default function EditSourcingForm({
               <div className="relative">
                 <input type="number" step="0.01" value={form.targetBudget} onChange={(e) => updateField("targetBudget", e.target.value)}
                   placeholder="0" className={`${inputClass} pr-8`} />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zinc-600">€</span>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zinc-500">€</span>
               </div>
             </div>
             <div>
@@ -126,7 +126,7 @@ export default function EditSourcingForm({
               <div className="relative">
                 <input type="number" step="0.5" value={form.commissionRate} onChange={(e) => updateField("commissionRate", e.target.value)}
                   className={`${inputClass} pr-8`} />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zinc-600">%</span>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zinc-500">%</span>
               </div>
             </div>
           </div>

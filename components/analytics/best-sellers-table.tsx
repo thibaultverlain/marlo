@@ -8,10 +8,11 @@ import { CATEGORIES } from "@/lib/data";
 
 type SortKey = keyof Pick<BestSellerRow, "rotationScore" | "unitsSold" | "totalRevenue" | "totalMargin" | "avgDaysToSell">;
 
+// Or / Argent / Bronze — distinction par intensite de l'amber/zinc
 const PODIUM = [
-  { icon: Trophy, color: "text-yellow-400",   bg: "bg-yellow-500/15" },
-  { icon: Medal,  color: "text-zinc-300",     bg: "bg-zinc-400/15" },
-  { icon: Award,  color: "text-orange-400",   bg: "bg-orange-500/15" },
+  { icon: Trophy, color: "text-amber-300", bg: "bg-amber-400/20" },  // or
+  { icon: Medal,  color: "text-zinc-300",  bg: "bg-zinc-400/15" },   // argent
+  { icon: Award,  color: "text-amber-500", bg: "bg-amber-600/15" },  // bronze
 ];
 
 export default function BestSellersTable({
@@ -83,7 +84,7 @@ export default function BestSellersTable({
                         <Icon size={13} className={podium.color} />
                       </span>
                     ) : (
-                      <span className="inline-flex items-center justify-center w-7 h-7 text-zinc-600 text-[11px] font-mono">{idx + 1}</span>
+                      <span className="inline-flex items-center justify-center w-7 h-7 text-zinc-500 text-[11px] font-mono">{idx + 1}</span>
                     )}
                   </td>
                   <td className="px-4 py-3 font-semibold text-white capitalize">{row.label}</td>

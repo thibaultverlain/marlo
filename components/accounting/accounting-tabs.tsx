@@ -126,7 +126,7 @@ export default function AccountingTabs({
                       style={{ height: `${(m.purchases / maxValue) * 100}%` }}
                     />
                   </div>
-                  <span className={`text-[9px] ${isCurrentMonth ? "text-rose-400 font-semibold" : "text-zinc-600"}`}>{m.month}</span>
+                  <span className={`text-[9px] ${isCurrentMonth ? "text-rose-400 font-semibold" : "text-zinc-500"}`}>{m.month}</span>
                 </div>
               );
             })}
@@ -169,7 +169,7 @@ export default function AccountingTabs({
                 <Icon size={14} />
                 <span className="hidden sm:inline">{label}</span>
                 <span className="sm:hidden">{key === "recipes" ? "Recettes" : "Achats"}</span>
-                <span className="text-[11px] text-zinc-600">({count})</span>
+                <span className="text-[11px] text-zinc-500">({count})</span>
               </button>
             ))}
           </div>

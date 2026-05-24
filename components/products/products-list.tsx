@@ -24,14 +24,16 @@ export type ProductListItem = {
   daysInStock: number;
 };
 
+// Palette resserree : zinc (neutre) + rose (actif) + amber (attente) + emerald (succes) + red (echec)
+// La distinction passe par couleur ET intensite, pas par variete arc-en-ciel.
 const STATUS_STYLES: Record<string, { bg: string; text: string; dot: string }> = {
-  en_stock: { bg: "bg-emerald-500/12 border-emerald-500/20", text: "text-emerald-400", dot: "bg-emerald-400" },
-  en_vente: { bg: "bg-blue-500/12 border-blue-500/20", text: "text-blue-400", dot: "bg-blue-400" },
-  reserve: { bg: "bg-amber-500/12 border-amber-500/20", text: "text-amber-400", dot: "bg-amber-400" },
-  vendu: { bg: "bg-violet-500/12 border-violet-500/20", text: "text-violet-400", dot: "bg-violet-400" },
-  expedie: { bg: "bg-orange-500/12 border-orange-500/20", text: "text-orange-400", dot: "bg-orange-400" },
-  livre: { bg: "bg-zinc-500/12 border-zinc-500/20", text: "text-zinc-400", dot: "bg-zinc-400" },
-  retourne: { bg: "bg-red-500/12 border-red-500/20", text: "text-red-400", dot: "bg-red-400" },
+  en_stock: { bg: "bg-zinc-500/12 border-zinc-500/25", text: "text-zinc-300", dot: "bg-zinc-400" },
+  en_vente: { bg: "bg-rose-500/12 border-rose-500/25", text: "text-rose-400", dot: "bg-rose-400" },
+  reserve: { bg: "bg-amber-500/12 border-amber-500/25", text: "text-amber-400", dot: "bg-amber-400" },
+  vendu: { bg: "bg-emerald-500/15 border-emerald-500/30", text: "text-emerald-400", dot: "bg-emerald-400" },
+  expedie: { bg: "bg-emerald-500/10 border-emerald-500/20", text: "text-emerald-300", dot: "bg-emerald-300" },
+  livre: { bg: "bg-emerald-500/20 border-emerald-500/35", text: "text-emerald-400", dot: "bg-emerald-400" },
+  retourne: { bg: "bg-red-500/12 border-red-500/25", text: "text-red-400", dot: "bg-red-400" },
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -142,13 +144,13 @@ export default function ProductsList({ products }: { products: ProductListItem[]
       {/* Search + filters + view toggle */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         <div className="relative flex-1">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600" />
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
           <input
             type="text"
             placeholder="Rechercher (titre, marque, SKU)..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-[13px] bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-rose-500/50 focus:border-rose-500/50 text-zinc-200 placeholder:text-zinc-600"
+            className="w-full pl-9 pr-4 py-2 text-[13px] bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-rose-500/50 focus:border-rose-500/50 text-zinc-200 placeholder:text-zinc-500"
           />
         </div>
         <div className="flex items-center gap-2">
@@ -253,7 +255,7 @@ export default function ProductsList({ products }: { products: ProductListItem[]
               onChange={toggleSelectAll}
               className="w-3.5 h-3.5 rounded border-[var(--color-border)] bg-[var(--color-bg)] text-rose-500 focus:ring-rose-500 focus:ring-1"
             />
-            <span className="ml-3 text-[11px] text-zinc-600 uppercase tracking-wider font-semibold">
+            <span className="ml-3 text-[11px] text-zinc-500 uppercase tracking-wider font-semibold">
               {filtered.length} resultat{filtered.length > 1 ? "s" : ""}
             </span>
           </div>
@@ -279,14 +281,14 @@ export default function ProductsList({ products }: { products: ProductListItem[]
                       )}
                     </div>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-[11px] text-zinc-600 font-mono">{product.sku}</span>
+                      <span className="text-[11px] text-zinc-500 font-mono">{product.sku}</span>
                       <span className="text-zinc-700">·</span>
                       <span className="text-[11px] text-zinc-500">{product.brand}</span>
                     </div>
                   </div>
                   <div className="text-right flex-shrink-0 hidden sm:block">
                     <p className="text-[13px] font-medium text-zinc-200 tabular-nums">{formatCurrency(product.targetPrice)}</p>
-                    <p className="text-[11px] text-zinc-600 tabular-nums">Achat : {formatCurrency(product.purchasePrice)}</p>
+                    <p className="text-[11px] text-zinc-500 tabular-nums">Achat : {formatCurrency(product.purchasePrice)}</p>
                   </div>
                   <div className="flex-shrink-0 sm:w-24 text-right">
                     <StatusBadge status={product.status} />
@@ -316,7 +318,7 @@ export default function ProductsList({ products }: { products: ProductListItem[]
                 <p className="text-[11px] text-zinc-500 mt-1">{product.brand}</p>
                 <div className="mt-3 pt-3 border-t border-[var(--color-border)]">
                   <p className="text-[15px] font-bold text-white tabular-nums">{formatCurrency(product.targetPrice)}</p>
-                  <p className="text-[11px] text-zinc-600 tabular-nums">Achat : {formatCurrency(product.purchasePrice)}</p>
+                  <p className="text-[11px] text-zinc-500 tabular-nums">Achat : {formatCurrency(product.purchasePrice)}</p>
                 </div>
                 {product.daysInStock > 30 && !["vendu", "livre", "retourne"].includes(product.status) && (
                   <div className="mt-2 flex items-center gap-1 text-[10px] text-amber-400">

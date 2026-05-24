@@ -38,7 +38,7 @@ export default function AuthBrandSelector({
       <div>
         <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 mb-3">Marque</p>
         <div className="relative mb-3">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600" />
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
           <input
             type="text"
             value={brandSearch}

@@ -53,9 +53,9 @@ const SORT_OPTIONS = [
 
 const CHANNEL_STYLES: Record<string, { bg: string; text: string; dot: string }> = {
   vinted: { bg: "bg-teal-500/10 border-teal-500/20", text: "text-teal-400", dot: "bg-teal-400" },
-  vestiaire: { bg: "bg-orange-500/10 border-orange-500/20", text: "text-orange-400", dot: "bg-orange-400" },
+  vestiaire: { bg: "bg-amber-500/10 border-amber-500/20", text: "text-amber-400", dot: "bg-amber-400" },
   stockx: { bg: "bg-emerald-500/10 border-emerald-500/20", text: "text-emerald-400", dot: "bg-emerald-400" },
-  prive: { bg: "bg-violet-500/10 border-violet-500/20", text: "text-violet-400", dot: "bg-violet-400" },
+  prive: { bg: "bg-rose-500/10 border-rose-500/20", text: "text-rose-400", dot: "bg-rose-400" },
   autre: { bg: "bg-zinc-500/10 border-zinc-500/20", text: "text-zinc-400", dot: "bg-zinc-400" },
 };
 const CHANNEL_LABELS: Record<string, string> = {
@@ -94,7 +94,7 @@ function ShippingBadge({ status }: { status: string | null }) {
   if (!status || status === "livre") return null;
   const config: Record<string, { label: string; cl: string; icon: any }> = {
     a_expedier: { label: "A expedier", cl: "text-amber-400 bg-amber-500/10", icon: Package },
-    expedie: { label: "Expedie", cl: "text-blue-400 bg-blue-500/10", icon: Truck },
+    expedie: { label: "Expedie", cl: "text-emerald-400 bg-emerald-500/10", icon: Truck },
     retourne: { label: "Retourne", cl: "text-red-400 bg-red-500/10", icon: X },
   };
   const c = config[status];
@@ -204,13 +204,13 @@ export default function SalesListClient({
       {/* Search + filters */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600" />
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
           <input
             type="text"
             placeholder="Rechercher (article, marque, SKU, client, notes)..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-[13px] bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-rose-500/50 focus:border-rose-500/50 text-zinc-200 placeholder:text-zinc-600"
+            className="w-full pl-9 pr-4 py-2 text-[13px] bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-rose-500/50 focus:border-rose-500/50 text-zinc-200 placeholder:text-zinc-500"
           />
         </div>
         <div className="flex gap-2">
@@ -291,7 +291,7 @@ export default function SalesListClient({
               onChange={toggleSelectAll}
               className="w-3.5 h-3.5 rounded border-[var(--color-border)] bg-[var(--color-bg)] text-rose-500 focus:ring-rose-500 focus:ring-1"
             />
-            <span className="ml-3 text-[11px] text-zinc-600 uppercase tracking-wider font-semibold">
+            <span className="ml-3 text-[11px] text-zinc-500 uppercase tracking-wider font-semibold">
               {filtered.length} resultat{filtered.length > 1 ? "s" : ""}
             </span>
           </div>
@@ -317,7 +317,7 @@ export default function SalesListClient({
                       {sale.customerName && (
                         <span className="text-[11px] text-zinc-500">· {sale.customerName}</span>
                       )}
-                      <span className="text-[11px] text-zinc-600">· {formatDate(sale.soldAt)}</span>
+                      <span className="text-[11px] text-zinc-500">· {formatDate(sale.soldAt)}</span>
                     </div>
                   </div>
                   <div className="text-right flex-shrink-0">

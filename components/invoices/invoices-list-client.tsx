@@ -16,7 +16,7 @@ type Invoice = {
 
 const STATUS_MAP: Record<string, { label: string; cl: string }> = {
   brouillon: { label: "Brouillon", cl: "bg-zinc-500/15 text-zinc-400 border-zinc-500/20" },
-  envoyee: { label: "Envoyee", cl: "bg-blue-500/15 text-blue-400 border-blue-500/20" },
+  envoyee: { label: "Envoyee", cl: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20" },
   payee: { label: "Payee", cl: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20" },
   annulee: { label: "Annulee", cl: "bg-red-500/15 text-red-400 border-red-500/20" },
 };
@@ -100,13 +100,13 @@ export default function InvoicesListClient({ invoices }: { invoices: Invoice[] }
       {/* Search + sort */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600" />
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
           <input
             type="text"
             placeholder="Rechercher (numero, client)..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-[13px] bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-rose-500/50 text-zinc-200 placeholder:text-zinc-600"
+            className="w-full pl-9 pr-4 py-2 text-[13px] bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-rose-500/50 text-zinc-200 placeholder:text-zinc-500"
           />
         </div>
         <div className="relative">
@@ -146,7 +146,7 @@ export default function InvoicesListClient({ invoices }: { invoices: Invoice[] }
       ) : (
         <div className="card-static overflow-hidden">
           <div className="px-5 py-2.5 border-b border-[var(--color-border)] bg-[var(--color-bg)]/30">
-            <span className="text-[11px] text-zinc-600 uppercase tracking-wider font-semibold">
+            <span className="text-[11px] text-zinc-500 uppercase tracking-wider font-semibold">
               {filtered.length} resultat{filtered.length > 1 ? "s" : ""}
             </span>
           </div>
@@ -161,13 +161,13 @@ export default function InvoicesListClient({ invoices }: { invoices: Invoice[] }
                   <Link href={`/invoices/${inv.id}`} className="flex-1 flex items-center gap-3 min-w-0">
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
                       inv.status === "payee" ? "bg-emerald-500/10" :
-                      inv.status === "envoyee" ? "bg-blue-500/10" :
+                      inv.status === "envoyee" ? "bg-emerald-500/10" :
                       inv.status === "annulee" ? "bg-red-500/10" :
                       "bg-[var(--color-bg-hover)]"
                     }`}>
                       <FileText size={16} className={
                         inv.status === "payee" ? "text-emerald-400" :
-                        inv.status === "envoyee" ? "text-blue-400" :
+                        inv.status === "envoyee" ? "text-emerald-400" :
                         inv.status === "annulee" ? "text-red-400" :
                         "text-zinc-500"
                       } />
@@ -185,7 +185,7 @@ export default function InvoicesListClient({ invoices }: { invoices: Invoice[] }
                       <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                         <span className="text-[11px] text-zinc-500">{inv.customerName ?? "Sans client"}</span>
                         <span className="text-zinc-700">·</span>
-                        <span className="text-[11px] text-zinc-600">{formatDate(inv.createdAt)}</span>
+                        <span className="text-[11px] text-zinc-500">{formatDate(inv.createdAt)}</span>
                       </div>
                     </div>
                   </Link>
@@ -196,7 +196,7 @@ export default function InvoicesListClient({ invoices }: { invoices: Invoice[] }
                     <p className="text-[13px] font-medium text-white tabular-nums sm:w-24 text-right">{formatCurrency(inv.amountTtc)}</p>
                     <a
                       href={`/api/invoices/${inv.id}/pdf?download=1`}
-                      className="w-8 h-8 flex items-center justify-center rounded-lg text-zinc-600 hover:text-zinc-300 hover:bg-[var(--color-bg-hover)] transition-colors"
+                      className="w-8 h-8 flex items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-300 hover:bg-[var(--color-bg-hover)] transition-colors"
                       title="Telecharger PDF"
                     >
                       <Download size={14} />
