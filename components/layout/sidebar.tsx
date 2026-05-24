@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Package, ShoppingCart, Users, Search,
-  ShoppingBag, FileText, Calculator, Settings, Menu, X, BarChart3, Users2, ListTodo, Zap, ClipboardList, Truck,
+  ShoppingBag, FileText, Calculator, Settings, Menu, X, BarChart3, ListTodo, ClipboardList, Truck, ShieldCheck,
 } from "lucide-react";
 import ThemeToggle from "./theme-toggle";
 import LogoutButton from "./logout-button";
@@ -42,15 +42,17 @@ const NAV_SECTIONS = [
     label: "Outils",
     items: [
       { href: "/tasks", label: "Taches", icon: ListTodo, perm: "tasks" },
+      { href: "/authentification", label: "Authenticite", icon: ShieldCheck, perm: "authentification" },
       { href: "/templates", label: "Templates", icon: ClipboardList, perm: "templates" },
       { href: "/analytics", label: "Analytique", icon: BarChart3, perm: "analytics" },
     ],
   },
 ];
 
+// Note: /team est cache pour le mode solo. La route reste accessible directement,
+// et reapparaitra ici automatiquement si tu invites un collaborateur un jour.
 const BOTTOM_ITEMS = [
   { href: "/settings", label: "Reglages", icon: Settings, perm: "settings" },
-  { href: "/team", label: "Equipe", icon: Users2, perm: "team" },
 ];
 
 type ShopInfo = { shopId: string; shopName: string; role: string };

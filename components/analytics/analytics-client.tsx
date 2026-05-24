@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { BarChart3, TrendingUp, AlertTriangle, FileSpreadsheet, Percent, ShoppingCart, Wallet } from "lucide-react";
+import { BarChart3, TrendingUp, AlertTriangle, FileSpreadsheet, Percent, ShoppingCart, Wallet, Zap, Trophy, ChevronRight } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LineChart, Line } from "recharts";
 import { formatCurrency, formatPercent } from "@/lib/utils";
 import { CHANNELS, CATEGORIES } from "@/lib/data";
@@ -88,6 +88,34 @@ export default function AnalyticsClient({ initialData }: { initialData: any }) {
             <span className="hidden sm:inline">Excel</span>
           </a>
         </div>
+      </div>
+
+      {/* Quick links vers les sous-pages analytics */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <Link href="/analytics/velocity" className="block card-static p-4 hover:border-[var(--color-border-hover)] transition-all group">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
+              <Zap size={16} className="text-emerald-400" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[13px] font-semibold text-white">Vitesse de vente</p>
+              <p className="text-[11px] text-zinc-500 mt-0.5 truncate">Combien de jours par marque, categorie, canal</p>
+            </div>
+            <ChevronRight size={14} className="text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+          </div>
+        </Link>
+        <Link href="/analytics/best-sellers" className="block card-static p-4 hover:border-[var(--color-border-hover)] transition-all group">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-yellow-500/10 flex items-center justify-center flex-shrink-0">
+              <Trophy size={16} className="text-yellow-400" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[13px] font-semibold text-white">Best sellers</p>
+              <p className="text-[11px] text-zinc-500 mt-0.5 truncate">Top marques, categories et produits par rotation</p>
+            </div>
+            <ChevronRight size={14} className="text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+          </div>
+        </Link>
       </div>
 
       {/* Month comparison KPIs - 4 */}

@@ -31,16 +31,10 @@ export default function ShopSwitcher({
     return () => document.removeEventListener("mousedown", handleClick);
   }, [open]);
 
-  // Don't show if only one shop
+  // Mode solo : un seul shop = pas de switcher du tout, ni de bandeau.
+  // Reapparait automatiquement des qu'un 2e shop est cree.
   if (shops.length <= 1) {
-    return (
-      <div className="px-5 pb-3 hidden lg:block">
-        <div className="flex items-center gap-2 text-[11px] text-zinc-600">
-          <Store size={12} />
-          <span className="truncate">{currentShopName}</span>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   function handleSwitch(shopId: string) {

@@ -82,16 +82,16 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         </div>
       </div>
 
-      {/* Dormants banner (cliquable) */}
+      {/* Dormants banner (cliquable) — pointe vers la vue dediee avec suggestions de baisse */}
       {dormantCount > 0 && view === "stock" && (
-        <Link href="/products?view=stock&filter=dormant"
+        <Link href="/products/dormants"
           className="flex items-center gap-3 bg-amber-500/[0.08] border border-amber-500/20 rounded-xl px-4 py-3 hover:bg-amber-500/[0.12] transition-colors">
           <div className="w-9 h-9 rounded-xl bg-amber-500/15 flex items-center justify-center flex-shrink-0">
             <AlertTriangle size={16} className="text-amber-400" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-[13px] font-semibold text-amber-300">{dormantCount} article{dormantCount > 1 ? "s" : ""} dormant{dormantCount > 1 ? "s" : ""}</p>
-            <p className="text-[11px] text-amber-400/70 mt-0.5">En stock depuis plus de 30 jours</p>
+            <p className="text-[11px] text-amber-400/70 mt-0.5">En stock depuis plus de 30 jours — voir les suggestions de baisse</p>
           </div>
           <span className="text-[11px] text-amber-400">Voir →</span>
         </Link>

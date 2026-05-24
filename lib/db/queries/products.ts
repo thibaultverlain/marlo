@@ -38,6 +38,26 @@ export async function getDormantProducts(shopId: string, thresholdDays: number =
     .orderBy(products.createdAt);
 }
 
+/**
+ * Stats agregees pour la vue Dormants : nombre par tranche d'anciennete +
+ * valeur d'achat et de revente immobilisee.
+ */
+export async function getDormantStats(shopId: string) {
+  const rows = await db
+    .select({
+      total: sql<number>`count(*)::int`,
+      bucket30: sql<number>`count(*) filter (where created_at < NOW() - INTERVAL '30 days' and created_at >= NOW() - INTERVAL '60 days')::int`,
+      bucket60: sql<number>`count(*) filter (where created_at < NOW() - INTERVAL '60 days' and created_at >= NOW() - INTERVAL '90 days')::int`,
+      bucket90: sql<number>`count(*) filter (where created_at < NOW() - INTERVAL '90 days')::int`,
+      lockedPurchase: sql<number>`coalesce(sum(purchase_price) filter (where created_at < NOW() - INTERVAL '30 days'), 0)::numeric`,
+      lockedTarget: sql<number>`coalesce(sum(target_price) filter (where created_at < NOW() - INTERVAL '30 days'), 0)::numeric`,
+    })
+    .from(products)
+    .where(and(eq(products.shopId, shopId), inArray(products.status, ["en_stock", "en_vente"])));
+
+  return rows[0] ?? { total: 0, bucket30: 0, bucket60: 0, bucket90: 0, lockedPurchase: 0, lockedTarget: 0 };
+}
+
 export async function getNextSku(shopId: string): Promise<string> {
   const result = await db
     .select({ count: sql<number>`count(*)::int` })

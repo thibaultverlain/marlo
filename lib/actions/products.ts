@@ -177,6 +177,52 @@ export async function bulkDeleteProductsAction(ids: string[]) {
   }
 }
 
+/**
+ * Applique une baisse de prix suggeree (vue Dormants) sur un produit.
+ * Cree un entry dans price_history pour tracer la decision.
+ */
+export async function applyDormantPriceSuggestionAction(
+  productId: string,
+  newPrice: number,
+): Promise<{ success?: boolean; error?: string }> {
+  if (!Number.isFinite(newPrice) || newPrice <= 0) {
+    return { error: "Prix suggere invalide" };
+  }
+  try {
+    const ctx = await getAuthContext();
+    const { getProductById } = await import("@/lib/db/queries/products");
+    const existing = await getProductById(productId);
+    if (!existing || existing.shopId !== ctx.shopId) {
+      return { error: "Produit introuvable" };
+    }
+    if (Number(existing.purchasePrice) > newPrice) {
+      return { error: "Le prix suggere est inferieur au prix d'achat. Baisse refusee." };
+    }
+
+    const newPriceStr = String(newPrice);
+    if (existing.targetPrice !== newPriceStr) {
+      const { recordPriceChange } = await import("@/lib/db/queries/price-history");
+      await recordPriceChange(
+        productId, ctx.shopId, ctx.userId,
+        existing.targetPrice,
+        newPriceStr,
+        "target_price",
+        "Suggestion dormant appliquee",
+      );
+    }
+
+    await updateProduct(productId, { targetPrice: newPriceStr });
+    revalidatePath("/products");
+    revalidatePath("/products/dormants");
+    revalidatePath(`/products/${productId}`);
+    revalidatePath("/dashboard");
+    return { success: true };
+  } catch (err) {
+    console.error("applyDormantPriceSuggestionAction error:", err);
+    return { error: "Erreur lors de l'application." };
+  }
+}
+
 export async function bulkUpdateStatusAction(ids: string[], status: string) {
   if (!Array.isArray(ids) || ids.length === 0) {
     return { error: "Aucun article selectionne" };
