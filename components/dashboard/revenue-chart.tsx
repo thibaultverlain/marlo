@@ -54,8 +54,10 @@ export default function RevenueChart({ initialData }: { initialData?: DataPoint[
   const [dateTo, setDateTo] = useState("");
 
   useEffect(() => {
-    if (period === "month" && initialData) { setData(initialData); return; }
+    // Custom : le fetch est declenche manuellement par handleCustomDateSearch
+    // (sinon ca fire des qu'on change de date dans le picker).
     if (period === "custom") return;
+    if (period === "month" && initialData) { setData(initialData); return; }
     setLoading(true);
     fetch(`/api/dashboard/chart?period=${period}`)
       .then((r) => r.json())
@@ -65,8 +67,9 @@ export default function RevenueChart({ initialData }: { initialData?: DataPoint[
 
   function handleCustomDateSearch() {
     if (!dateFrom || !dateTo) return;
-    setLoading(true);
     setShowDatePicker(false);
+    setPeriod("custom");
+    setLoading(true);
     fetch(`/api/dashboard/chart?period=custom&from=${dateFrom}&to=${dateTo}`)
       .then((r) => r.json())
       .then((json) => { setData(json.data ?? []); setLoading(false); })

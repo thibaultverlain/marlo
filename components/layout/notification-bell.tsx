@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { Bell, X, Check, CheckCheck, ShoppingCart, ListTodo, Users2, AlertTriangle, Package, FileText, Zap } from "lucide-react";
 
 type Notif = {
@@ -36,6 +37,7 @@ function timeAgo(dateStr: string): string {
 }
 
 export default function NotificationBell() {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [notifs, setNotifs] = useState<Notif[]>([]);
   const [unread, setUnread] = useState(0);
@@ -90,7 +92,12 @@ export default function NotificationBell() {
     if (!notif.read) handleMarkRead(notif.id);
     if (notif.href) {
       setOpen(false);
-      window.location.href = notif.href;
+      // Navigation cote client (pas de full reload) si interne
+      if (notif.href.startsWith("/")) {
+        router.push(notif.href);
+      } else {
+        window.location.href = notif.href;
+      }
     }
   }
 

@@ -120,8 +120,15 @@ export async function GET(req: NextRequest) {
       if (!fromStr || !toStr) {
         return NextResponse.json({ data: [], error: "Dates requises" }, { status: 400 });
       }
-      const from = new Date(fromStr);
-      const to = new Date(toStr + "T23:59:59");
+      // Parse en HEURE LOCALE (serveur), pour matcher l'intention de l'utilisateur :
+      // "du 15 mars au 20 mars" = du 15 mars 00:00 local au 20 mars 23:59:59 local.
+      const fm = fromStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      const tm = toStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (!fm || !tm) {
+        return NextResponse.json({ data: [], error: "Format date invalide" }, { status: 400 });
+      }
+      const from = new Date(Number(fm[1]), Number(fm[2]) - 1, Number(fm[3]), 0, 0, 0);
+      const to = new Date(Number(tm[1]), Number(tm[2]) - 1, Number(tm[3]), 23, 59, 59, 999);
       const diffDays = Math.ceil((to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24));
 
       if (diffDays <= 31) {

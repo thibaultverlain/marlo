@@ -15,13 +15,22 @@ const PRESETS = [
   { label: "Cette annee", yearStart: true },
 ];
 
+// IMPORTANT : on travaille en HEURE LOCALE pour eviter le bug de decalage
+// d'un jour (toISOString() convertit en UTC). YYYY-MM-DD reste un format
+// neutre, mais il doit representer le jour vu par l'utilisateur, pas en UTC.
 function toISO(d: Date): string {
-  return d.toISOString().split("T")[0];
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
 }
 
 function parseISO(s: string): Date | null {
   if (!s) return null;
-  const d = new Date(s + "T00:00:00");
+  // Parse en heure locale pour rester coherent avec toISO ci-dessus
+  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return null;
+  const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
   return isNaN(d.getTime()) ? null : d;
 }
 
