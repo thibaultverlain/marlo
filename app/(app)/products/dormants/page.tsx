@@ -1,9 +1,9 @@
-import Link from "next/link";
-import { ArrowLeft, Snowflake, AlertTriangle, Flame, Skull, Lock } from "lucide-react";
+import { AlertTriangle, Flame, Skull, Lock } from "lucide-react";
 import { getAuthContext } from "@/lib/auth/require-role";
 import { getDormantProducts, getDormantStats } from "@/lib/db/queries/products";
 import { formatCurrency } from "@/lib/utils";
 import DormantsList from "@/components/products/dormants/dormants-list";
+import { PageHeader } from "@/components/ui/page-header";
 
 export const dynamic = "force-dynamic";
 
@@ -20,21 +20,12 @@ export default async function DormantsPage() {
 
   return (
     <div className="space-y-6 page-enter">
-      {/* Header */}
-      <div className="flex items-center gap-3">
-        <Link
-          href="/products"
-          className="w-9 h-9 flex items-center justify-center rounded-lg border border-[var(--color-border)] text-zinc-500 hover:text-zinc-300 transition-colors"
-        >
-          <ArrowLeft size={18} />
-        </Link>
-        <div className="flex-1">
-          <h1 className="text-2xl font-bold text-white tracking-tight">Stock dormant</h1>
-          <p className="text-[13px] text-zinc-500 mt-0.5">
-            Produits en stock depuis plus de 30 jours — agis pour les sortir
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        backHref="/products"
+        title="Stock dormant"
+        subtitle="Produits en stock depuis plus de 30 jours — agis pour les sortir"
+        level="sub"
+      />
 
       {/* Stats cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 stagger">

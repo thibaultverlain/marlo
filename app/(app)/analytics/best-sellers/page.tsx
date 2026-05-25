@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, Trophy, Zap, ChevronRight } from "lucide-react";
+import { Trophy, Zap, ChevronRight } from "lucide-react";
 import { getAuthContext } from "@/lib/auth/require-role";
 import {
   getBestSellersByBrand,
@@ -8,6 +8,7 @@ import {
 } from "@/lib/db/queries/sales-analytics";
 import BestSellersTable from "@/components/analytics/best-sellers-table";
 import TopProductsList from "@/components/analytics/top-products-list";
+import { PageHeader } from "@/components/ui/page-header";
 
 export const dynamic = "force-dynamic";
 
@@ -29,39 +30,33 @@ export default async function BestSellersPage({ searchParams }: { searchParams: 
     getTopFastestProducts(shopId, validPeriod.months, 20),
   ]);
 
+  const periodSwitcher = (
+    <div className="flex bg-zinc-800/60 rounded-lg p-0.5">
+      {PERIODS.map((p) => (
+        <Link
+          key={p.months}
+          href={`/analytics/best-sellers?period=${p.months}`}
+          className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-all ${
+            p.months === validPeriod.months
+              ? "bg-[rgba(225,29,72,0.12)] text-rose-400"
+              : "text-zinc-500 hover:text-zinc-300"
+          }`}
+        >
+          {p.label}
+        </Link>
+      ))}
+    </div>
+  );
+
   return (
     <div className="space-y-6 page-enter">
-      {/* Header */}
-      <div className="flex items-center gap-3">
-        <Link
-          href="/analytics"
-          className="w-9 h-9 flex items-center justify-center rounded-lg border border-[var(--color-border)] text-zinc-500 hover:text-zinc-300 transition-colors"
-        >
-          <ArrowLeft size={18} />
-        </Link>
-        <div className="flex-1">
-          <h1 className="text-2xl font-bold text-white tracking-tight">Best sellers</h1>
-          <p className="text-[13px] text-zinc-500 mt-0.5">
-            Ce qui tourne le mieux — pour decider ou mettre ton budget de sourcing
-          </p>
-        </div>
-
-        <div className="flex bg-zinc-800/60 rounded-lg p-0.5">
-          {PERIODS.map((p) => (
-            <Link
-              key={p.months}
-              href={`/analytics/best-sellers?period=${p.months}`}
-              className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-all ${
-                p.months === validPeriod.months
-                  ? "bg-[rgba(225,29,72,0.12)] text-rose-400"
-                  : "text-zinc-500 hover:text-zinc-300"
-              }`}
-            >
-              {p.label}
-            </Link>
-          ))}
-        </div>
-      </div>
+      <PageHeader
+        backHref="/analytics"
+        title="Best sellers"
+        subtitle="Ce qui tourne le mieux — pour decider ou mettre ton budget de sourcing"
+        actions={periodSwitcher}
+        level="sub"
+      />
 
       {byBrand.length === 0 && topProducts.length === 0 ? (
         <div className="card-static p-12 text-center">

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, Zap, Package, Tag, Store, ChevronRight } from "lucide-react";
+import { Zap, Package, Tag, Store, ChevronRight } from "lucide-react";
 import { getAuthContext } from "@/lib/auth/require-role";
 import {
   getVelocityByBrand,
@@ -9,6 +9,7 @@ import {
 } from "@/lib/db/queries/sales-analytics";
 import { formatCurrency } from "@/lib/utils";
 import VelocityTable from "@/components/analytics/velocity-table";
+import { PageHeader } from "@/components/ui/page-header";
 
 export const dynamic = "force-dynamic";
 
@@ -31,40 +32,33 @@ export default async function VelocityPage({ searchParams }: { searchParams: Pro
     getVelocityByChannel(shopId, validPeriod.months),
   ]);
 
+  const periodSwitcher = (
+    <div className="flex bg-zinc-800/60 rounded-lg p-0.5">
+      {PERIODS.map((p) => (
+        <Link
+          key={p.months}
+          href={`/analytics/velocity?period=${p.months}`}
+          className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-all ${
+            p.months === validPeriod.months
+              ? "bg-[rgba(225,29,72,0.12)] text-rose-400"
+              : "text-zinc-500 hover:text-zinc-300"
+          }`}
+        >
+          {p.label}
+        </Link>
+      ))}
+    </div>
+  );
+
   return (
     <div className="space-y-6 page-enter">
-      {/* Header */}
-      <div className="flex items-center gap-3">
-        <Link
-          href="/analytics"
-          className="w-9 h-9 flex items-center justify-center rounded-lg border border-[var(--color-border)] text-zinc-500 hover:text-zinc-300 transition-colors"
-        >
-          <ArrowLeft size={18} />
-        </Link>
-        <div className="flex-1">
-          <h1 className="text-2xl font-bold text-white tracking-tight">Vitesse de vente</h1>
-          <p className="text-[13px] text-zinc-500 mt-0.5">
-            Combien de temps tes articles passent en stock avant d'etre vendus
-          </p>
-        </div>
-
-        {/* Period switcher */}
-        <div className="flex bg-zinc-800/60 rounded-lg p-0.5">
-          {PERIODS.map((p) => (
-            <Link
-              key={p.months}
-              href={`/analytics/velocity?period=${p.months}`}
-              className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-all ${
-                p.months === validPeriod.months
-                  ? "bg-[rgba(225,29,72,0.12)] text-rose-400"
-                  : "text-zinc-500 hover:text-zinc-300"
-              }`}
-            >
-              {p.label}
-            </Link>
-          ))}
-        </div>
-      </div>
+      <PageHeader
+        backHref="/analytics"
+        title="Vitesse de vente"
+        subtitle="Combien de temps tes articles passent en stock avant d'etre vendus"
+        actions={periodSwitcher}
+        level="sub"
+      />
 
       {/* Overview cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 stagger">
