@@ -1,5 +1,3 @@
-"use client";
-
 import { Target, TrendingUp, TrendingDown } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 
