@@ -2,6 +2,40 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ── Theme customizations Tailwind v4 ──────────────────── */
+@theme {
+  /* Echelle texte fonctionnelle (5 tailles maxi)
+     Usage :
+       text-cap      → 10px  (uppercase tracking, micro-labels)
+       text-meta     → 11px  (meta, timestamps, badges)
+       text-body     → 13px  (texte courant)
+       text-lead     → 15px  (titres de section)
+       text-display  → 22px  (KPI numbers)
+       text-hero     → 40px  (le grand chiffre du dashboard)
+  */
+  --text-cap: 10px;
+  --text-cap--line-height: 14px;
+  --text-cap--letter-spacing: 0.04em;
+  --text-meta: 11px;
+  --text-meta--line-height: 16px;
+  --text-body: 13px;
+  --text-body--line-height: 18px;
+  --text-lead: 15px;
+  --text-lead--line-height: 22px;
+  --text-display: 22px;
+  --text-display--line-height: 26px;
+  --text-display--letter-spacing: -0.02em;
+  --text-hero: 40px;
+  --text-hero--line-height: 42px;
+  --text-hero--letter-spacing: -0.03em;
+
+  /* Radius tokens — alignes avec globals */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+}
+
 /* ╔══════════════════════════════════════════════════════════════════╗
    ║  MARLO DESIGN SYSTEM                                              ║
    ║  Palette : rose (accent) + emerald/red/amber (semantique) + zinc ║
@@ -472,12 +506,72 @@ select option { background-color: var(--color-bg-card); color: var(--color-text)
 }
 
 /* ── Page transitions ────────────────────────────────────── */
+
+/* View Transitions API natif — fade entre pages */
+@view-transition {
+  navigation: auto;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.18s;
+  animation-timing-function: ease-out;
+}
+::view-transition-old(root) {
+  animation-name: viewFadeOut;
+}
+::view-transition-new(root) {
+  animation-name: viewFadeIn;
+}
+@keyframes viewFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes viewFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* Fallback pour les browsers sans View Transitions */
 .page-enter {
   animation: fadeSlideIn 0.25s ease-out;
 }
 @keyframes fadeSlideIn {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* Stagger d'apparition pour les grilles de cards */
+.stagger > * {
+  animation: fadeSlideIn 0.35s ease-out backwards;
+}
+.stagger > *:nth-child(1) { animation-delay: 0ms; }
+.stagger > *:nth-child(2) { animation-delay: 40ms; }
+.stagger > *:nth-child(3) { animation-delay: 80ms; }
+.stagger > *:nth-child(4) { animation-delay: 120ms; }
+.stagger > *:nth-child(5) { animation-delay: 160ms; }
+.stagger > *:nth-child(6) { animation-delay: 200ms; }
+.stagger > *:nth-child(7) { animation-delay: 240ms; }
+.stagger > *:nth-child(8) { animation-delay: 280ms; }
+
+/* Hover lift sur les cards interactives */
+.card-lift {
+  transition: transform 0.2s ease-out, border-color 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+.card-lift:hover {
+  transform: translateY(-1px);
+  border-color: var(--color-border-accent);
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* Respecter reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* ── Gradient text (accent values) ───────────────────────── */

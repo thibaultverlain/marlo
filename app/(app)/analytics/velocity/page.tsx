@@ -67,7 +67,7 @@ export default async function VelocityPage({ searchParams }: { searchParams: Pro
       </div>
 
       {/* Overview cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 stagger">
         <OverviewCard
           icon={<Package size={14} className="text-rose-400" />}
           label="Ventes totales"

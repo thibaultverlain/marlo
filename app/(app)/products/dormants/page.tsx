@@ -37,7 +37,7 @@ export default async function DormantsPage() {
       </div>
 
       {/* Stats cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 stagger">
         <StatCard
           icon={<AlertTriangle size={14} className="text-amber-400" />}
           label="30-60 jours"

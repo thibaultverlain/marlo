@@ -100,7 +100,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
 
       {/* KPIs */}
       {inStockCount > 0 && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 stagger">
           <div className="kpi-card p-4 flex flex-col justify-between min-h-[110px]">
             <div className="flex items-start justify-between">
               <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Articles</p>

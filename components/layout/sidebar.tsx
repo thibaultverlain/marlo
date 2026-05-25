@@ -136,13 +136,20 @@ export default function Sidebar({
                     <Link
                       key={item.href}
                       href={item.href}
-                      className={`flex items-center gap-2.5 px-3 py-[9px] lg:py-[8px] rounded-[10px] text-[13px] transition-all duration-200 ${
+                      className={`relative flex items-center gap-2.5 px-3 py-[9px] lg:py-[8px] rounded-[10px] text-[13px] transition-all duration-200 ${
                         isActive
                           ? "font-semibold"
                           : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-bg-hover)]"
                       }`}
                       style={isActive ? { background: "rgba(225, 29, 72, 0.08)", color: "var(--color-accent)" } : {}}
                     >
+                      {/* Indicateur vertical pour l'item actif */}
+                      {isActive && (
+                        <span
+                          aria-hidden
+                          className="absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-r-full bg-rose-400"
+                        />
+                      )}
                       <Icon size={17} strokeWidth={isActive ? 1.8 : 1.5} />
                       <span className={`flex-1 ${isActive ? "font-semibold" : "font-normal"}`}>{item.label}</span>
                       {showBadge && (

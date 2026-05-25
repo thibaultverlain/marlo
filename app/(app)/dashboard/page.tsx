@@ -210,7 +210,7 @@ export default async function DashboardPage() {
       <RevenueChart initialData={chartData} />
 
       {/* 4. KPIs secondaires — discrets */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 stagger">
         <div className="card-static p-4">
           <div className="flex items-start justify-between mb-3">
             <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">CA total</p>
