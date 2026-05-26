@@ -39,6 +39,15 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
         serialNumber: product.serialNumber ?? "",
         notes: product.notes ?? "",
         status: product.status,
+        // Premium fields
+        subcategory: product.subcategory,
+        material: product.material,
+        countryOfOrigin: product.countryOfOrigin,
+        retailPrice: product.retailPrice ? String(product.retailPrice) : null,
+        hasInvoice: product.hasInvoice,
+        measurements: product.measurements,
+        signatureDetails: product.signatureDetails,
+        keywords: product.keywords,
       }} />
     </div>
   );

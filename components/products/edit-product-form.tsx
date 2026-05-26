@@ -6,6 +6,7 @@ import { Save, AlertCircle, CheckCircle2 } from "lucide-react";
 import { formatCurrency, formatPercent } from "@/lib/utils";
 import { LUXURY_BRANDS, CATEGORIES, CONDITIONS, CHANNELS, PRODUCT_STATUSES } from "@/lib/data";
 import { updateProductAction } from "@/lib/actions/products";
+import PremiumDetailsSection, { EMPTY_PREMIUM_DETAILS, type PremiumDetailsValue } from "./premium-details-section";
 
 const inputClass = "w-full px-3 py-2.5 text-[13px] bg-[var(--color-bg-raised)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500/50 focus:border-indigo-500/50 text-zinc-200 placeholder:text-zinc-500";
 const labelClass = "block text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-1.5";
@@ -15,10 +16,31 @@ type ProductData = {
   size: string; color: string; condition: string; purchasePrice: string;
   targetPrice: string; purchaseSource: string; purchaseDate: string;
   listedOn: string[]; serialNumber: string; notes: string; status: string;
+  // Premium fields (depuis getProductById)
+  subcategory?: string | null;
+  material?: string | null;
+  countryOfOrigin?: string | null;
+  retailPrice?: string | null;
+  hasInvoice?: boolean | null;
+  measurements?: Record<string, number | string> | null;
+  signatureDetails?: string[] | null;
+  keywords?: string[] | null;
 };
 
 export default function EditProductForm({ product }: { product: ProductData }) {
   const [form, setForm] = useState({ ...product });
+  const [premium, setPremium] = useState<PremiumDetailsValue>({
+    subcategory: product.subcategory ?? "",
+    material: product.material ?? "",
+    countryOfOrigin: product.countryOfOrigin ?? "",
+    retailPrice: product.retailPrice ?? "",
+    hasInvoice: product.hasInvoice ?? false,
+    measurements: product.measurements
+      ? Object.fromEntries(Object.entries(product.measurements).map(([k, v]) => [k, String(v)]))
+      : {},
+    signatureDetails: product.signatureDetails ?? [],
+    keywords: product.keywords ?? [],
+  });
   const [brandSearch, setBrandSearch] = useState(product.brand);
   const [showBrandDropdown, setShowBrandDropdown] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -49,6 +71,16 @@ export default function EditProductForm({ product }: { product: ProductData }) {
     formData.append("targetPrice", form.targetPrice); formData.append("purchaseSource", form.purchaseSource);
     formData.append("purchaseDate", form.purchaseDate); formData.append("status", form.status);
     formData.append("serialNumber", form.serialNumber); formData.append("notes", form.notes);
+
+    // Premium fields
+    formData.append("subcategory", premium.subcategory);
+    formData.append("material", premium.material);
+    formData.append("countryOfOrigin", premium.countryOfOrigin);
+    formData.append("retailPrice", premium.retailPrice);
+    formData.append("hasInvoice", String(premium.hasInvoice));
+    formData.append("measurements", JSON.stringify(premium.measurements));
+    premium.signatureDetails.forEach((d) => formData.append("signatureDetails", d));
+    premium.keywords.forEach((k) => formData.append("keywords", k));
 
     startTransition(async () => {
       const result = await updateProductAction(product.id, formData);
@@ -141,6 +173,12 @@ export default function EditProductForm({ product }: { product: ProductData }) {
 
         <div><label className={labelClass}>Numéro de série</label><input type="text" value={form.serialNumber} onChange={(e) => updateField("serialNumber", e.target.value)} className={inputClass} /></div>
         <div><label className={labelClass}>Notes</label><textarea value={form.notes} onChange={(e) => updateField("notes", e.target.value)} rows={3} className={`${inputClass} resize-none`} /></div>
+
+        <PremiumDetailsSection
+          category={form.category}
+          value={premium}
+          onChange={(next) => { setPremium(next); setSaved(false); }}
+        />
       </div>
 
       <div className="flex items-center justify-end gap-3 pb-8">

@@ -7,6 +7,7 @@ import { formatCurrency, formatPercent } from "@/lib/utils";
 import { LUXURY_BRANDS, CATEGORIES, CONDITIONS, CHANNELS } from "@/lib/data";
 import { CURRENCIES, convertToEur } from "@/lib/currency";
 import { createProductAction } from "@/lib/actions/products";
+import PremiumDetailsSection, { EMPTY_PREMIUM_DETAILS, type PremiumDetailsValue } from "./premium-details-section";
 
 const inputClass = "w-full px-3 py-2.5 text-[13px] bg-[var(--color-bg-raised)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500/50 focus:border-indigo-500/50 text-zinc-200 placeholder:text-zinc-500";
 const labelClass = "block text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-1.5";
@@ -19,6 +20,7 @@ export default function NewProductForm() {
     purchaseDate: new Date().toISOString().split("T")[0],
     status: "en_stock" as string, serialNumber: "", notes: "",
   });
+  const [premium, setPremium] = useState<PremiumDetailsValue>(EMPTY_PREMIUM_DETAILS);
   const [brandSearch, setBrandSearch] = useState("");
   const [showBrandDropdown, setShowBrandDropdown] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -57,6 +59,19 @@ export default function NewProductForm() {
     formData.append("purchaseDate", form.purchaseDate);
     formData.append("status", form.status);
     formData.append("serialNumber", form.serialNumber); formData.append("notes", form.notes);
+
+    // Premium details
+    if (premium.subcategory) formData.append("subcategory", premium.subcategory);
+    if (premium.material) formData.append("material", premium.material);
+    if (premium.countryOfOrigin) formData.append("countryOfOrigin", premium.countryOfOrigin);
+    if (premium.retailPrice) formData.append("retailPrice", premium.retailPrice);
+    formData.append("hasInvoice", String(premium.hasInvoice));
+    if (Object.keys(premium.measurements).length > 0) {
+      formData.append("measurements", JSON.stringify(premium.measurements));
+    }
+    premium.signatureDetails.forEach((d) => formData.append("signatureDetails", d));
+    premium.keywords.forEach((k) => formData.append("keywords", k));
+
     startTransition(async () => { const result = await createProductAction(formData); if (result?.error) setError(result.error); });
   }
 
@@ -185,6 +200,12 @@ export default function NewProductForm() {
 
         <div><label className={labelClass}>Numéro de série</label><input type="text" value={form.serialNumber} onChange={(e) => updateField("serialNumber", e.target.value)} placeholder="Pour traçabilité" className={inputClass} /></div>
         <div><label className={labelClass}>Notes</label><textarea value={form.notes} onChange={(e) => updateField("notes", e.target.value)} rows={3} placeholder="Notes libres..." className={`${inputClass} resize-none`} /></div>
+
+        <PremiumDetailsSection
+          category={form.category}
+          value={premium}
+          onChange={setPremium}
+        />
       </div>
 
       <div className="flex items-center justify-end gap-3 pb-8">

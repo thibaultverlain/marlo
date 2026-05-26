@@ -33,6 +33,15 @@ const productSchema = z.object({
   status: z.string().optional(),
   serialNumber: z.string().optional().nullable(),
   notes: z.string().optional().nullable(),
+  // Premium fields (tous optionnels)
+  subcategory: z.string().optional().nullable(),
+  material: z.string().optional().nullable(),
+  countryOfOrigin: z.string().optional().nullable(),
+  retailPrice: z.string().optional().nullable(),
+  hasInvoice: z.string().optional(), // "true" | "false"
+  measurements: z.string().optional(), // JSON string
+  signatureDetails: z.array(z.string()).optional(),
+  keywords: z.array(z.string()).optional(),
 });
 
 export async function createProductAction(formData: FormData) {
@@ -52,6 +61,15 @@ export async function createProductAction(formData: FormData) {
     status: (formData.get("status") as string) || "en_stock",
     serialNumber: formData.get("serialNumber") as string | null,
     notes: formData.get("notes") as string | null,
+    // Premium fields
+    subcategory: formData.get("subcategory") as string | null,
+    material: formData.get("material") as string | null,
+    countryOfOrigin: formData.get("countryOfOrigin") as string | null,
+    retailPrice: formData.get("retailPrice") as string | null,
+    hasInvoice: formData.get("hasInvoice") as string | undefined,
+    measurements: formData.get("measurements") as string | undefined,
+    signatureDetails: formData.getAll("signatureDetails") as string[],
+    keywords: formData.getAll("keywords") as string[],
   };
 
   const purchaseCurrency = (formData.get("purchaseCurrency") as string) || "EUR";
@@ -65,6 +83,23 @@ export async function createProductAction(formData: FormData) {
     const ctx = await getAuthContext();
     const priceNum = parseFloat(parsed.data.purchasePrice) || 0;
     const priceEur = purchaseCurrency !== "EUR" ? String(convertToEur(priceNum, purchaseCurrency)) : parsed.data.purchasePrice;
+
+    // Parse premium fields
+    let measurementsObj: Record<string, number | string> | null = null;
+    if (parsed.data.measurements) {
+      try {
+        const parsedM = JSON.parse(parsed.data.measurements);
+        if (parsedM && typeof parsedM === "object") {
+          // Convertir les strings en number si possible
+          const cleaned: Record<string, number | string> = {};
+          for (const [k, v] of Object.entries(parsedM)) {
+            const n = Number(v);
+            cleaned[k] = !isNaN(n) ? n : String(v);
+          }
+          measurementsObj = cleaned;
+        }
+      } catch {}
+    }
 
     await createProduct({
       userId: ctx.userId,
@@ -86,6 +121,19 @@ export async function createProductAction(formData: FormData) {
       serialNumber: parsed.data.serialNumber ?? null,
       notes: parsed.data.notes ?? null,
       status: (parsed.data.status as any) ?? "en_stock",
+      // Premium fields
+      subcategory: parsed.data.subcategory || null,
+      material: parsed.data.material || null,
+      countryOfOrigin: parsed.data.countryOfOrigin || null,
+      retailPrice: parsed.data.retailPrice ? cleanPrice(parsed.data.retailPrice) : null,
+      hasInvoice: parsed.data.hasInvoice === "true",
+      measurements: measurementsObj,
+      signatureDetails: parsed.data.signatureDetails && parsed.data.signatureDetails.length > 0
+        ? parsed.data.signatureDetails
+        : null,
+      keywords: parsed.data.keywords && parsed.data.keywords.length > 0
+        ? parsed.data.keywords
+        : null,
     });
   } catch (err) {
     console.error("createProductAction error:", err);
@@ -99,10 +147,12 @@ export async function createProductAction(formData: FormData) {
 
 export async function updateProductAction(id: string, formData: FormData) {
   const raw: Record<string, any> = {};
+  // Multi-value fields (arrays)
+  const arrayKeys = new Set(["listedOn", "signatureDetails", "keywords"]);
   formData.forEach((value, key) => {
-    if (key === "listedOn") {
-      if (!raw.listedOn) raw.listedOn = [];
-      raw.listedOn.push(value);
+    if (arrayKeys.has(key)) {
+      if (!raw[key]) raw[key] = [];
+      raw[key].push(value);
     } else {
       raw[key] = value;
     }
@@ -119,6 +169,39 @@ export async function updateProductAction(id: string, formData: FormData) {
     const updateData: Record<string, any> = { ...parsed.data };
     const status = formData.get("status") as string;
     if (status) updateData.status = status;
+
+    // Premium : transformations
+    if (parsed.data.measurements !== undefined) {
+      try {
+        const m = JSON.parse(parsed.data.measurements as string);
+        if (m && typeof m === "object") {
+          const cleaned: Record<string, number | string> = {};
+          for (const [k, v] of Object.entries(m)) {
+            const n = Number(v);
+            cleaned[k] = !isNaN(n) ? n : String(v);
+          }
+          updateData.measurements = Object.keys(cleaned).length > 0 ? cleaned : null;
+        }
+      } catch {
+        updateData.measurements = null;
+      }
+    }
+    if (parsed.data.hasInvoice !== undefined) {
+      updateData.hasInvoice = parsed.data.hasInvoice === "true";
+    }
+    if (parsed.data.retailPrice !== undefined) {
+      updateData.retailPrice = parsed.data.retailPrice ? cleanPrice(parsed.data.retailPrice) : null;
+    }
+    // Sanitize empty arrays/strings to null
+    if (parsed.data.signatureDetails !== undefined) {
+      updateData.signatureDetails = parsed.data.signatureDetails.length > 0 ? parsed.data.signatureDetails : null;
+    }
+    if (parsed.data.keywords !== undefined) {
+      updateData.keywords = parsed.data.keywords.length > 0 ? parsed.data.keywords : null;
+    }
+    for (const k of ["subcategory", "material", "countryOfOrigin"] as const) {
+      if (updateData[k] === "") updateData[k] = null;
+    }
 
     // Record price history if target_price changed
     if (parsed.data.targetPrice !== undefined) {
