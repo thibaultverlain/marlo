@@ -3,12 +3,21 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { X, Wand2, ImageIcon, Loader2, Check, AlertCircle, RotateCcw } from "lucide-react";
 
+/**
+ * Marlo Studio — packshot luxe style Vestiaire / 1stDibs.
+ *
+ * Le style de reference :
+ *   - Fond gris tres clair uniforme (#f4f4f4) avec subtile vignette
+ *   - Ombre "puddle" courte sous l'objet (compressee verticalement)
+ *   - Centrage propre + padding constant
+ *   - Pas de gradient marque
+ */
+
 const BACKGROUNDS = [
-  { id: "white", label: "Blanc studio", thumb: "#ffffff" },
-  { id: "cream", label: "Beige luxe", thumb: "#f0e6d0" },
-  { id: "grey", label: "Gris degrade", thumb: "#dfdfdf" },
-  { id: "rose", label: "Rose poudre", thumb: "#fbd6dd" },
-  { id: "marble", label: "Marbre", thumb: "#e8e6e1" },
+  { id: "vestiaire", label: "Vestiaire", description: "Style packshot luxe" },
+  { id: "studio_white", label: "Blanc studio", description: "Fond blanc pur uniforme" },
+  { id: "beige_lux", label: "Beige luxe", description: "Ton chaleureux haut de gamme" },
+  { id: "graphite", label: "Graphite", description: "Fond sombre cinematique" },
 ];
 
 const CANVAS_SIZE = 1080;
@@ -31,9 +40,10 @@ export default function PhotoStudioModal({
   const [cutoutBlob, setCutoutBlob] = useState<Blob | null>(null);
   const [cutoutUrl, setCutoutUrl] = useState<string | null>(null);
 
-  const [bg, setBg] = useState("white");
-  const [shadow, setShadow] = useState(60);
+  const [bg, setBg] = useState("vestiaire");
+  const [shadow, setShadow] = useState(70);
   const [brightness, setBrightness] = useState(100);
+  const [scale, setScale] = useState(85); // % de la zone de canvas occupee
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -47,9 +57,10 @@ export default function PhotoStudioModal({
       if (cutoutUrl) URL.revokeObjectURL(cutoutUrl);
       setCutoutUrl(null);
       cutoutImageRef.current = null;
-      setBg("white");
-      setShadow(60);
+      setBg("vestiaire");
+      setShadow(70);
       setBrightness(100);
+      setScale(85);
     }
   }, [open]);
 
@@ -59,17 +70,11 @@ export default function PhotoStudioModal({
 
     try {
       const { removeBackground } = await import("@imgly/background-removal");
-
-      // Use the medium model for better quality (slightly slower but much more accurate)
       const blob = await removeBackground(file, {
-        model: "isnet", // Better than the default 'isnet_fp16' for quality
-        output: {
-          format: "image/png",
-          quality: 1,
-        },
+        model: "isnet",
+        output: { format: "image/png", quality: 1 },
       });
 
-      // Pre-load the image once for performance
       const url = URL.createObjectURL(blob);
       const img = new Image();
       img.onload = () => {
@@ -90,17 +95,25 @@ export default function PhotoStudioModal({
     }
   }
 
-  // Calculate the bounding box of non-transparent pixels
-  function getObjectBounds(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const data = imageData.data;
-    let minX = canvas.width, minY = canvas.height, maxX = 0, maxY = 0;
-    let found = false;
+  /**
+   * Calcule le bounding box de l'objet detoure (alpha > 20).
+   * Permet de recadrer precisement avant placement.
+   */
+  function getObjectBounds(img: HTMLImageElement): { minX: number; minY: number; maxX: number; maxY: number; width: number; height: number } | null {
+    const off = document.createElement("canvas");
+    off.width = img.width;
+    off.height = img.height;
+    const offCtx = off.getContext("2d");
+    if (!offCtx) return null;
+    offCtx.drawImage(img, 0, 0);
+    const data = offCtx.getImageData(0, 0, img.width, img.height).data;
 
-    for (let y = 0; y < canvas.height; y++) {
-      for (let x = 0; x < canvas.width; x++) {
-        const alpha = data[(y * canvas.width + x) * 4 + 3];
-        if (alpha > 20) { // Threshold to ignore semi-transparent edges
+    let minX = img.width, minY = img.height, maxX = 0, maxY = 0;
+    let found = false;
+    // Sample par pas de 2 pour aller plus vite
+    for (let y = 0; y < img.height; y += 2) {
+      for (let x = 0; x < img.width; x += 2) {
+        if (data[(y * img.width + x) * 4 + 3] > 20) {
           if (x < minX) minX = x;
           if (x > maxX) maxX = x;
           if (y < minY) minY = y;
@@ -109,7 +122,6 @@ export default function PhotoStudioModal({
         }
       }
     }
-
     if (!found) return null;
     return { minX, minY, maxX, maxY, width: maxX - minX, height: maxY - minY };
   }
@@ -124,106 +136,158 @@ export default function PhotoStudioModal({
     canvas.width = CANVAS_SIZE;
     canvas.height = CANVAS_SIZE;
 
-    // 1. Draw background
+    // 1. Fond + vignette
     drawBackground(ctx, bg);
 
-    // 2. Calculate fit for the object centered with bottom padding
-    const padding = CANVAS_SIZE * 0.08;
-    const bottomPadding = CANVAS_SIZE * 0.12; // More space at bottom for shadow
-    const maxWidth = CANVAS_SIZE - padding * 2;
-    const maxHeight = CANVAS_SIZE - padding - bottomPadding;
-    const scale = Math.min(maxWidth / img.width, maxHeight / img.height);
-    const w = img.width * scale;
-    const h = img.height * scale;
-    const x = (CANVAS_SIZE - w) / 2;
-    const y = (CANVAS_SIZE - h) / 2 - bottomPadding / 4; // Slight upward shift to leave room for shadow
+    // 2. Cadrage de l'objet avec bounding box (centrage precis)
+    const bounds = getObjectBounds(img);
+    const objWidth = bounds ? bounds.width : img.width;
+    const objHeight = bounds ? bounds.height : img.height;
 
-    // 3. Draw shadow that follows the object silhouette
-    if (shadow > 0) {
-      drawObjectShadow(ctx, img, x, y, w, h, shadow);
+    const scaleFactor = scale / 100;
+    const maxWidth = CANVAS_SIZE * scaleFactor;
+    const maxHeight = CANVAS_SIZE * scaleFactor * 0.85; // un peu moins haut pour laisser place a l'ombre
+    const fit = Math.min(maxWidth / objWidth, maxHeight / objHeight);
+
+    // Taille finale en pixels
+    const drawW = img.width * fit;
+    const drawH = img.height * fit;
+
+    // Position : centre horizontal, base de l'objet a ~88% de la hauteur (place pour ombre)
+    const x = (CANVAS_SIZE - drawW) / 2 - (bounds ? bounds.minX * fit : 0);
+    const baselineY = CANVAS_SIZE * 0.88;
+    const y = baselineY - (bounds ? bounds.maxY * fit : drawH);
+
+    // 3. Ombre puddle (compressée verticalement, sous l'objet)
+    if (shadow > 0 && bounds) {
+      drawPuddleShadow(ctx, img, x, y, drawW, drawH, bounds, fit, shadow);
     }
 
-    // 4. Draw object with brightness adjustment
+    // 4. Objet
     ctx.save();
     if (brightness !== 100) {
       ctx.filter = `brightness(${brightness}%)`;
     }
-    ctx.drawImage(img, x, y, w, h);
+    ctx.drawImage(img, x, y, drawW, drawH);
     ctx.restore();
-  }, [bg, shadow, brightness]);
 
-  // Draw a realistic shadow that follows the object's silhouette
-  function drawObjectShadow(ctx: CanvasRenderingContext2D, img: HTMLImageElement, x: number, y: number, w: number, h: number, intensity: number) {
+    // 5. Vignette tres subtile par-dessus (sauf graphite qui en a deja une)
+    if (bg !== "graphite") {
+      drawSubtleVignette(ctx, bg);
+    }
+  }, [bg, shadow, brightness, scale]);
+
+  /**
+   * Ombre "puddle" : silhouette de l'objet, comprimee verticalement (scaleY ~0.18),
+   * blur eleve, position juste sous la base de l'objet.
+   * Donne l'effet "Vestiaire" : ombre courte et large.
+   */
+  function drawPuddleShadow(
+    ctx: CanvasRenderingContext2D,
+    img: HTMLImageElement,
+    objX: number, objY: number, objW: number, objH: number,
+    bounds: { minX: number; minY: number; maxX: number; maxY: number; width: number; height: number },
+    fit: number,
+    intensity: number,
+  ) {
     const factor = intensity / 100;
 
-    // Create offscreen canvas with the object
+    // Silhouette de l'objet (noir, alpha = 1 partout ou l'objet est present)
     const off = document.createElement("canvas");
     off.width = CANVAS_SIZE;
     off.height = CANVAS_SIZE;
     const offCtx = off.getContext("2d");
     if (!offCtx) return;
-
-    // Draw image on offscreen
-    offCtx.drawImage(img, x, y, w, h);
-
-    // Convert to pure black silhouette
+    offCtx.drawImage(img, objX, objY, objW, objH);
     offCtx.globalCompositeOperation = "source-in";
-    offCtx.fillStyle = "rgba(0, 0, 0, 1)";
+    offCtx.fillStyle = "rgba(20, 22, 25, 1)";
     offCtx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
 
-    // Now draw this silhouette on the main canvas, offset down + blurred
+    // Position de la base de l'objet en coordonnees canvas
+    const objBaseY = objY + bounds.maxY * fit;
+    const shadowCenterX = objX + (bounds.minX + bounds.width / 2) * fit;
+
+    // Premiere couche : ombre principale, compressee
     ctx.save();
-    ctx.globalAlpha = 0.35 * factor;
-    ctx.filter = `blur(${Math.round(20 * factor)}px)`;
+    ctx.globalAlpha = 0.32 * factor;
+    ctx.filter = `blur(${Math.round(18 * factor + 8)}px)`;
 
-    // Compress vertically for natural shadow (like under-object ground shadow)
-    const offsetY = h * 0.05 * factor;
-    const shadowY = y + offsetY;
-    const shadowScaleY = 1;
-
-    ctx.translate(0, shadowY * (1 - shadowScaleY));
-    ctx.scale(1, shadowScaleY);
+    // ScaleY tres faible (compression verticale) pour effet "ground shadow"
+    const sy = 0.18;
+    // Translate pour que l'ombre soit basee a objBaseY
+    ctx.translate(shadowCenterX, objBaseY);
+    ctx.scale(1, sy);
+    ctx.translate(-shadowCenterX, -objBaseY);
     ctx.drawImage(off, 0, 0);
     ctx.restore();
 
-    // Add a softer second shadow underneath for more realism
+    // Deuxieme couche : ombre plus large et plus floue (ambiant occlusion)
     ctx.save();
-    ctx.globalAlpha = 0.2 * factor;
-    ctx.filter = `blur(${Math.round(40 * factor)}px)`;
-    ctx.translate(0, h * 0.08 * factor);
+    ctx.globalAlpha = 0.16 * factor;
+    ctx.filter = `blur(${Math.round(40 * factor + 20)}px)`;
+    const sy2 = 0.12;
+    ctx.translate(shadowCenterX, objBaseY + 8);
+    ctx.scale(1.15, sy2);
+    ctx.translate(-shadowCenterX, -(objBaseY + 8));
     ctx.drawImage(off, 0, 0);
     ctx.restore();
   }
 
+  /**
+   * Vignette ultra subtile : assombrit legerement les coins/bas pour donner
+   * de la profondeur sans alterer le fond uniforme. ~5-8% d'opacite max.
+   */
+  function drawSubtleVignette(ctx: CanvasRenderingContext2D, preset: string) {
+    const grad = ctx.createRadialGradient(
+      CANVAS_SIZE / 2, CANVAS_SIZE * 0.45, CANVAS_SIZE * 0.3,
+      CANVAS_SIZE / 2, CANVAS_SIZE * 0.55, CANVAS_SIZE * 0.75,
+    );
+    grad.addColorStop(0, "rgba(0,0,0,0)");
+    grad.addColorStop(0.6, "rgba(0,0,0,0)");
+    // Intensite differente selon le fond
+    const intensity = preset === "vestiaire" ? 0.05 : preset === "beige_lux" ? 0.07 : 0.04;
+    grad.addColorStop(1, `rgba(0,0,0,${intensity})`);
+    ctx.save();
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+    ctx.restore();
+  }
+
+  /**
+   * Fond uniforme ou tres legerement gradient selon preset.
+   * Style packshot luxe : fond presque flat, pas de gradient agressif.
+   */
   function drawBackground(ctx: CanvasRenderingContext2D, preset: string) {
-    if (preset === "marble") {
-      const grad = ctx.createRadialGradient(CANVAS_SIZE * 0.3, CANVAS_SIZE * 0.3, 0, CANVAS_SIZE * 0.5, CANVAS_SIZE * 0.5, CANVAS_SIZE * 0.7);
-      grad.addColorStop(0, "#f5f3ee");
-      grad.addColorStop(0.5, "#e8e6e1");
-      grad.addColorStop(1, "#d8d5cd");
+    if (preset === "graphite") {
+      // Fond sombre cinematique avec gradient subtil
+      const grad = ctx.createRadialGradient(
+        CANVAS_SIZE * 0.5, CANVAS_SIZE * 0.4, 0,
+        CANVAS_SIZE * 0.5, CANVAS_SIZE * 0.5, CANVAS_SIZE * 0.8,
+      );
+      grad.addColorStop(0, "#3a3a3d");
+      grad.addColorStop(0.5, "#2a2a2c");
+      grad.addColorStop(1, "#1a1a1c");
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
-      ctx.strokeStyle = "rgba(150, 145, 138, 0.12)";
-      ctx.lineWidth = 2;
-      for (let i = 0; i < 6; i++) {
-        ctx.beginPath();
-        const startX = Math.random() * CANVAS_SIZE;
-        const startY = Math.random() * CANVAS_SIZE;
-        ctx.moveTo(startX, startY);
-        for (let j = 0; j < 5; j++) {
-          ctx.lineTo(startX + (Math.random() - 0.5) * 400, startY + (Math.random() - 0.5) * 400);
-        }
-        ctx.stroke();
-      }
-    } else {
-      const grad = ctx.createLinearGradient(0, 0, 0, CANVAS_SIZE);
-      if (preset === "white") { grad.addColorStop(0, "#ffffff"); grad.addColorStop(1, "#f0f0f0"); }
-      else if (preset === "cream") { grad.addColorStop(0, "#faf5eb"); grad.addColorStop(1, "#ede4cf"); }
-      else if (preset === "grey") { grad.addColorStop(0, "#f5f5f5"); grad.addColorStop(1, "#d4d4d4"); }
-      else if (preset === "rose") { grad.addColorStop(0, "#fef0f1"); grad.addColorStop(1, "#fbd6dd"); }
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+      return;
     }
+
+    let baseColor: string;
+    if (preset === "vestiaire") baseColor = "#f4f4f4"; // gris tres clair Vestiaire
+    else if (preset === "studio_white") baseColor = "#fafafa"; // presque blanc
+    else if (preset === "beige_lux") baseColor = "#efe8da"; // beige chaud subtil
+    else baseColor = "#f4f4f4";
+
+    // Remplissage uniforme
+    ctx.fillStyle = baseColor;
+    ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+
+    // Tres leger gradient bas pour donner de la dimension (pas une teinte differente)
+    const grad = ctx.createLinearGradient(0, CANVAS_SIZE * 0.5, 0, CANVAS_SIZE);
+    grad.addColorStop(0, "rgba(0,0,0,0)");
+    grad.addColorStop(1, "rgba(0,0,0,0.03)");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
   }
 
   useEffect(() => {
@@ -237,7 +301,7 @@ export default function PhotoStudioModal({
 
     try {
       const blob: Blob = await new Promise((resolve, reject) => {
-        canvasRef.current!.toBlob((b) => b ? resolve(b) : reject(new Error("Canvas vide")), "image/jpeg", 0.92);
+        canvasRef.current!.toBlob((b) => b ? resolve(b) : reject(new Error("Canvas vide")), "image/jpeg", 0.95);
       });
 
       const file = new File([blob], `studio-${Date.now()}.jpg`, { type: "image/jpeg" });
@@ -277,6 +341,8 @@ export default function PhotoStudioModal({
 
   if (!open) return null;
 
+  const currentBg = BACKGROUNDS.find((b) => b.id === bg);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" onClick={onClose}>
       <div className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
@@ -287,7 +353,7 @@ export default function PhotoStudioModal({
             </div>
             <div>
               <h3 className="text-[15px] font-semibold text-white">Marlo Studio</h3>
-              <p className="text-[11px] text-zinc-500">Photo professionnelle en quelques clics</p>
+              <p className="text-[11px] text-zinc-500">Packshot luxe en quelques clics</p>
             </div>
           </div>
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-[var(--color-bg-hover)] text-zinc-500 hover:text-zinc-300">
@@ -313,7 +379,7 @@ export default function PhotoStudioModal({
               </div>
               <p className="text-[14px] font-semibold text-white mb-1">Charge une photo</p>
               <p className="text-[12px] text-zinc-500">Article photographie chez toi, fond importe peu</p>
-              <p className="text-[10px] text-zinc-500 mt-3">JPG, PNG · 10MB max</p>
+              <p className="text-[10px] text-zinc-500 mt-3">JPG, PNG · 10MB max · Photo bien eclairee = meilleur detourage</p>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -328,7 +394,7 @@ export default function PhotoStudioModal({
             <div className="py-16 text-center">
               <Loader2 size={36} className="text-rose-400 animate-spin inline-block" />
               <p className="text-[14px] font-semibold text-white mt-4">Detection precise de l'objet...</p>
-              <p className="text-[12px] text-zinc-500 mt-1">Modele haute qualite, ca prend 5 a 10 secondes</p>
+              <p className="text-[12px] text-zinc-500 mt-1">Modele haute qualite, 5 a 10 secondes</p>
               <p className="text-[10px] text-zinc-500 mt-3">Premiere utilisation : telechargement du modele (~80MB)</p>
             </div>
           )}
@@ -336,7 +402,7 @@ export default function PhotoStudioModal({
           {(step === "editing" || step === "saving") && cutoutUrl && (
             <div className="grid grid-cols-1 md:grid-cols-[1fr_240px] gap-5">
               <div className="flex items-start justify-center">
-                <div className="relative w-full max-w-[400px] aspect-square rounded-xl overflow-hidden border border-[var(--color-border)]">
+                <div className="relative w-full max-w-[420px] aspect-square rounded-xl overflow-hidden border border-[var(--color-border)] shadow-lg">
                   <canvas
                     ref={canvasRef}
                     style={{ width: "100%", height: "100%", display: "block" }}
@@ -350,23 +416,46 @@ export default function PhotoStudioModal({
               </div>
 
               <div className="space-y-5">
+                {/* Backgrounds */}
                 <div>
                   <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-2">Fond</p>
-                  <div className="grid grid-cols-5 md:grid-cols-3 gap-2">
+                  <div className="space-y-1.5">
                     {BACKGROUNDS.map((b) => (
                       <button
                         key={b.id}
                         onClick={() => setBg(b.id)}
                         disabled={step === "saving"}
-                        className={`aspect-square rounded-lg border-2 transition-all ${bg === b.id ? "border-rose-400 ring-2 ring-rose-400/20" : "border-[var(--color-border)] hover:border-[var(--color-border-hover)]"}`}
-                        style={{ background: b.thumb }}
-                        title={b.label}
-                      />
+                        className={`w-full px-3 py-2 rounded-lg text-left transition-all border ${
+                          bg === b.id
+                            ? "bg-rose-500/8 border-rose-500/40"
+                            : "bg-[var(--color-bg-raised)] border-[var(--color-border)] hover:border-[var(--color-border-hover)]"
+                        }`}
+                      >
+                        <p className={`text-[12px] font-semibold ${bg === b.id ? "text-rose-300" : "text-zinc-300"}`}>{b.label}</p>
+                        <p className="text-[10px] text-zinc-500 mt-0.5">{b.description}</p>
+                      </button>
                     ))}
                   </div>
-                  <p className="text-[10px] text-zinc-500 mt-1.5">{BACKGROUNDS.find((b) => b.id === bg)?.label}</p>
                 </div>
 
+                {/* Scale */}
+                <div>
+                  <div className="flex justify-between mb-1.5">
+                    <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider">Taille</p>
+                    <p className="text-[10px] text-zinc-400 tabular-nums">{scale}%</p>
+                  </div>
+                  <input
+                    type="range"
+                    min={50}
+                    max={95}
+                    value={scale}
+                    disabled={step === "saving"}
+                    onChange={(e) => setScale(Number(e.target.value))}
+                    className="w-full accent-rose-400"
+                  />
+                </div>
+
+                {/* Shadow */}
                 <div>
                   <div className="flex justify-between mb-1.5">
                     <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider">Ombre</p>
@@ -383,6 +472,7 @@ export default function PhotoStudioModal({
                   />
                 </div>
 
+                {/* Brightness */}
                 <div>
                   <div className="flex justify-between mb-1.5">
                     <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider">Luminosite</p>
@@ -390,8 +480,8 @@ export default function PhotoStudioModal({
                   </div>
                   <input
                     type="range"
-                    min={50}
-                    max={150}
+                    min={70}
+                    max={130}
                     value={brightness}
                     disabled={step === "saving"}
                     onChange={(e) => setBrightness(Number(e.target.value))}
@@ -405,7 +495,7 @@ export default function PhotoStudioModal({
                   className="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-[12px] font-medium text-zinc-500 hover:text-zinc-300 transition disabled:opacity-50"
                 >
                   <RotateCcw size={12} />
-                  Recharger
+                  Recharger une photo
                 </button>
               </div>
             </div>
