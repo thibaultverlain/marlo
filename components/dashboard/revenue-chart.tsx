@@ -1,13 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Calendar } from "lucide-react";
+import { Calendar, TrendingUp, TrendingDown, ShoppingCart } from "lucide-react";
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine,
 } from "recharts";
 import CalendarPicker from "./calendar-picker";
 
-type DataPoint = { label: string; revenue: number };
+type DataPoint = {
+  label: string;
+  fullLabel?: string;
+  revenue: number;
+  count: number;
+};
+
 type Period = "year" | "month" | "week" | "day" | "custom";
 
 const PERIOD_LABELS: { key: Period; label: string }[] = [
@@ -18,26 +24,47 @@ const PERIOD_LABELS: { key: Period; label: string }[] = [
 ];
 
 function formatEur(value: number): string {
-  if (value >= 1000) return `${(value / 1000).toFixed(1)}k`;
+  if (value >= 1000) return `${(value / 1000).toFixed(value < 10000 ? 1 : 0)}k`;
   return `${Math.round(value)}`;
 }
 
-function CustomTooltip({ active, payload, label }: any) {
+function formatFullEur(value: number): string {
+  return new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(value);
+}
+
+function CustomTooltip({ active, payload }: any) {
   if (!active || !payload?.length) return null;
+  const p = payload[0].payload as DataPoint;
   return (
-    <div className="rounded-xl px-4 py-3 text-sm shadow-xl border"
-      style={{ background: "var(--color-bg-card)", borderColor: "var(--color-border-accent)", backdropFilter: "blur(8px)" }}>
-      <p style={{ color: "var(--color-text-muted)" }} className="text-[11px] mb-0.5">{label}</p>
-      <p style={{ color: "var(--color-text)" }} className="font-bold text-[15px] tabular-nums">
-        {new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(payload[0].value)}
-      </p>
+    <div
+      className="rounded-xl px-4 py-3 shadow-2xl border min-w-[180px]"
+      style={{
+        background: "var(--color-bg-card)",
+        borderColor: "var(--color-border-accent)",
+        backdropFilter: "blur(12px)",
+      }}
+    >
+      <p className="text-[11px] text-zinc-500 mb-2 font-medium">{p.fullLabel ?? p.label}</p>
+      <div className="flex items-baseline justify-between gap-3">
+        <span className="text-[10px] text-zinc-500 uppercase tracking-wider">CA</span>
+        <span className="font-bold text-[15px] text-white tabular-nums">{formatFullEur(p.revenue)}</span>
+      </div>
+      {p.count > 0 && (
+        <div className="flex items-baseline justify-between gap-3 mt-1.5">
+          <span className="text-[10px] text-zinc-500 uppercase tracking-wider">Ventes</span>
+          <span className="text-[12px] text-zinc-300 tabular-nums font-medium">{p.count}</span>
+        </div>
+      )}
     </div>
   );
 }
 
 function formatDateRange(from: string, to: string): string {
-  const f = new Date(from);
-  const t = new Date(to);
+  const fm = from.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  const tm = to.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!fm || !tm) return `${from} - ${to}`;
+  const f = new Date(Number(fm[1]), Number(fm[2]) - 1, Number(fm[3]));
+  const t = new Date(Number(tm[1]), Number(tm[2]) - 1, Number(tm[3]));
   const opts: Intl.DateTimeFormatOptions = { day: "numeric", month: "short" };
   if (f.getFullYear() !== t.getFullYear()) {
     return `${f.toLocaleDateString("fr-FR", { ...opts, year: "numeric" })} - ${t.toLocaleDateString("fr-FR", { ...opts, year: "numeric" })}`;
@@ -45,24 +72,43 @@ function formatDateRange(from: string, to: string): string {
   return `${f.toLocaleDateString("fr-FR", opts)} - ${t.toLocaleDateString("fr-FR", opts)}`;
 }
 
+function periodDescription(period: Period): string {
+  switch (period) {
+    case "day": return "Aujourd'hui par heure";
+    case "week": return "Cette semaine";
+    case "month": return "Ce mois";
+    case "year": return "Cette annee";
+    default: return "";
+  }
+}
+
 export default function RevenueChart({ initialData }: { initialData?: DataPoint[] }) {
   const [period, setPeriod] = useState<Period>("month");
   const [data, setData] = useState<DataPoint[]>(initialData ?? []);
+  const [meta, setMeta] = useState<{ total: number; count: number; nonZeroPoints: number } | null>(null);
   const [loading, setLoading] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
 
   useEffect(() => {
-    // Custom : le fetch est declenche manuellement par handleCustomDateSearch
-    // (sinon ca fire des qu'on change de date dans le picker).
     if (period === "custom") return;
-    if (period === "month" && initialData) { setData(initialData); return; }
+    if (period === "month" && initialData) {
+      setData(initialData);
+      const total = initialData.reduce((s, d) => s + d.revenue, 0);
+      const count = initialData.reduce((s, d) => s + d.count, 0);
+      setMeta({ total, count, nonZeroPoints: initialData.filter((d) => d.revenue > 0).length });
+      return;
+    }
     setLoading(true);
     fetch(`/api/dashboard/chart?period=${period}`)
       .then((r) => r.json())
-      .then((json) => { setData(json.data ?? []); setLoading(false); })
-      .catch(() => setLoading(false));
+      .then((json) => {
+        setData(json.data ?? []);
+        setMeta(json.meta ?? null);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, [period, initialData]);
 
   function handleCustomDateSearch() {
@@ -72,38 +118,90 @@ export default function RevenueChart({ initialData }: { initialData?: DataPoint[
     setLoading(true);
     fetch(`/api/dashboard/chart?period=custom&from=${dateFrom}&to=${dateTo}`)
       .then((r) => r.json())
-      .then((json) => { setData(json.data ?? []); setLoading(false); })
-      .catch(() => setLoading(false));
+      .then((json) => {
+        setData(json.data ?? []);
+        setMeta(json.meta ?? null);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }
 
-  const total = data.reduce((s, d) => s + d.revenue, 0);
+  const total = meta?.total ?? data.reduce((s, d) => s + d.revenue, 0);
+  const count = meta?.count ?? data.reduce((s, d) => s + d.count, 0);
+  const avgPerSale = count > 0 ? total / count : 0;
+  const hasData = total > 0 || count > 0;
+
+  // Trouver le pic pour mettre en evidence
+  const maxPoint = data.reduce((max, d) => d.revenue > (max?.revenue ?? 0) ? d : max, null as DataPoint | null);
+
+  const subtitle = period === "custom" && dateFrom && dateTo
+    ? formatDateRange(dateFrom, dateTo)
+    : periodDescription(period);
 
   return (
     <div className="chart-container">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-6 pt-5 pb-3">
-        <div>
-          <h2 className="section-title">Chiffre d'affaires</h2>
-          <p className="text-xl lg:text-2xl font-bold text-white tabular-nums mt-1">
-            {new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(total)}
-          </p>
-          {period === "custom" && dateFrom && dateTo && (
-            <p className="text-[11px] text-zinc-500 mt-0.5">{formatDateRange(dateFrom, dateTo)}</p>
-          )}
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 px-6 pt-5 pb-4 border-b border-[var(--color-border-subtle)]">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <h2 className="section-title">Chiffre d'affaires</h2>
+            {hasData && (
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 uppercase tracking-wider">
+                Live
+              </span>
+            )}
+          </div>
+          <p className="text-[11px] text-zinc-500 mt-0.5">{subtitle}</p>
+
+          {/* Trio CA / Ventes / Ticket moyen */}
+          <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1 mt-3">
+            <div>
+              <p className="text-2xl lg:text-3xl font-bold tabular-nums tracking-tight gradient-text leading-none">
+                {formatFullEur(total)}
+              </p>
+              <p className="text-[10px] text-zinc-500 uppercase tracking-wider mt-1">Total</p>
+            </div>
+            {count > 0 && (
+              <>
+                <div>
+                  <p className="text-[15px] font-semibold tabular-nums text-zinc-200">{count}</p>
+                  <p className="text-[10px] text-zinc-500 uppercase tracking-wider mt-0.5">Ventes</p>
+                </div>
+                <div>
+                  <p className="text-[15px] font-semibold tabular-nums text-zinc-200">{formatFullEur(avgPerSale)}</p>
+                  <p className="text-[10px] text-zinc-500 uppercase tracking-wider mt-0.5">Ticket moy.</p>
+                </div>
+              </>
+            )}
+          </div>
         </div>
-        <div className="flex items-center gap-2 self-start sm:self-auto">
+
+        <div className="flex items-center gap-2 self-start sm:self-auto flex-shrink-0">
           <div className="flex bg-zinc-800/60 rounded-lg p-0.5">
             {PERIOD_LABELS.map(({ key, label }) => (
-              <button key={key} onClick={() => { setPeriod(key); setShowDatePicker(false); }}
+              <button
+                key={key}
+                onClick={() => { setPeriod(key); setShowDatePicker(false); }}
                 className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-all duration-200 ${
-                  period === key ? "bg-[rgba(225,29,72,0.12)] text-rose-400" : "text-zinc-500 hover:text-zinc-300"
-                }`}>{label}</button>
+                  period === key
+                    ? "bg-[rgba(225,29,72,0.12)] text-rose-400"
+                    : "text-zinc-500 hover:text-zinc-300"
+                }`}
+              >
+                {label}
+              </button>
             ))}
           </div>
           <div className="relative">
-            <button onClick={() => { setShowDatePicker(!showDatePicker); if (!showDatePicker) setPeriod("custom"); }}
+            <button
+              onClick={() => { setShowDatePicker(!showDatePicker); if (!showDatePicker) setPeriod("custom"); }}
               className={`w-8 h-8 flex items-center justify-center rounded-lg transition-all ${
-                period === "custom" ? "bg-rose-500/10 text-rose-400" : "text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.03]"
-              }`} title="Date personnalisee">
+                period === "custom"
+                  ? "bg-rose-500/10 text-rose-400"
+                  : "text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.03]"
+              }`}
+              title="Date personnalisee"
+            >
               <Calendar size={15} />
             </button>
             {showDatePicker && (
@@ -120,27 +218,98 @@ export default function RevenueChart({ initialData }: { initialData?: DataPoint[
           </div>
         </div>
       </div>
-      <div className="h-[200px] lg:h-[280px] px-2">
+
+      {/* Chart */}
+      <div className="h-[220px] lg:h-[300px] px-2 pt-4">
         {loading ? (
           <div className="h-full flex items-center justify-center">
             <div className="w-5 h-5 border-2 border-rose-500 border-t-transparent rounded-full animate-spin" />
           </div>
+        ) : !hasData ? (
+          <div className="h-full flex flex-col items-center justify-center text-center px-6">
+            <div className="w-12 h-12 rounded-2xl bg-[var(--color-bg-hover)] flex items-center justify-center mb-3">
+              <ShoppingCart size={20} className="text-zinc-500" strokeWidth={1.5} />
+            </div>
+            <p className="text-[13px] font-semibold text-zinc-300">Aucune vente sur cette periode</p>
+            <p className="text-[11px] text-zinc-500 mt-1">
+              {period === "custom"
+                ? "Essaie une autre plage de dates."
+                : "Selectionne une autre periode ou cree ta premiere vente."}
+            </p>
+          </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }} barCategoryGap="20%">
+            <AreaChart data={data} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
               <defs>
-                <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="var(--color-accent)" stopOpacity={0.9} />
-                  <stop offset="100%" stopColor="var(--color-accent)" stopOpacity={0.5} />
+                <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="var(--color-accent)" stopOpacity={0.45} />
+                  <stop offset="50%" stopColor="var(--color-accent)" stopOpacity={0.15} />
+                  <stop offset="100%" stopColor="var(--color-accent)" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="revenueStroke" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="var(--color-accent)" stopOpacity={1} />
+                  <stop offset="100%" stopColor="var(--color-accent-hover)" stopOpacity={1} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
-              <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: "var(--color-text-muted)", fontSize: 11 }}
-                interval={data.length > 15 ? Math.floor(data.length / 8) : 0} />
-              <YAxis axisLine={false} tickLine={false} tick={{ fill: "var(--color-text-muted)", fontSize: 11 }} tickFormatter={formatEur} width={50} />
-              <Tooltip content={<CustomTooltip />} cursor={{ fill: "var(--color-bg-hover)", radius: 6 }} />
-              <Bar dataKey="revenue" fill="url(#barGradient)" radius={[6, 6, 0, 0]} maxBarSize={48} />
-            </BarChart>
+
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="var(--color-border)"
+                vertical={false}
+                opacity={0.5}
+              />
+
+              <XAxis
+                dataKey="label"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "var(--color-text-tertiary)", fontSize: 11 }}
+                interval={data.length > 15 ? Math.floor(data.length / 8) : 0}
+                tickMargin={8}
+              />
+
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "var(--color-text-tertiary)", fontSize: 11 }}
+                tickFormatter={formatEur}
+                width={50}
+                tickMargin={4}
+              />
+
+              <Tooltip
+                content={<CustomTooltip />}
+                cursor={{ stroke: "var(--color-accent)", strokeWidth: 1, strokeDasharray: "3 3", opacity: 0.5 }}
+              />
+
+              {/* Reference line sur le pic */}
+              {maxPoint && maxPoint.revenue > 0 && data.length > 5 && (
+                <ReferenceLine
+                  y={maxPoint.revenue}
+                  stroke="var(--color-accent)"
+                  strokeDasharray="2 2"
+                  strokeOpacity={0.25}
+                />
+              )}
+
+              <Area
+                type="monotone"
+                dataKey="revenue"
+                stroke="url(#revenueStroke)"
+                strokeWidth={2.5}
+                fill="url(#revenueGradient)"
+                fillOpacity={1}
+                animationDuration={600}
+                animationEasing="ease-out"
+                activeDot={{
+                  r: 5,
+                  fill: "var(--color-accent)",
+                  stroke: "var(--color-bg-card)",
+                  strokeWidth: 2,
+                }}
+                dot={false}
+              />
+            </AreaChart>
           </ResponsiveContainer>
         )}
       </div>

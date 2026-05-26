@@ -24,18 +24,26 @@ async function getChartDataMonth(shopId: string) {
   const year = now.getFullYear();
   const month = now.getMonth();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const monthLabel = ["Jan", "Fev", "Mar", "Avr", "Mai", "Juin", "Juil", "Aout", "Sep", "Oct", "Nov", "Dec"][month];
   const rows = await db
     .select({
       day: sql<number>`extract(day from sold_at)::int`,
       revenue: sql<number>`coalesce(sum(sale_price), 0)::numeric`,
+      count: sql<number>`count(*)::int`,
     })
     .from(sales)
     .where(and(eq(sales.shopId, shopId), gte(sales.soldAt, new Date(year, month, 1)), lte(sales.soldAt, new Date(year, month + 1, 0, 23, 59, 59))))
     .groupBy(sql`extract(day from sold_at)`)
     .orderBy(sql`extract(day from sold_at)`);
   return Array.from({ length: daysInMonth }, (_, i) => {
-    const row = rows.find((r) => r.day === i + 1);
-    return { label: String(i + 1), revenue: Number(row?.revenue ?? 0) };
+    const day = i + 1;
+    const row = rows.find((r) => r.day === day);
+    return {
+      label: String(day),
+      fullLabel: `${day} ${monthLabel}`,
+      revenue: Number(row?.revenue ?? 0),
+      count: Number(row?.count ?? 0),
+    };
   });
 }
 
