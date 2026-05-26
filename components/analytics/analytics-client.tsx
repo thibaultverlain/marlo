@@ -71,7 +71,7 @@ export default function AnalyticsClient({ initialData }: { initialData: any }) {
                 onClick={() => setPeriod(f.key)}
                 className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-all ${
                   period === f.key
-                    ? "bg-[rgba(225,29,72,0.12)] text-rose-400"
+                    ? "bg-[var(--color-accent-muted)] text-rose-400"
                     : "text-zinc-500 hover:text-zinc-300"
                 }`}
               >
@@ -209,7 +209,7 @@ export default function AnalyticsClient({ initialData }: { initialData: any }) {
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "#52525b", fontSize: 11 }} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fill: "#52525b", fontSize: 11 }} tickFormatter={(v) => `${v}€`} />
                 <Tooltip content={<CustomTooltip />} />
-                <Line type="monotone" dataKey="revenue" stroke="#fb7185" strokeWidth={2} dot={{ fill: "#fb7185", r: 3 }} name="CA" />
+                <Line type="monotone" dataKey="revenue" stroke="#0d6b4e" strokeWidth={2} dot={{ fill: "#0d6b4e", r: 3 }} name="CA" />
                 <Line type="monotone" dataKey="margin" stroke="#10b981" strokeWidth={2} dot={{ fill: "#10b981", r: 3 }} name="Marge" />
               </LineChart>
             </ResponsiveContainer>
@@ -264,7 +264,7 @@ export default function AnalyticsClient({ initialData }: { initialData: any }) {
                   <Tooltip content={<CustomTooltip />} />
                   <Bar dataKey="totalMargin" radius={[4, 4, 0, 0]}>
                     {data.categoryPerf.map((_: any, i: number) => (
-                      <Cell key={i} fill={i === 0 ? "#fb7185" : i === 1 ? "#f43f5e" : "#e11d48"} />
+                      <Cell key={i} fill={i === 0 ? "#0d6b4e" : i === 1 ? "#0a5840" : "#084632"} />
                     ))}
                   </Bar>
                 </BarChart>

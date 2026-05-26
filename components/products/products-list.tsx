@@ -190,11 +190,11 @@ export default function ProductsList({ products }: { products: ProductListItem[]
 
           <div className="flex bg-zinc-800/60 rounded-lg p-0.5">
             <button onClick={() => setView("list")}
-              className={`p-1.5 rounded transition ${view === "list" ? "bg-[rgba(225,29,72,0.12)] text-rose-400" : "text-zinc-500 hover:text-zinc-300"}`}>
+              className={`p-1.5 rounded transition ${view === "list" ? "bg-[var(--color-accent-muted)] text-rose-400" : "text-zinc-500 hover:text-zinc-300"}`}>
               <List size={14} />
             </button>
             <button onClick={() => setView("grid")}
-              className={`p-1.5 rounded transition ${view === "grid" ? "bg-[rgba(225,29,72,0.12)] text-rose-400" : "text-zinc-500 hover:text-zinc-300"}`}>
+              className={`p-1.5 rounded transition ${view === "grid" ? "bg-[var(--color-accent-muted)] text-rose-400" : "text-zinc-500 hover:text-zinc-300"}`}>
               <LayoutGrid size={14} />
             </button>
           </div>

@@ -187,12 +187,12 @@ export default function DocumentsPageClient({ documents }: { documents: Doc[] })
       {/* Filters */}
       <div className="flex bg-zinc-800/60 rounded-lg p-0.5 w-fit flex-wrap">
         <button onClick={() => setFilterCat("all")}
-          className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-all ${filterCat === "all" ? "bg-[rgba(251,113,133,0.12)] text-rose-400" : "text-zinc-500 hover:text-zinc-300"}`}>
+          className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-all ${filterCat === "all" ? "bg-[var(--color-accent-muted)] text-rose-400" : "text-zinc-500 hover:text-zinc-300"}`}>
           Tout
         </button>
         {CATEGORIES.map((c) => (
           <button key={c.value} onClick={() => setFilterCat(c.value)}
-            className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-all ${filterCat === c.value ? "bg-[rgba(251,113,133,0.12)] text-rose-400" : "text-zinc-500 hover:text-zinc-300"}`}>
+            className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-all ${filterCat === c.value ? "bg-[var(--color-accent-muted)] text-rose-400" : "text-zinc-500 hover:text-zinc-300"}`}>
             {c.label}
           </button>
         ))}

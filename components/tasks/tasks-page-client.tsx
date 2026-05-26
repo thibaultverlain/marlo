@@ -330,7 +330,7 @@ export default function TasksPageClient({
             href={`/tasks?filter=${f.key}`}
             className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-all whitespace-nowrap ${
               activeFilter === f.key
-                ? "bg-[rgba(225,29,72,0.12)] text-rose-400"
+                ? "bg-[var(--color-accent-muted)] text-rose-400"
                 : "text-zinc-500 hover:text-zinc-300"
             }`}
           >

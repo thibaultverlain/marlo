@@ -238,7 +238,7 @@ export default function TemplatesPageClient({
       <div className="flex bg-zinc-800/60 rounded-lg p-0.5 w-fit max-w-full overflow-x-auto">
         <button onClick={() => setFilterType("all")}
           className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-all whitespace-nowrap ${
-            filterType === "all" ? "bg-[rgba(225,29,72,0.12)] text-rose-400" : "text-zinc-500 hover:text-zinc-300"
+            filterType === "all" ? "bg-[var(--color-accent-muted)] text-rose-400" : "text-zinc-500 hover:text-zinc-300"
           }`}>
           Tous ({counts.all})
         </button>
@@ -247,7 +247,7 @@ export default function TemplatesPageClient({
           return (
             <button key={k} onClick={() => setFilterType(k)}
               className={`flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-medium rounded-md transition-all whitespace-nowrap ${
-                filterType === k ? "bg-[rgba(225,29,72,0.12)] text-rose-400" : "text-zinc-500 hover:text-zinc-300"
+                filterType === k ? "bg-[var(--color-accent-muted)] text-rose-400" : "text-zinc-500 hover:text-zinc-300"
               }`}>
               <Icon size={11} />
               {v.short} ({counts[k]})

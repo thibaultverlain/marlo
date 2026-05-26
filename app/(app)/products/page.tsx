@@ -135,15 +135,15 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       {/* Toggle 3 etats */}
       <div className="flex bg-zinc-800/60 rounded-lg p-0.5 w-fit">
         <Link href="/products?view=stock"
-          className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-all ${view === "stock" ? "bg-[rgba(225,29,72,0.12)] text-rose-400" : "text-zinc-500 hover:text-zinc-300"}`}>
+          className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-all ${view === "stock" ? "bg-[var(--color-accent-muted)] text-rose-400" : "text-zinc-500 hover:text-zinc-300"}`}>
           En stock ({inStockCount})
         </Link>
         <Link href="/products?view=sold"
-          className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-all ${view === "sold" ? "bg-[rgba(225,29,72,0.12)] text-rose-400" : "text-zinc-500 hover:text-zinc-300"}`}>
+          className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-all ${view === "sold" ? "bg-[var(--color-accent-muted)] text-rose-400" : "text-zinc-500 hover:text-zinc-300"}`}>
           Vendus ({soldCount})
         </Link>
         <Link href="/products?view=all"
-          className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-all ${view === "all" ? "bg-[rgba(225,29,72,0.12)] text-rose-400" : "text-zinc-500 hover:text-zinc-300"}`}>
+          className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-all ${view === "all" ? "bg-[var(--color-accent-muted)] text-rose-400" : "text-zinc-500 hover:text-zinc-300"}`}>
           Tout ({totalCount})
         </Link>
       </div>

@@ -141,7 +141,7 @@ export default function Sidebar({
                           ? "font-semibold"
                           : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-bg-hover)]"
                       }`}
-                      style={isActive ? { background: "rgba(225, 29, 72, 0.08)", color: "var(--color-accent)" } : {}}
+                      style={isActive ? { background: "var(--color-accent-muted)", color: "var(--color-accent)" } : {}}
                     >
                       {/* Indicateur vertical pour l'item actif */}
                       {isActive && (
@@ -178,7 +178,7 @@ export default function Sidebar({
                 className={`flex items-center gap-2.5 px-3 py-[8px] rounded-[10px] text-[13px] transition-all duration-200 ${
                   isActive ? "font-semibold" : "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-bg-hover)]"
                 }`}
-                style={isActive ? { background: "rgba(225, 29, 72, 0.08)", color: "var(--color-accent)" } : {}}
+                style={isActive ? { background: "var(--color-accent-muted)", color: "var(--color-accent)" } : {}}
               >
                 <Icon size={16} strokeWidth={1.5} />
                 <span>{item.label}</span>

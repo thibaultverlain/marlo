@@ -40,7 +40,7 @@ export default async function VelocityPage({ searchParams }: { searchParams: Pro
           href={`/analytics/velocity?period=${p.months}`}
           className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-all ${
             p.months === validPeriod.months
-              ? "bg-[rgba(225,29,72,0.12)] text-rose-400"
+              ? "bg-[var(--color-accent-muted)] text-rose-400"
               : "text-zinc-500 hover:text-zinc-300"
           }`}
         >
