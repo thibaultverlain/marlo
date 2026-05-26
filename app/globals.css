@@ -36,21 +36,21 @@
   --radius-xl: 20px;
 
   /* ╔══════════════════════════════════════════════════════════════╗
-     ║  PALETTE EMERAUDE & OR (remap Tailwind rose-* → emeraude)    ║
-     ║  Permet de basculer toute l'app sans toucher les composants   ║
-     ║  qui utilisent text-rose-X / bg-rose-X.                       ║
+     ║  PALETTE VERT ELECTRIQUE & OR                                ║
+     ║  Remap Tailwind rose-* → vert vif premium. Style fintech     ║
+     ║  moderne, plus lumineux qu'un emeraude classique.            ║
      ╚══════════════════════════════════════════════════════════════╝ */
-  --color-rose-50:  #ebf5f0;
-  --color-rose-100: #c4e2d2;
-  --color-rose-200: #9bcfb3;
-  --color-rose-300: #56a585;
-  --color-rose-400: #2d8a6a;  /* utilise pour text-rose-400 */
-  --color-rose-500: #0d6b4e;  /* accent principal */
-  --color-rose-600: #0a5840;
-  --color-rose-700: #084632;
-  --color-rose-800: #053425;
-  --color-rose-900: #032018;
-  --color-rose-950: #02110d;
+  --color-rose-50:  #e6fbf2;
+  --color-rose-100: #b3f3d5;
+  --color-rose-200: #7eebb6;
+  --color-rose-300: #4ddd96;
+  --color-rose-400: #2dd49d;  /* utilise pour text-rose-400 - vert clair pop */
+  --color-rose-500: #00d68f;  /* accent principal - vert electrique premium */
+  --color-rose-600: #00b377;
+  --color-rose-700: #008a5c;
+  --color-rose-800: #056b4a;
+  --color-rose-900: #033d2a;
+  --color-rose-950: #01221a;
 
   /* Famille "Gold" pour les highlights (badges, podium, accents secondaires) */
   --color-gold-50:  #fbf6e8;
@@ -91,21 +91,21 @@
   --color-border: rgba(255, 255, 255, 0.06);
   --color-border-hover: rgba(255, 255, 255, 0.12);
   --color-border-subtle: rgba(255, 255, 255, 0.03);
-  --color-border-accent: rgba(13, 107, 78, 0.30);
+  --color-border-accent: rgba(0, 214, 143, 0.30);
 
   /* Text — 4 niveaux clairs */
   --color-text: #eeeef2;          /* Primary */
   --color-text-secondary: #a1a1aa; /* Secondary (zinc-400 equivalent) */
   --color-text-tertiary: #71717a;  /* Tertiary (zinc-500 — meta info readable) */
   --color-text-disabled: #52525b;  /* Disabled (zinc-600 — for very dim cap labels only) */
-  --color-text-inverse: #ffffff;
+  --color-text-inverse: #06150f;  /* fond tres fonce pour contraste sur bouton vert vif */
 
-  /* Accent (emeraude profond) */
-  --color-accent: #0d6b4e;
-  --color-accent-hover: #0a5840;
-  --color-accent-muted: rgba(13, 107, 78, 0.12);
-  --color-accent-text: #56a585;
-  --color-accent-glow: rgba(13, 107, 78, 0.18);
+  /* Accent (vert electrique premium) */
+  --color-accent: #00d68f;
+  --color-accent-hover: #00b377;
+  --color-accent-muted: rgba(0, 214, 143, 0.12);
+  --color-accent-text: #7eebb6;
+  --color-accent-glow: rgba(0, 214, 143, 0.25);
 
   /* Gold (highlight secondaire) */
   --color-gold: #c9a961;
@@ -131,8 +131,8 @@
 
   /* Shadows */
   --shadow-card: 0 1px 3px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.03);
-  --shadow-card-hover: 0 8px 24px rgba(0,0,0,0.5), 0 0 0 1px rgba(13,107,78,0.15);
-  --shadow-glow-accent: 0 0 24px rgba(13, 107, 78, 0.10);
+  --shadow-card-hover: 0 8px 24px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,214,143,0.20);
+  --shadow-glow-accent: 0 0 24px rgba(0, 214, 143, 0.15);
   --shadow-sidebar: none;
 
   /* Radius — 4 valeurs */
@@ -158,19 +158,19 @@
   --color-border: rgba(0, 0, 0, 0.08);
   --color-border-hover: rgba(0, 0, 0, 0.15);
   --color-border-subtle: rgba(0, 0, 0, 0.04);
-  --color-border-accent: rgba(13, 107, 78, 0.25);
+  --color-border-accent: rgba(0, 179, 119, 0.30);
 
   --color-text: #0a1614;
   --color-text-secondary: #475c54;
   --color-text-tertiary: #687a72;
   --color-text-disabled: #9aa39e;
-  --color-text-inverse: #ffffff;
+  --color-text-inverse: #06150f;
 
-  --color-accent: #0a5840;
-  --color-accent-hover: #084632;
-  --color-accent-muted: rgba(10, 88, 64, 0.08);
-  --color-accent-text: #053425;
-  --color-accent-glow: rgba(10, 88, 64, 0.08);
+  --color-accent: #00b377;
+  --color-accent-hover: #008a5c;
+  --color-accent-muted: rgba(0, 179, 119, 0.10);
+  --color-accent-text: #008a5c;
+  --color-accent-glow: rgba(0, 179, 119, 0.12);
 
   --color-gold: #a88a47;
   --color-gold-bright: #c9a961;
@@ -193,9 +193,9 @@
   --color-danger-border: rgba(220, 38, 38, 0.20);
 
   --shadow-card: 0 1px 3px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.04);
-  --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.06), 0 0 0 1px rgba(10,88,64,0.12);
-  --shadow-glow-accent: 0 0 16px rgba(10, 88, 64, 0.05);
-  --shadow-sidebar: 1px 0 12px rgba(10, 88, 64, 0.04), 1px 0 0 rgba(10, 88, 64, 0.06);
+  --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,179,119,0.15);
+  --shadow-glow-accent: 0 0 16px rgba(0, 179, 119, 0.08);
+  --shadow-sidebar: 1px 0 12px rgba(0, 179, 119, 0.04), 1px 0 0 rgba(0, 179, 119, 0.06);
 
   color-scheme: light;
 }
