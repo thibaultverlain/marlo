@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Calendar, TrendingUp, TrendingDown, ShoppingCart } from "lucide-react";
+import { Calendar, ShoppingCart } from "lucide-react";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine,
 } from "recharts";
 import CalendarPicker from "./calendar-picker";
+import { formatCurrency } from "@/lib/utils";
 
 type DataPoint = {
   label: string;
@@ -23,13 +24,14 @@ const PERIOD_LABELS: { key: Period; label: string }[] = [
   { key: "year", label: "Annee" },
 ];
 
-function formatEur(value: number): string {
+// Format compact pour l'axe Y (sans symbole, sans arrondi parasite).
+// On garde 1 decimale si la valeur a des centimes significatifs, 0 sinon.
+function formatYAxis(value: number): string {
   if (value >= 1000) return `${(value / 1000).toFixed(value < 10000 ? 1 : 0)}k`;
-  return `${Math.round(value)}`;
-}
-
-function formatFullEur(value: number): string {
-  return new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(value);
+  // Pas de Math.round : si recharts donne un tick = 21.5, on affiche "21,5"
+  // (pas "22" qui creerait un mismatch avec le total du header)
+  if (Number.isInteger(value)) return String(value);
+  return value.toFixed(2).replace(".", ",").replace(/,?0+$/, "");
 }
 
 function CustomTooltip({ active, payload }: any) {
@@ -47,7 +49,7 @@ function CustomTooltip({ active, payload }: any) {
       <p className="text-[11px] text-zinc-500 mb-2 font-medium">{p.fullLabel ?? p.label}</p>
       <div className="flex items-baseline justify-between gap-3">
         <span className="text-[10px] text-zinc-500 uppercase tracking-wider">CA</span>
-        <span className="font-bold text-[15px] text-white tabular-nums">{formatFullEur(p.revenue)}</span>
+        <span className="font-bold text-[15px] text-white tabular-nums">{formatCurrency(p.revenue)}</span>
       </div>
       {p.count > 0 && (
         <div className="flex items-baseline justify-between gap-3 mt-1.5">
@@ -157,7 +159,7 @@ export default function RevenueChart({ initialData }: { initialData?: DataPoint[
           <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1 mt-3">
             <div>
               <p className="text-2xl lg:text-3xl font-bold tabular-nums tracking-tight gradient-text leading-none">
-                {formatFullEur(total)}
+                {formatCurrency(total)}
               </p>
               <p className="text-[10px] text-zinc-500 uppercase tracking-wider mt-1">Total</p>
             </div>
@@ -168,7 +170,7 @@ export default function RevenueChart({ initialData }: { initialData?: DataPoint[
                   <p className="text-[10px] text-zinc-500 uppercase tracking-wider mt-0.5">Ventes</p>
                 </div>
                 <div>
-                  <p className="text-[15px] font-semibold tabular-nums text-zinc-200">{formatFullEur(avgPerSale)}</p>
+                  <p className="text-[15px] font-semibold tabular-nums text-zinc-200">{formatCurrency(avgPerSale)}</p>
                   <p className="text-[10px] text-zinc-500 uppercase tracking-wider mt-0.5">Ticket moy.</p>
                 </div>
               </>
@@ -272,7 +274,7 @@ export default function RevenueChart({ initialData }: { initialData?: DataPoint[
                 axisLine={false}
                 tickLine={false}
                 tick={{ fill: "var(--color-text-tertiary)", fontSize: 11 }}
-                tickFormatter={formatEur}
+                tickFormatter={formatYAxis}
                 width={50}
                 tickMargin={4}
               />
