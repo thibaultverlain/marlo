@@ -41,9 +41,9 @@ export default function PhotoStudioModal({
   const [cutoutUrl, setCutoutUrl] = useState<string | null>(null);
 
   const [bg, setBg] = useState("vestiaire");
-  const [shadow, setShadow] = useState(70);
+  const [shadow, setShadow] = useState(75);
   const [brightness, setBrightness] = useState(100);
-  const [scale, setScale] = useState(85); // % de la zone de canvas occupee
+  const [scale, setScale] = useState(70); // % de la zone de canvas occupee (rendu Vestiaire plus aere)
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -58,9 +58,9 @@ export default function PhotoStudioModal({
       setCutoutUrl(null);
       cutoutImageRef.current = null;
       setBg("vestiaire");
-      setShadow(70);
+      setShadow(75);
       setBrightness(100);
-      setScale(85);
+      setScale(70);
     }
   }, [open]);
 
@@ -169,7 +169,8 @@ export default function PhotoStudioModal({
 
     // Base de l'objet apres scaling = bounds.maxY * fit (depuis le coin du PNG dessine)
     // On veut cette base a baselineY → y_drawImage = baselineY - bounds.maxY * fit
-    const baselineY = CANVAS_SIZE * 0.88;
+    // Baseline a 82% donne plus d'espace en bas pour l'ombre + plus de respiration
+    const baselineY = CANVAS_SIZE * 0.82;
     const y = baselineY - bounds.maxY * fit;
 
     // 6. Ombre puddle (compressee verticalement, sous l'objet)
@@ -221,28 +222,29 @@ export default function PhotoStudioModal({
     const objBaseY = objY + bounds.maxY * fit;
     const shadowCenterX = objX + (bounds.minX + bounds.width / 2) * fit;
 
-    // Premiere couche : ombre principale, compressee
+    // Premiere couche : ombre principale, compressee et plus etalee horizontalement
     ctx.save();
-    ctx.globalAlpha = 0.32 * factor;
-    ctx.filter = `blur(${Math.round(18 * factor + 8)}px)`;
+    ctx.globalAlpha = 0.28 * factor;
+    ctx.filter = `blur(${Math.round(28 * factor + 12)}px)`;
 
-    // ScaleY tres faible (compression verticale) pour effet "ground shadow"
-    const sy = 0.18;
-    // Translate pour que l'ombre soit basee a objBaseY
+    // Compression verticale + etalement horizontal pour effet "puddle" Vestiaire
+    const sy = 0.15;
+    const sx = 1.1; // legere extension horizontale
     ctx.translate(shadowCenterX, objBaseY);
-    ctx.scale(1, sy);
+    ctx.scale(sx, sy);
     ctx.translate(-shadowCenterX, -objBaseY);
     ctx.drawImage(off, 0, 0);
     ctx.restore();
 
-    // Deuxieme couche : ombre plus large et plus floue (ambiant occlusion)
+    // Deuxieme couche : halo plus large et plus flou (ambiant occlusion)
     ctx.save();
-    ctx.globalAlpha = 0.16 * factor;
-    ctx.filter = `blur(${Math.round(40 * factor + 20)}px)`;
-    const sy2 = 0.12;
-    ctx.translate(shadowCenterX, objBaseY + 8);
-    ctx.scale(1.15, sy2);
-    ctx.translate(-shadowCenterX, -(objBaseY + 8));
+    ctx.globalAlpha = 0.14 * factor;
+    ctx.filter = `blur(${Math.round(60 * factor + 30)}px)`;
+    const sy2 = 0.1;
+    const sx2 = 1.35; // halo bien plus large que l'objet
+    ctx.translate(shadowCenterX, objBaseY + 10);
+    ctx.scale(sx2, sy2);
+    ctx.translate(-shadowCenterX, -(objBaseY + 10));
     ctx.drawImage(off, 0, 0);
     ctx.restore();
   }
