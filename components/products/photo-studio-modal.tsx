@@ -139,31 +139,45 @@ export default function PhotoStudioModal({
     // 1. Fond + vignette
     drawBackground(ctx, bg);
 
-    // 2. Cadrage de l'objet avec bounding box (centrage precis)
+    // 2. Bounding box de l'OBJET DETOURE (pas du PNG entier qui peut avoir
+    //    beaucoup de transparence autour). Tout le scaling et centrage se
+    //    fait par rapport a ce bounding box.
     const bounds = getObjectBounds(img);
-    const objWidth = bounds ? bounds.width : img.width;
-    const objHeight = bounds ? bounds.height : img.height;
+    if (!bounds) {
+      // Pas d'objet detecte — fallback : dessiner le PNG centre brut
+      ctx.drawImage(img, 0, 0, CANVAS_SIZE, CANVAS_SIZE);
+      return;
+    }
 
+    // 3. Calcul du fit base UNIQUEMENT sur la taille de l'objet
     const scaleFactor = scale / 100;
-    const maxWidth = CANVAS_SIZE * scaleFactor;
-    const maxHeight = CANVAS_SIZE * scaleFactor * 0.85; // un peu moins haut pour laisser place a l'ombre
-    const fit = Math.min(maxWidth / objWidth, maxHeight / objHeight);
+    const maxObjWidth = CANVAS_SIZE * scaleFactor;
+    const maxObjHeight = CANVAS_SIZE * scaleFactor * 0.85; // marge pour l'ombre en bas
+    const fit = Math.min(maxObjWidth / bounds.width, maxObjHeight / bounds.height);
 
-    // Taille finale en pixels
+    // 4. Taille finale du PNG complet apres scaling
     const drawW = img.width * fit;
     const drawH = img.height * fit;
 
-    // Position : centre horizontal, base de l'objet a ~88% de la hauteur (place pour ombre)
-    const x = (CANVAS_SIZE - drawW) / 2 - (bounds ? bounds.minX * fit : 0);
-    const baselineY = CANVAS_SIZE * 0.88;
-    const y = baselineY - (bounds ? bounds.maxY * fit : drawH);
+    // 5. Position : on veut le CENTRE de l'objet exactement au centre horizontal,
+    //    et la BASE de l'objet a 88% de la hauteur du canvas.
+    //    Le centre de l'objet dans le PNG (en pixels PNG) : bounds.minX + bounds.width/2
+    //    Apres scaling : (bounds.minX + bounds.width/2) * fit, depuis le coin du PNG dessine.
+    //    Donc x_drawImage = CANVAS_SIZE/2 - (bounds.minX + bounds.width/2) * fit
+    const objCenterXInPng = bounds.minX + bounds.width / 2;
+    const x = CANVAS_SIZE / 2 - objCenterXInPng * fit;
 
-    // 3. Ombre puddle (compressée verticalement, sous l'objet)
-    if (shadow > 0 && bounds) {
+    // Base de l'objet apres scaling = bounds.maxY * fit (depuis le coin du PNG dessine)
+    // On veut cette base a baselineY → y_drawImage = baselineY - bounds.maxY * fit
+    const baselineY = CANVAS_SIZE * 0.88;
+    const y = baselineY - bounds.maxY * fit;
+
+    // 6. Ombre puddle (compressee verticalement, sous l'objet)
+    if (shadow > 0) {
       drawPuddleShadow(ctx, img, x, y, drawW, drawH, bounds, fit, shadow);
     }
 
-    // 4. Objet
+    // 7. Objet
     ctx.save();
     if (brightness !== 100) {
       ctx.filter = `brightness(${brightness}%)`;
@@ -171,7 +185,7 @@ export default function PhotoStudioModal({
     ctx.drawImage(img, x, y, drawW, drawH);
     ctx.restore();
 
-    // 5. Vignette tres subtile par-dessus (sauf graphite qui en a deja une)
+    // 8. Vignette tres subtile par-dessus (sauf graphite qui en a deja une)
     if (bg !== "graphite") {
       drawSubtleVignette(ctx, bg);
     }
