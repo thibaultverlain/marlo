@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import {
   Wallet, Plus, X, Clock, TrendingUp, AlertTriangle, Check,
-  Pencil, Trash2, Loader2, Package, Lock,
+  Pencil, Trash2, Loader2, Package, Lock, ShoppingBag,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import {
@@ -33,6 +33,8 @@ type TreasuryProps = {
   capitalTotal: number;
   lockedRatio: number;
   stopBuying: boolean;
+  buyingBudget: number;
+  buyingThreshold: number;
 };
 
 export default function TreasurySection(props: TreasuryProps) {
@@ -47,7 +49,7 @@ export default function TreasurySection(props: TreasuryProps) {
         <PendingCard payouts={props.pendingPayouts} total={props.pendingTotal} />
       </div>
 
-      {/* Capital + ratio immobilise */}
+      {/* Capital + ratio immobilise + budget max */}
       <CapitalSummary
         cash={props.cashBalance}
         stock={props.stockValue}
@@ -55,6 +57,8 @@ export default function TreasurySection(props: TreasuryProps) {
         capitalTotal={props.capitalTotal}
         lockedRatio={props.lockedRatio}
         stopBuying={props.stopBuying}
+        buyingBudget={props.buyingBudget}
+        buyingThreshold={props.buyingThreshold}
       />
     </div>
   );
@@ -333,16 +337,18 @@ function PendingCard({ payouts, total }: { payouts: PendingPayout[]; total: numb
   );
 }
 
-/* ───── Capital total + ratio ────────────────────────────────── */
+/* ───── Capital total + ratio + budget max ──────────────────── */
 function CapitalSummary({
-  cash, stock, pending, capitalTotal, lockedRatio, stopBuying,
+  cash, stock, pending, capitalTotal, lockedRatio, stopBuying, buyingBudget, buyingThreshold,
 }: {
   cash: number; stock: number; pending: number;
   capitalTotal: number; lockedRatio: number; stopBuying: boolean;
+  buyingBudget: number; buyingThreshold: number;
 }) {
   const pct = lockedRatio * 100;
+  const thresholdPct = buyingThreshold * 100;
   const safe = pct < 50;
-  const warning = pct >= 50 && pct <= 65;
+  const warning = pct >= 50 && pct <= thresholdPct;
 
   return (
     <div className="card-static p-5">
@@ -356,27 +362,53 @@ function CapitalSummary({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4 items-center">
-        {/* Big number */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 items-start">
+        {/* 1. Capital total (gradient hero) */}
         <div>
-          <p className="text-[32px] font-bold tabular-nums tracking-tight gradient-text">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5">Total</p>
+          <p className="text-[28px] font-bold tabular-nums tracking-tight gradient-text leading-none">
             {formatCurrency(capitalTotal)}
           </p>
-          <div className="flex flex-wrap gap-3 mt-2 text-[11px]">
+          <div className="flex flex-col gap-0.5 mt-3 text-[11px]">
             <span className="text-zinc-500">Cash <span className="text-zinc-300 font-semibold ml-1 tabular-nums">{formatCurrency(cash)}</span></span>
             <span className="text-zinc-500">+ Stock <span className="text-zinc-300 font-semibold ml-1 tabular-nums">{formatCurrency(stock)}</span></span>
             <span className="text-zinc-500">+ En cours <span className="text-zinc-300 font-semibold ml-1 tabular-nums">{formatCurrency(pending)}</span></span>
           </div>
         </div>
 
-        <div className="hidden md:block w-px h-16 bg-[var(--color-border)]" />
+        {/* 2. Budget max disponible */}
+        <div>
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <ShoppingBag size={12} className={stopBuying ? "text-red-400" : "text-emerald-400"} />
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Budget max achat</p>
+          </div>
+          <p className={`text-[28px] font-bold tabular-nums tracking-tight leading-none ${
+            stopBuying ? "text-red-400" : "text-emerald-400"
+          }`}>
+            {stopBuying ? formatCurrency(0) : formatCurrency(buyingBudget)}
+          </p>
+          <p className="text-[11px] mt-3 leading-relaxed">
+            {stopBuying ? (
+              <span className="text-red-300">
+                <span className="font-semibold">Stop achat.</span>{" "}
+                {buyingBudget < 0
+                  ? `Tu dois liquider ${formatCurrency(Math.abs(buyingBudget))} avant de racheter.`
+                  : "Tu es au seuil critique."}
+              </span>
+            ) : (
+              <span className="text-zinc-500">
+                Tu peux acheter pour <span className="text-emerald-400 font-semibold">{formatCurrency(buyingBudget)}</span> sans depasser {thresholdPct.toFixed(0)}% d'immobilisation.
+              </span>
+            )}
+          </p>
+        </div>
 
-        {/* Ratio immobilise */}
+        {/* 3. Ratio immobilise */}
         <div>
           <div className="flex items-center justify-between mb-1.5">
             <div className="flex items-center gap-1.5">
               <Lock size={12} className="text-zinc-500" />
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">% immobilise</span>
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">% immobilise</span>
             </div>
             <span className={`text-[20px] font-bold tabular-nums ${
               stopBuying ? "text-red-400" : warning ? "text-amber-400" : "text-emerald-400"
@@ -385,13 +417,11 @@ function CapitalSummary({
             </span>
           </div>
 
-          {/* Progress bar avec seuil 65% */}
           <div className="relative h-2.5 bg-zinc-800/60 rounded-full overflow-hidden">
-            {/* Marker seuil 65% */}
             <div
               className="absolute top-0 bottom-0 w-px bg-red-500/60 z-10"
-              style={{ left: "65%" }}
-              title="Seuil critique 65%"
+              style={{ left: `${thresholdPct}%` }}
+              title={`Seuil critique ${thresholdPct.toFixed(0)}%`}
             />
             <div
               className="h-full rounded-full transition-all duration-500"
@@ -405,10 +435,10 @@ function CapitalSummary({
               }}
             />
           </div>
-          <p className="text-[10px] text-zinc-500 mt-1.5">
-            {safe && "Marge de manoeuvre confortable. Tu peux continuer a sourcer."}
-            {warning && "Zone de prudence. Surveille les rotations avant d'acheter plus."}
-            {stopBuying && "Au-dessus de 65% : tu manques de liquidite pour saisir des opportunites."}
+          <p className="text-[10px] text-zinc-500 mt-1.5 leading-relaxed">
+            {safe && "Marge de manoeuvre confortable."}
+            {warning && "Zone de prudence."}
+            {stopBuying && `Au-dessus du seuil ${thresholdPct.toFixed(0)}%.`}
           </p>
         </div>
       </div>

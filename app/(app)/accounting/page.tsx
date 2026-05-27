@@ -55,6 +55,8 @@ export default async function AccountingPage({ searchParams }: { searchParams: P
         capitalTotal={treasury.capitalTotal}
         lockedRatio={treasury.lockedRatio}
         stopBuying={treasury.stopBuying}
+        buyingBudget={treasury.buyingBudget}
+        buyingThreshold={treasury.buyingThreshold}
       />
 
       {/* ─── COMPTABILITE FISCALE (annuel) ─────────────── */}

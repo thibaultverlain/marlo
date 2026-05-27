@@ -22,6 +22,8 @@ export type TreasuryState = {
   capitalTotal: number;
   lockedRatio: number;
   stopBuying: boolean;
+  buyingBudget: number;     // Budget max disponible pour acheter sans depasser le seuil
+  buyingThreshold: number;  // Le seuil 0.65 reutilisable
 };
 
 export async function getTreasuryState(shopId: string): Promise<TreasuryState> {
@@ -49,8 +51,11 @@ export async function getTreasuryState(shopId: string): Promise<TreasuryState> {
   const stockValue = Number(stockStats?.totalValue ?? 0);
 
   const capitalTotal = cashBalance + stockValue + pendingTotal;
+  const buyingThreshold = 0.65; // 65% de capital max immobilise
   const lockedRatio = capitalTotal > 0 ? stockValue / capitalTotal : 0;
-  const stopBuying = lockedRatio > 0.65;
+  // Budget max = capital * seuil - stock actuel (combien tu peux acheter avant de depasser 65%)
+  const buyingBudget = capitalTotal * buyingThreshold - stockValue;
+  const stopBuying = buyingBudget <= 0;
 
   return {
     cashBalance,
@@ -61,6 +66,8 @@ export async function getTreasuryState(shopId: string): Promise<TreasuryState> {
     capitalTotal,
     lockedRatio,
     stopBuying,
+    buyingBudget,
+    buyingThreshold,
   };
 }
 
