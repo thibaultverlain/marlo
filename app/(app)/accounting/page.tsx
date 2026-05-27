@@ -2,9 +2,11 @@ import Link from "next/link";
 import { getAuthContext } from "@/lib/auth/require-role";
 import { TrendingUp, TrendingDown, BarChart3, Percent } from "lucide-react";
 import { getRecipeBook, getPurchasesRegister, getAccountingStats } from "@/lib/db/queries/accounting";
+import { getTreasuryState } from "@/lib/db/queries/treasury";
 import { formatCurrency } from "@/lib/utils";
 import { CHANNELS } from "@/lib/data";
 import AccountingTabs from "@/components/accounting/accounting-tabs";
+import TreasurySection from "@/components/accounting/treasury-section";
 
 export const revalidate = 30;
 
@@ -14,11 +16,12 @@ export default async function AccountingPage({ searchParams }: { searchParams: P
   const tab = sp.tab ?? "recipes";
   const { shopId } = await getAuthContext();
 
-  const [recipes, purchasesRows, stats, prevStats] = await Promise.all([
+  const [recipes, purchasesRows, stats, prevStats, treasury] = await Promise.all([
     getRecipeBook(shopId, year),
     getPurchasesRegister(shopId, year),
     getAccountingStats(shopId, year),
     getAccountingStats(shopId, year - 1),
+    getTreasuryState(shopId),
   ]);
 
   const benefit = stats.revenue - stats.expenses;
@@ -39,7 +42,26 @@ export default async function AccountingPage({ searchParams }: { searchParams: P
     <div className="space-y-6 page-enter">
       <div>
         <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">Comptabilite</h1>
-        <p className="text-zinc-500 mt-1 text-sm">Livre de recettes et registre des achats</p>
+        <p className="text-zinc-500 mt-1 text-sm">Tresorerie operationnelle + livre de recettes et registre des achats</p>
+      </div>
+
+      {/* ─── TRESORERIE (operationnel) ─────────────────── */}
+      <TreasurySection
+        cashBalance={treasury.cashBalance}
+        cashUpdatedAt={treasury.cashUpdatedAt}
+        pendingPayouts={treasury.pendingPayouts}
+        pendingTotal={treasury.pendingTotal}
+        stockValue={treasury.stockValue}
+        capitalTotal={treasury.capitalTotal}
+        lockedRatio={treasury.lockedRatio}
+        stopBuying={treasury.stopBuying}
+      />
+
+      {/* ─── COMPTABILITE FISCALE (annuel) ─────────────── */}
+      <div className="pt-2 border-t border-[var(--color-border-subtle)]">
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 mt-4 mb-3">
+          Comptabilite fiscale
+        </p>
       </div>
 
       {/* Selecteur annee */}

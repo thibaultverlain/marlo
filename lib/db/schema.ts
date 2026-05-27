@@ -259,8 +259,22 @@ export const shopSettings = pgTable("shop_settings", {
   legalMention: text("legal_mention"),
   paymentTerms: text("payment_terms").default("Paiement comptant"),
   lateFeePct: decimal("late_fee_pct", { precision: 5, scale: 4 }).default("0"),
+  // Tresorerie : solde cash mis a jour manuellement
+  cashBalance: decimal("cash_balance", { precision: 10, scale: 2 }).default("0"),
+  cashUpdatedAt: timestamp("cash_updated_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Ventes en cours (paiement plateforme non encore credite)
+export const pendingPayouts = pgTable("pending_payouts", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  shopId: uuid("shop_id").references(() => shops.id).notNull(),
+  label: text("label").notNull(),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  platform: text("platform").notNull(), // vinted / vestiaire / stockx / autre
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 // ── Shops & Team ──────────────────────────────────────
@@ -467,6 +481,8 @@ export type PsItem = typeof psItems.$inferSelect;
 export type Purchase = typeof purchases.$inferSelect;
 export type ShopSettings = typeof shopSettings.$inferSelect;
 export type NewShopSettings = typeof shopSettings.$inferInsert;
+export type PendingPayout = typeof pendingPayouts.$inferSelect;
+export type NewPendingPayout = typeof pendingPayouts.$inferInsert;
 export type Shop = typeof shops.$inferSelect;
 export type TeamMember = typeof teamMembers.$inferSelect;
 export type TeamInvitation = typeof teamInvitations.$inferSelect;
