@@ -36,21 +36,22 @@
   --radius-xl: 20px;
 
   /* ╔══════════════════════════════════════════════════════════════╗
-     ║  PALETTE VERT ELECTRIQUE & OR                                ║
-     ║  Remap Tailwind rose-* → vert vif premium. Style fintech     ║
-     ║  moderne, plus lumineux qu'un emeraude classique.            ║
+     ║  PALETTE BLEU MARINE & BLANC                                 ║
+     ║  Remap Tailwind rose-* → bleu marine intemporel.             ║
+     ║  Style luxe classique (Hermes / Smythson / Goyard).          ║
+     ║  Base : #14233F. Echelle generee en H/S constants, L varie.  ║
      ╚══════════════════════════════════════════════════════════════╝ */
-  --color-rose-50:  #e6fbf2;
-  --color-rose-100: #b3f3d5;
-  --color-rose-200: #7eebb6;
-  --color-rose-300: #4ddd96;
-  --color-rose-400: #2dd49d;  /* utilise pour text-rose-400 - vert clair pop */
-  --color-rose-500: #00d68f;  /* accent principal - vert electrique premium */
-  --color-rose-600: #00b377;
-  --color-rose-700: #008a5c;
-  --color-rose-800: #056b4a;
-  --color-rose-900: #033d2a;
-  --color-rose-950: #01221a;
+  --color-rose-50:  #f0f3f8;
+  --color-rose-100: #d6dde8;
+  --color-rose-200: #b3bed1;
+  --color-rose-300: #8595b5;
+  --color-rose-400: #5a6e96;  /* utilise sur dark : visible sur fond noir */
+  --color-rose-500: #14233F;  /* accent principal — couleur du brief */
+  --color-rose-600: #101c33;
+  --color-rose-700: #0c1626;
+  --color-rose-800: #08101c;
+  --color-rose-900: #050913;
+  --color-rose-950: #02040a;
 
   /* Famille "Gold" pour les highlights (badges, podium, accents secondaires) */
   --color-gold-50:  #fbf6e8;
@@ -67,47 +68,45 @@
 
 /* ╔══════════════════════════════════════════════════════════════════╗
    ║  MARLO DESIGN SYSTEM                                              ║
-   ║  Palette : emeraude (accent) + or (highlight) + emerald clair    ║
-   ║            (success) + red (danger) + amber (warning) + zinc     ║
-   ║  Note : les classes Tailwind "rose-*" sont remappees vers        ║
-   ║  l'emeraude via @theme, on garde donc text-rose-X dans le code. ║
-   ║  Tailles texte : 4 niveaux fonctionnels                          ║
-   ║  Radius : 4 valeurs avec regle                                   ║
+   ║  Palette FINALE : bleu marine (#14233F) + blanc + charbon (#0F0E0C)║
+   ║  Style : luxe classique, intemporel, sobre                        ║
+   ║  Note : classes Tailwind "rose-*" sont remappees vers bleu marine ║
+   ║  via @theme, on garde text-rose-X dans le code.                  ║
    ╚══════════════════════════════════════════════════════════════════╝ */
 
 /* ── DARK (defaut) ──────────────────────────────────────── */
 :root,
 [data-theme="dark"] {
-  /* Backgrounds — teinte legerement plus verte pour matcher l'emeraude */
-  --color-bg: #08090b;
-  --color-bg-raised: #0c0e0d;
-  --color-bg-card: #101413;
-  --color-bg-card-hover: #161c1a;
-  --color-bg-hover: #1a201e;
-  --color-bg-sidebar: #0a0c0b;
-  --color-bg-input: #0d100f;
+  /* Backgrounds — charbon profond (#0F0E0C) avec nuances */
+  --color-bg: #0F0E0C;
+  --color-bg-raised: #161512;
+  --color-bg-card: #1c1a17;
+  --color-bg-card-hover: #232017;
+  --color-bg-hover: #26231e;
+  --color-bg-sidebar: #110f0d;
+  --color-bg-input: #14120f;
 
   /* Borders */
   --color-border: rgba(255, 255, 255, 0.06);
   --color-border-hover: rgba(255, 255, 255, 0.12);
   --color-border-subtle: rgba(255, 255, 255, 0.03);
-  --color-border-accent: rgba(0, 214, 143, 0.30);
+  --color-border-accent: rgba(90, 110, 150, 0.40);
 
-  /* Text — 4 niveaux clairs */
-  --color-text: #eeeef2;          /* Primary */
-  --color-text-secondary: #a1a1aa; /* Secondary (zinc-400 equivalent) */
-  --color-text-tertiary: #71717a;  /* Tertiary (zinc-500 — meta info readable) */
-  --color-text-disabled: #52525b;  /* Disabled (zinc-600 — for very dim cap labels only) */
-  --color-text-inverse: #06150f;  /* fond tres fonce pour contraste sur bouton vert vif */
+  /* Text — base #FFFFFF + nuances */
+  --color-text: #FFFFFF;            /* Primary (blanc pur du brief) */
+  --color-text-secondary: #b8b5af;  /* Secondary */
+  --color-text-tertiary: #807d76;   /* Tertiary (meta info readable) */
+  --color-text-disabled: #5a5751;   /* Disabled */
+  --color-text-inverse: #0F0E0C;    /* charbon : texte sur bouton clair */
 
-  /* Accent (vert electrique premium) */
-  --color-accent: #00d68f;
-  --color-accent-hover: #00b377;
-  --color-accent-muted: rgba(0, 214, 143, 0.12);
-  --color-accent-text: #7eebb6;
-  --color-accent-glow: rgba(0, 214, 143, 0.25);
+  /* Accent (bleu marine — clarifie pour visibilite sur fond charbon) */
+  --color-accent: #5a6e96;
+  --color-accent-hover: #7a8caa;
+  --color-accent-muted: rgba(90, 110, 150, 0.14);
+  --color-accent-text: #b3bed1;
+  --color-accent-glow: rgba(90, 110, 150, 0.30);
 
-  /* Gold (highlight secondaire) */
+  /* Gold (highlight secondaire) — conserve pour podium / badges premium */
   --color-gold: #c9a961;
   --color-gold-bright: #d4af7a;
   --color-gold-muted: rgba(201, 169, 97, 0.12);
@@ -131,8 +130,8 @@
 
   /* Shadows */
   --shadow-card: 0 1px 3px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.03);
-  --shadow-card-hover: 0 8px 24px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,214,143,0.20);
-  --shadow-glow-accent: 0 0 24px rgba(0, 214, 143, 0.15);
+  --shadow-card-hover: 0 8px 24px rgba(0,0,0,0.5), 0 0 0 1px rgba(90,110,150,0.25);
+  --shadow-glow-accent: 0 0 24px rgba(90, 110, 150, 0.18);
   --shadow-sidebar: none;
 
   /* Radius — 4 valeurs */
@@ -147,30 +146,33 @@
 
 /* ── LIGHT ──────────────────────────────────────────────── */
 [data-theme="light"] {
-  --color-bg: #f4f6f5;
-  --color-bg-raised: #ffffff;
-  --color-bg-card: #ffffff;
-  --color-bg-card-hover: #f6f9f7;
-  --color-bg-hover: #eef3f0;
-  --color-bg-sidebar: #ffffff;
-  --color-bg-input: #ffffff;
+  /* Backgrounds — blanc (#FFFFFF) avec nuances tres legeres */
+  --color-bg: #FFFFFF;
+  --color-bg-raised: #FFFFFF;
+  --color-bg-card: #FFFFFF;
+  --color-bg-card-hover: #f7f7f5;
+  --color-bg-hover: #f0efec;
+  --color-bg-sidebar: #FFFFFF;
+  --color-bg-input: #FFFFFF;
 
-  --color-border: rgba(0, 0, 0, 0.08);
-  --color-border-hover: rgba(0, 0, 0, 0.15);
-  --color-border-subtle: rgba(0, 0, 0, 0.04);
-  --color-border-accent: rgba(0, 179, 119, 0.30);
+  --color-border: rgba(15, 14, 12, 0.08);
+  --color-border-hover: rgba(15, 14, 12, 0.18);
+  --color-border-subtle: rgba(15, 14, 12, 0.04);
+  --color-border-accent: rgba(20, 35, 63, 0.30);
 
-  --color-text: #0a1614;
-  --color-text-secondary: #475c54;
-  --color-text-tertiary: #687a72;
-  --color-text-disabled: #9aa39e;
-  --color-text-inverse: #06150f;
+  /* Text — base #0F0E0C (charbon, contraste max sur fond blanc) */
+  --color-text: #0F0E0C;
+  --color-text-secondary: #3a3833;
+  --color-text-tertiary: #6a6862;
+  --color-text-disabled: #9a9892;
+  --color-text-inverse: #FFFFFF;     /* blanc sur bouton bleu marine */
 
-  --color-accent: #00b377;
-  --color-accent-hover: #008a5c;
-  --color-accent-muted: rgba(0, 179, 119, 0.10);
-  --color-accent-text: #008a5c;
-  --color-accent-glow: rgba(0, 179, 119, 0.12);
+  /* Accent (bleu marine — #14233F direct sur fond blanc) */
+  --color-accent: #14233F;
+  --color-accent-hover: #0c1626;
+  --color-accent-muted: rgba(20, 35, 63, 0.08);
+  --color-accent-text: #14233F;
+  --color-accent-glow: rgba(20, 35, 63, 0.10);
 
   --color-gold: #a88a47;
   --color-gold-bright: #c9a961;
@@ -193,9 +195,9 @@
   --color-danger-border: rgba(220, 38, 38, 0.20);
 
   --shadow-card: 0 1px 3px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.04);
-  --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,179,119,0.15);
-  --shadow-glow-accent: 0 0 16px rgba(0, 179, 119, 0.08);
-  --shadow-sidebar: 1px 0 12px rgba(0, 179, 119, 0.04), 1px 0 0 rgba(0, 179, 119, 0.06);
+  --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.06), 0 0 0 1px rgba(20,35,63,0.12);
+  --shadow-glow-accent: 0 0 16px rgba(20, 35, 63, 0.06);
+  --shadow-sidebar: 1px 0 12px rgba(20, 35, 63, 0.04), 1px 0 0 rgba(20, 35, 63, 0.06);
 
   color-scheme: light;
 }
