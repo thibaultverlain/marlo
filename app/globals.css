@@ -39,17 +39,21 @@
      ║  PALETTE BLEU MARINE & BLANC                                 ║
      ║  Remap Tailwind rose-* → bleu marine intemporel.             ║
      ║  Style luxe classique (Hermes / Smythson / Goyard).          ║
-     ║  Base : #14233F. Echelle generee en H/S constants, L varie.  ║
+     ║                                                              ║
+     ║  Note : on DECALE l'echelle pour que rose-500 soit la        ║
+     ║  version CLAIRE (visible sur dark ET light). Le #14233F brut ║
+     ║  est trop fonce pour fonctionner sur fond charbon — on le    ║
+     ║  reserve aux niveaux 700-800 (texte foncé, hover light).     ║
      ╚══════════════════════════════════════════════════════════════╝ */
   --color-rose-50:  #f0f3f8;
   --color-rose-100: #d6dde8;
   --color-rose-200: #b3bed1;
   --color-rose-300: #8595b5;
-  --color-rose-400: #5a6e96;  /* utilise sur dark : visible sur fond noir */
-  --color-rose-500: #14233F;  /* accent principal — couleur du brief */
-  --color-rose-600: #101c33;
-  --color-rose-700: #0c1626;
-  --color-rose-800: #08101c;
+  --color-rose-400: #7a8caa;  /* hover / texte clair */
+  --color-rose-500: #5a6e96;  /* accent principal — visible partout */
+  --color-rose-600: #475a82;  /* hover */
+  --color-rose-700: #14233F;  /* couleur du brief (utilisable comme texte fonce sur light) */
+  --color-rose-800: #0c1626;
   --color-rose-900: #050913;
   --color-rose-950: #02040a;
 
@@ -97,7 +101,7 @@
   --color-text-secondary: #b8b5af;  /* Secondary */
   --color-text-tertiary: #807d76;   /* Tertiary (meta info readable) */
   --color-text-disabled: #5a5751;   /* Disabled */
-  --color-text-inverse: #0F0E0C;    /* charbon : texte sur bouton clair */
+  --color-text-inverse: #FFFFFF;    /* blanc : texte sur bouton bleu marine (contraste max) */
 
   /* Accent (bleu marine — clarifie pour visibilite sur fond charbon) */
   --color-accent: #5a6e96;

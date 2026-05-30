@@ -153,7 +153,7 @@ export default function Sidebar({
                       <Icon size={17} strokeWidth={isActive ? 1.8 : 1.5} />
                       <span className={`flex-1 ${isActive ? "font-semibold" : "font-normal"}`}>{item.label}</span>
                       {showBadge && (
-                        <span className="w-[18px] h-[18px] rounded-full bg-rose-400/90 text-[9px] font-bold text-black flex items-center justify-center">
+                        <span className="w-[18px] h-[18px] rounded-full bg-rose-400/90 text-[9px] font-bold text-white flex items-center justify-center">
                           {alertCount}
                         </span>
                       )}
