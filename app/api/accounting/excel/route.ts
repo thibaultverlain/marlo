@@ -5,7 +5,7 @@ import { CHANNELS } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 
-function escapeCsv(value: any): string {
+function escapeCsv(value: unknown): string {
   if (value === null || value === undefined) return "";
   const s = String(value);
   if (s.includes(",") || s.includes('"') || s.includes("\n")) {
@@ -14,11 +14,15 @@ function escapeCsv(value: any): string {
   return s;
 }
 
+function fr(n: number): string {
+  return n.toFixed(2).replace(".", ",");
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { shopId } = await getAuthContext();
     const sp = request.nextUrl.searchParams;
-    const year = parseInt(sp.get("year") ?? String(new Date().getFullYear()), 10);
+    const year = parseInt(sp.get("year") ?? "2026", 10);
     const tab = sp.get("tab") ?? "recipes";
 
     let csv: string;
@@ -26,7 +30,7 @@ export async function GET(request: NextRequest) {
 
     if (tab === "purchases") {
       const purchases = await getPurchasesRegister(shopId, year);
-      const headers = ["Date", "SKU", "Description", "Fournisseur", "Categorie", "Paiement", "Montant (€)"];
+      const headers = ["Date", "SKU", "Description", "Fournisseur", "Categorie", "Paiement", "HT (EUR)", "TVA deductible (EUR)", "TTC (EUR)"];
       const rows = purchases.map((p) => [
         p.date ? new Date(p.date).toLocaleDateString("fr-FR") : "",
         p.productSku ?? "",
@@ -34,13 +38,15 @@ export async function GET(request: NextRequest) {
         p.supplier ?? "",
         p.category ?? "",
         p.paymentMethod ?? "",
-        p.amount.toFixed(2).replace(".", ","),
+        fr(p.amountHT),
+        p.vatDeductible ? fr(p.vat) : "0,00",
+        fr(p.amountTTC),
       ]);
-      csv = "\uFEFF" + headers.map(escapeCsv).join(",") + "\n" + rows.map((r) => r.map(escapeCsv).join(",")).join("\n");
-      filename = `registre-achats-${year}.csv`;
+      csv = "﻿" + headers.map(escapeCsv).join(",") + "\n" + rows.map((r) => r.map(escapeCsv).join(",")).join("\n");
+      filename = `journal-achats-SASU-${year}.csv`;
     } else {
       const recipes = await getRecipeBook(shopId, year);
-      const headers = ["Date", "N Facture", "Client", "Article", "Canal", "Paiement", "Montant (€)"];
+      const headers = ["Date", "N Facture", "Client", "Article", "Canal", "Paiement", "HT (EUR)", "TVA collectee (EUR)", "TTC (EUR)"];
       const rows = recipes.map((r) => [
         new Date(r.date).toLocaleDateString("fr-FR"),
         r.invoiceNumber ?? "",
@@ -48,10 +54,12 @@ export async function GET(request: NextRequest) {
         r.productTitle ?? "",
         CHANNELS.find((c) => c.value === r.channel)?.label ?? r.channel,
         r.paymentMethod ?? "",
-        r.amount.toFixed(2).replace(".", ","),
+        fr(r.amountHT),
+        fr(r.vat),
+        fr(r.amountTTC),
       ]);
-      csv = "\uFEFF" + headers.map(escapeCsv).join(",") + "\n" + rows.map((r) => r.map(escapeCsv).join(",")).join("\n");
-      filename = `livre-recettes-${year}.csv`;
+      csv = "﻿" + headers.map(escapeCsv).join(",") + "\n" + rows.map((r) => r.map(escapeCsv).join(",")).join("\n");
+      filename = `journal-ventes-SASU-${year}.csv`;
     }
 
     return new NextResponse(csv, {
@@ -60,8 +68,9 @@ export async function GET(request: NextRequest) {
         "Content-Disposition": `attachment; filename="${filename}"`,
       },
     });
-  } catch (err: any) {
+  } catch (err) {
     console.error("Accounting export error:", err);
-    return NextResponse.json({ error: err.message || "Erreur" }, { status: 500 });
+    const msg = err instanceof Error ? err.message : "Erreur";
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
