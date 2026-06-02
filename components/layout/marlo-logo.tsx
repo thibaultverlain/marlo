@@ -22,9 +22,9 @@ export function MarloIcon({ size = 28 }: { size?: number }) {
   );
 }
 
-export function MarloWordmark() {
+export function MarloWordmark({ size = 15 }: { size?: number }) {
   return (
-    <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 15, fontWeight: 400, letterSpacing: "0.25em", color: "var(--color-text)" }}>
+    <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: size, fontWeight: 400, letterSpacing: "0.25em", color: "var(--color-text)" }}>
       MARLO
     </span>
   );

@@ -96,9 +96,9 @@ export default function Sidebar({
     <>
       {/* Mobile top bar */}
       <div className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-[var(--color-bg-sidebar)] border-b border-[var(--color-border)] flex items-center justify-between px-4 z-50">
-        <div className="flex items-center gap-1.5">
-          <MarloIcon size={28} />
-          <MarloWordmark />
+        <div className="flex items-center gap-2">
+          <MarloIcon size={34} />
+          <MarloWordmark size={17} />
         </div>
         <button onClick={() => setOpen(!open)} className="w-9 h-9 flex items-center justify-center rounded-lg text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-bg-hover)] transition-all duration-150">
           {open ? <X size={20} /> : <Menu size={20} />}
@@ -109,10 +109,10 @@ export default function Sidebar({
 
       <aside className={`fixed top-0 bottom-0 w-[220px] bg-[var(--color-bg-sidebar)] flex flex-col z-50 border-r border-[var(--color-border)] transition-transform duration-200 ease-out lg:left-0 lg:translate-x-0 ${open ? "left-0 translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
         style={{ boxShadow: "var(--shadow-sidebar)" }}>
-        <div className="px-5 py-5 hidden lg:block">
-          <div className="flex items-center gap-1.5">
-            <MarloIcon size={28} />
-            <MarloWordmark />
+        <div className="px-5 py-6 hidden lg:block">
+          <div className="flex items-center gap-2">
+            <MarloIcon size={44} />
+            <MarloWordmark size={22} />
           </div>
         </div>
 
