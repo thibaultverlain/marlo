@@ -446,25 +446,6 @@ export const priceHistory = pgTable("price_history", {
   reason: text("reason"),
 });
 
-// ── Authenticity checks ───────────────────────────────
-
-export const authenticityVerdictEnum = pgEnum("authenticity_verdict", [
-  "authentique", "suspect", "faux", "non_conclu"
-]);
-
-export const authenticityChecks = pgTable("authenticity_checks", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  userId: uuid("user_id").notNull(),
-  shopId: uuid("shop_id").references(() => shops.id),
-  productId: uuid("product_id").references(() => products.id),
-  brand: text("brand").notNull(),
-  model: text("model"),
-  points: jsonb("points").notNull().$type<Array<{ id: string; checked: boolean }>>(),
-  verdict: authenticityVerdictEnum("verdict").notNull().default("non_conclu"),
-  notes: text("notes"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
 // ── Types ──────────────────────────────────────────────
 
 export type Product = typeof products.$inferSelect;
@@ -496,8 +477,6 @@ export type Document = typeof documents.$inferSelect;
 export type NewDocument = typeof documents.$inferInsert;
 export type OrderGroup = typeof orderGroups.$inferSelect;
 export type PriceHistory = typeof priceHistory.$inferSelect;
-export type AuthenticityCheck = typeof authenticityChecks.$inferSelect;
-export type NewAuthenticityCheck = typeof authenticityChecks.$inferInsert;
 export type ProcessedInboundEmail = typeof processedInboundEmails.$inferSelect;
 export type NewProcessedInboundEmail = typeof processedInboundEmails.$inferInsert;
 export type ShopEmailCredentials = typeof shopEmailCredentials.$inferSelect;
@@ -508,7 +487,7 @@ export type TeamRole = "owner" | "manager" | "seller";
 export const ALL_PERMISSIONS = [
   "dashboard", "products", "sales", "customers", "analytics",
   "sourcing", "personal_shopping", "tasks", "invoices",
-  "accounting", "templates", "documents", "authentification",
+  "accounting", "templates", "documents",
   "team", "settings",
 ] as const;
 export type Permission = typeof ALL_PERMISSIONS[number];

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Package, ShoppingCart, Users, Search,
-  ShoppingBag, FileText, Calculator, Settings, Menu, X, BarChart3, ListTodo, ClipboardList, Truck, ShieldCheck,
+  ShoppingBag, FileText, Calculator, Settings, Menu, X, BarChart3, ListTodo, ClipboardList, Truck,
 } from "lucide-react";
 import ThemeToggle from "./theme-toggle";
 import LogoutButton from "./logout-button";
@@ -42,7 +42,6 @@ const NAV_SECTIONS = [
     label: "Outils",
     items: [
       { href: "/tasks", label: "Taches", icon: ListTodo, perm: "tasks" },
-      { href: "/authentification", label: "Authenticite", icon: ShieldCheck, perm: "authentification" },
       { href: "/templates", label: "Templates", icon: ClipboardList, perm: "templates" },
       { href: "/analytics", label: "Analytique", icon: BarChart3, perm: "analytics" },
     ],

@@ -306,21 +306,40 @@ export async function applyDormantPriceSuggestionAction(
   }
 }
 
+const VALID_STATUSES = ["en_stock", "en_vente", "reserve", "vendu", "expedie", "livre", "retourne"] as const;
+
 export async function bulkUpdateStatusAction(ids: string[], status: string) {
   if (!Array.isArray(ids) || ids.length === 0) {
     return { error: "Aucun article selectionne" };
   }
-  const validStatus = ["en_stock", "en_vente", "reserve"];
-  if (!validStatus.includes(status)) {
+  if (!VALID_STATUSES.includes(status as typeof VALID_STATUSES[number])) {
     return { error: "Statut invalide" };
   }
   try {
-    const ctx = await getAuthContext();
-    await Promise.all(ids.map((id) => updateProduct(id, { status: status as any })));
+    await getAuthContext();
+    await Promise.all(ids.map((id) => updateProduct(id, { status: status as typeof VALID_STATUSES[number] })));
     revalidatePath("/products");
     return { success: true, count: ids.length };
   } catch (err) {
     console.error("bulkUpdateStatusAction error:", err);
+    return { error: "Erreur lors de la mise a jour." };
+  }
+}
+
+// Changement rapide pour un seul produit (depuis le badge cliquable dans la liste).
+export async function updateProductStatusAction(id: string, status: string) {
+  if (!id) return { error: "ID manquant" };
+  if (!VALID_STATUSES.includes(status as typeof VALID_STATUSES[number])) {
+    return { error: "Statut invalide" };
+  }
+  try {
+    await getAuthContext();
+    await updateProduct(id, { status: status as typeof VALID_STATUSES[number] });
+    revalidatePath("/products");
+    revalidatePath(`/products/${id}`);
+    return { success: true };
+  } catch (err) {
+    console.error("updateProductStatusAction error:", err);
     return { error: "Erreur lors de la mise a jour." };
   }
 }

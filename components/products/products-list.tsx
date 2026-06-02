@@ -10,6 +10,7 @@ import {
 import { formatCurrency } from "@/lib/utils";
 import { PRODUCT_STATUSES } from "@/lib/data";
 import { bulkDeleteProductsAction, bulkUpdateStatusAction } from "@/lib/actions/products";
+import StatusBadgePicker from "./status-badge-picker";
 
 export type ProductListItem = {
   id: string;
@@ -24,32 +25,12 @@ export type ProductListItem = {
   daysInStock: number;
 };
 
-// Palette resserree : zinc (neutre) + rose (actif) + amber (attente) + emerald (succes) + red (echec)
-// La distinction passe par couleur ET intensite, pas par variete arc-en-ciel.
-const STATUS_STYLES: Record<string, { bg: string; text: string; dot: string }> = {
-  en_stock: { bg: "bg-zinc-500/12 border-zinc-500/25", text: "text-zinc-300", dot: "bg-zinc-400" },
-  en_vente: { bg: "bg-rose-500/12 border-rose-500/25", text: "text-rose-400", dot: "bg-rose-400" },
-  reserve: { bg: "bg-amber-500/12 border-amber-500/25", text: "text-amber-400", dot: "bg-amber-400" },
-  vendu: { bg: "bg-emerald-500/15 border-emerald-500/30", text: "text-emerald-400", dot: "bg-emerald-400" },
-  expedie: { bg: "bg-emerald-500/10 border-emerald-500/20", text: "text-emerald-300", dot: "bg-emerald-300" },
-  livre: { bg: "bg-emerald-500/20 border-emerald-500/35", text: "text-emerald-400", dot: "bg-emerald-400" },
-  retourne: { bg: "bg-red-500/12 border-red-500/25", text: "text-red-400", dot: "bg-red-400" },
-};
-
 const STATUS_LABELS: Record<string, string> = {
   en_stock: "En stock", en_vente: "En vente", reserve: "Reserve",
   vendu: "Vendu", expedie: "Expedie", livre: "Livre", retourne: "Retourne",
 };
 
-function StatusBadge({ status }: { status: string }) {
-  const s = STATUS_STYLES[status] ?? STATUS_STYLES.en_stock;
-  return (
-    <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-semibold border ${s.bg} ${s.text}`}>
-      <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${s.dot}`} />
-      {STATUS_LABELS[status] ?? status}
-    </span>
-  );
-}
+const BULK_STATUSES = ["en_stock", "en_vente", "reserve", "vendu", "expedie", "livre", "retourne"];
 
 type SortField = "recent" | "name" | "price_asc" | "price_desc" | "days_in_stock";
 
@@ -217,7 +198,7 @@ export default function ProductsList({ products }: { products: ProductListItem[]
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setShowStatusMenu(false)} />
                 <div className="absolute right-0 top-full mt-1 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg shadow-xl shadow-black/30 py-1 z-50 min-w-[160px]">
-                  {["en_stock", "en_vente", "reserve"].map((s) => (
+                  {BULK_STATUSES.map((s) => (
                     <button key={s} disabled={isPending}
                       onClick={() => handleBulkStatus(s)}
                       className="w-full px-3 py-1.5 text-left text-[12px] text-zinc-300 hover:bg-[var(--color-bg-hover)] disabled:opacity-50">
@@ -290,11 +271,11 @@ export default function ProductsList({ products }: { products: ProductListItem[]
                     <p className="text-[13px] font-medium text-zinc-200 tabular-nums">{formatCurrency(product.targetPrice)}</p>
                     <p className="text-[11px] text-zinc-500 tabular-nums">Achat : {formatCurrency(product.purchasePrice)}</p>
                   </div>
-                  <div className="flex-shrink-0 sm:w-24 text-right">
-                    <StatusBadge status={product.status} />
-                    <p className="text-[11px] text-zinc-400 tabular-nums mt-1 sm:hidden">{formatCurrency(product.targetPrice)}</p>
-                  </div>
                 </Link>
+                <div className="flex-shrink-0 sm:w-24 text-right" onClick={(e) => e.stopPropagation()}>
+                  <StatusBadgePicker productId={product.id} status={product.status} />
+                  <p className="text-[11px] text-zinc-400 tabular-nums mt-1 sm:hidden">{formatCurrency(product.targetPrice)}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -310,10 +291,10 @@ export default function ProductsList({ products }: { products: ProductListItem[]
                 onChange={() => toggleSelect(product.id)}
                 className="absolute top-3 left-3 w-3.5 h-3.5 rounded border-[var(--color-border)] bg-[var(--color-bg)] text-rose-500 focus:ring-rose-500 focus:ring-1 z-10 opacity-0 group-hover:opacity-100 checked:opacity-100"
               />
+              <div className="flex justify-end mb-2 relative z-10">
+                <StatusBadgePicker productId={product.id} status={product.status} compact />
+              </div>
               <Link href={`/products/${product.id}`}>
-                <div className="flex justify-end mb-2">
-                  <StatusBadge status={product.status} />
-                </div>
                 <p className="text-[13px] font-medium text-zinc-200 line-clamp-2 group-hover:text-white min-h-[36px]">{product.title}</p>
                 <p className="text-[11px] text-zinc-500 mt-1">{product.brand}</p>
                 <div className="mt-3 pt-3 border-t border-[var(--color-border)]">
