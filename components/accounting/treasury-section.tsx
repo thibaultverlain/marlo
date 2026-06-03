@@ -251,7 +251,7 @@ function PendingCard({ payouts, total }: { payouts: PendingPayout[]; total: numb
       {/* Form ajout */}
       {adding && (
         <form onSubmit={handleAdd} className="bg-[var(--color-bg-raised)] rounded-lg p-3 mb-3 space-y-2 border border-[var(--color-border)]">
-          <div className="grid grid-cols-[2fr_1fr_1fr] gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-[2fr_1fr_1fr] gap-2">
             <input
               type="text"
               name="label"

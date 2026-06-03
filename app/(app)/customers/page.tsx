@@ -39,7 +39,7 @@ export default async function CustomersPage() {
 
       {/* KPIs */}
       {customers.length > 0 && (
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="kpi-card p-4 flex flex-col justify-between min-h-[100px]">
             <div className="flex items-start justify-between">
               <p className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Total clients</p>

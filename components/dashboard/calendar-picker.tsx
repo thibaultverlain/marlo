@@ -115,7 +115,7 @@ export default function CalendarPicker({
   const rangeEnd = to ?? hoverEnd;
 
   return (
-    <div className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-xl shadow-xl shadow-black/40 p-4 w-[340px]">
+    <div className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-xl shadow-xl shadow-black/40 p-4 w-[min(340px,calc(100vw-2rem))]">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <button onClick={() => setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, 1))}
