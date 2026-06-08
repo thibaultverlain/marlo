@@ -12,7 +12,7 @@ export const revalidate = 30;
 
 export default async function AccountingPage({ searchParams }: { searchParams: Promise<{ year?: string; tab?: string }> }) {
   const sp = await searchParams;
-  // SASU MaisonRoseLin : exercice fiscal 2026 uniquement.
+  // SASU Nayren : exercice fiscal 2026 uniquement.
   const year = sp.year ? parseInt(sp.year, 10) : 2026;
   const tab = sp.tab ?? "recipes";
   const { shopId } = await getAuthContext();
