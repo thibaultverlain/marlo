@@ -17,29 +17,35 @@ function isValidPrice(s: string): boolean {
   return !isNaN(parseFloat(cleaned)) && isFinite(Number(cleaned));
 }
 
+// En Zod v4, z.string() rejette strictement null/undefined.
+// On utilise .nullish() (= nullable().optional()) pour autoriser les champs vides du FormData.
+const optStr = () => z.string().nullish();
+const optStrTransform = (fn: (s: string) => string) =>
+  z.string().nullish().transform((v) => (v == null || v === "" ? null : fn(v)));
+
 const productSchema = z.object({
   title: z.string().min(1, "Le titre est requis"),
   brand: z.string().min(1, "La marque est requise"),
-  model: z.string().optional().nullable(),
+  model: optStr(),
   category: z.enum(["sacs", "chaussures", "vetements", "accessoires", "montres", "bijoux", "autre"]),
-  size: z.string().optional().nullable(),
-  color: z.string().optional().nullable(),
+  size: optStr(),
+  color: optStr(),
   condition: z.enum(["neuf_avec_etiquettes", "neuf_sans_etiquettes", "comme_neuf", "tres_bon", "bon", "correct"]),
   purchasePrice: z.string().refine(isValidPrice, "Prix invalide").transform(cleanPrice),
-  targetPrice: z.string().transform(cleanPrice).optional().nullable(),
-  purchaseSource: z.string().optional().nullable(),
-  purchaseDate: z.string().optional().nullable(),
+  targetPrice: optStrTransform(cleanPrice),
+  purchaseSource: optStr(),
+  purchaseDate: optStr(),
   listedOn: z.array(z.string()).optional(),
-  status: z.string().optional(),
-  serialNumber: z.string().optional().nullable(),
-  notes: z.string().optional().nullable(),
+  status: optStr(),
+  serialNumber: optStr(),
+  notes: optStr(),
   // Premium fields (tous optionnels)
-  subcategory: z.string().optional().nullable(),
-  material: z.string().optional().nullable(),
-  countryOfOrigin: z.string().optional().nullable(),
-  retailPrice: z.string().optional().nullable(),
-  hasInvoice: z.string().optional(), // "true" | "false"
-  measurements: z.string().optional(), // JSON string
+  subcategory: optStr(),
+  material: optStr(),
+  countryOfOrigin: optStr(),
+  retailPrice: optStr(),
+  hasInvoice: optStr(), // "true" | "false"
+  measurements: optStr(), // JSON string
   signatureDetails: z.array(z.string()).optional(),
   keywords: z.array(z.string()).optional(),
 });
