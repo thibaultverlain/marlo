@@ -109,7 +109,7 @@ export async function togglePrepChecklistAction(saleId: string, key: string, che
 
 const VALID_DISPUTE_STATUSES = new Set(["ouvert", "rembourse", "resolu", "article_recupere"]);
 
-export async function setDisputeAction(saleId: string, status: string | null, reason?: string) {
+export async function setDisputeAction(saleId: string, status: string | null, reason?: string | null) {
   if (status !== null && !VALID_DISPUTE_STATUSES.has(status)) return { error: "Statut invalide" };
   const ctx = await getAuthContext();
   try {
