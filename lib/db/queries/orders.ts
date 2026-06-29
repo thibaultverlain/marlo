@@ -118,7 +118,6 @@ export async function getOrderDetail(shopId: string, saleId: string) {
       customerPhone: customers.phone,
       customerAddress: customers.address,
       customerCity: customers.city,
-      customerPostalCode: customers.postalCode,
     })
     .from(sales)
     .leftJoin(products, eq(sales.productId, products.id))

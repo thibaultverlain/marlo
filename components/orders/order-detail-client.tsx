@@ -52,7 +52,6 @@ type OrderDetail = {
   customerPhone: string | null;
   customerAddress: string | null;
   customerCity: string | null;
-  customerPostalCode: string | null;
 };
 
 const CHANNELS: Record<string, string> = {
@@ -124,8 +123,7 @@ export default function OrderDetailClient({ order: initialOrder }: { order: Orde
   const currentStepIdx = TIMELINE_STEPS.findIndex((s) => s.key === currentStep);
 
   const customerName = order.customerFirstName ? `${order.customerFirstName} ${order.customerLastName ?? ""}`.trim() : null;
-  const customerFullAddress = [order.customerAddress, [order.customerPostalCode, order.customerCity].filter(Boolean).join(" ")]
-    .filter(Boolean).join(", ");
+  const customerFullAddress = [order.customerAddress, order.customerCity].filter(Boolean).join(", ");
 
   function handleCopy(text: string, id: string) {
     navigator.clipboard.writeText(text);
