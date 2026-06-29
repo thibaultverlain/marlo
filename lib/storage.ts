@@ -47,6 +47,29 @@ export async function deleteProductImage(imageUrl: string): Promise<void> {
 }
 
 /**
+ * Upload une photo de preparation/envoi de commande.
+ * Stockee dans le bucket product-images sous le prefixe orders/.
+ */
+export async function uploadShippingPhoto(saleId: string, file: File): Promise<string> {
+  const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
+  const filename = `orders/${saleId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const { error } = await supabase.storage.from(BUCKET).upload(filename, file, { cacheControl: "3600", upsert: false });
+  if (error) {
+    console.error("Upload shipping photo error:", error);
+    throw new Error(`Erreur d'upload : ${error.message}`);
+  }
+  const { data } = supabase.storage.from(BUCKET).getPublicUrl(filename);
+  return data.publicUrl;
+}
+
+export async function deleteShippingPhoto(imageUrl: string): Promise<void> {
+  const parts = imageUrl.split(`/storage/v1/object/public/${BUCKET}/`);
+  if (parts.length < 2) return;
+  const { error } = await supabase.storage.from(BUCKET).remove([parts[1]]);
+  if (error) console.error("Delete shipping photo error:", error);
+}
+
+/**
  * Delete all images for a product.
  */
 export async function deleteAllProductImages(productId: string): Promise<void> {

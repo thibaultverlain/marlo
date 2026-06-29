@@ -118,6 +118,13 @@ export const sales = pgTable("sales", {
   soldAt: timestamp("sold_at").defaultNow().notNull(),
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  // Workflow traitement de commande
+  prepChecklist: jsonb("prep_checklist").$type<Record<string, boolean>>().notNull().default({}),
+  disputeStatus: text("dispute_status"),
+  disputeReason: text("dispute_reason"),
+  disputeOpenedAt: timestamp("dispute_opened_at", { withTimezone: true }),
+  disputeResolvedAt: timestamp("dispute_resolved_at", { withTimezone: true }),
+  shippingPhotos: text("shipping_photos").array().notNull().default([]),
 });
 
 export const customers = pgTable("customers", {

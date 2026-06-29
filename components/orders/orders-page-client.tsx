@@ -26,6 +26,8 @@ type Order = {
   trackingNumber: string | null;
   soldAt: Date;
   notes: string | null;
+  prepChecklist: Record<string, boolean> | null;
+  disputeStatus: string | null;
   productTitle: string | null;
   productBrand: string | null;
   productSku: string | null;
@@ -385,7 +387,7 @@ export default function OrdersPageClient({
                   </div>
 
                   {/* Content - cliquable vers detail */}
-                  <Link href={`/sales/${order.id}`} className="flex-1 min-w-0 block group">
+                  <Link href={`/orders/${order.id}`} className="flex-1 min-w-0 block group">
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="text-[13px] font-medium text-white truncate group-hover:text-rose-400 transition">
                         {order.productTitle ?? "Article"}
@@ -402,6 +404,22 @@ export default function OrdersPageClient({
                           Paiement en attente
                         </span>
                       )}
+                      {order.disputeStatus === "ouvert" && (
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold text-red-300 bg-red-500/15">
+                          <AlertTriangle size={9} />
+                          Litige
+                        </span>
+                      )}
+                      {(() => {
+                        if (order.shippingStatus !== "a_expedier") return null;
+                        const done = Object.values(order.prepChecklist ?? {}).filter(Boolean).length;
+                        if (done === 0) return null;
+                        return (
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold text-amber-400 bg-amber-500/10">
+                            Prep {done}/6
+                          </span>
+                        );
+                      })()}
                     </div>
                     <div className="flex items-center gap-1.5 mt-1 text-[11px] flex-wrap">
                       <span className="text-zinc-500">{CHANNELS[order.channel] ?? order.channel}</span>

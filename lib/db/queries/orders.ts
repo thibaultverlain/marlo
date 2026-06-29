@@ -20,6 +20,8 @@ export async function getOrdersByStatus(shopId: string, status?: string) {
       trackingNumber: sales.trackingNumber,
       soldAt: sales.soldAt,
       notes: sales.notes,
+      prepChecklist: sales.prepChecklist,
+      disputeStatus: sales.disputeStatus,
       productTitle: products.title,
       productBrand: products.brand,
       productSku: products.sku,
@@ -77,4 +79,70 @@ export async function updateShippingStatus(saleId: string, shopId: string, statu
 
 export async function updatePaymentStatus(saleId: string, shopId: string, status: string) {
   await db.update(sales).set({ paymentStatus: status as any }).where(and(eq(sales.id, saleId), eq(sales.shopId, shopId)));
+}
+
+export async function getOrderDetail(shopId: string, saleId: string) {
+  const rows = await db
+    .select({
+      id: sales.id,
+      shopId: sales.shopId,
+      productId: sales.productId,
+      customerId: sales.customerId,
+      channel: sales.channel,
+      salePrice: sales.salePrice,
+      platformFees: sales.platformFees,
+      shippingCost: sales.shippingCost,
+      netRevenue: sales.netRevenue,
+      margin: sales.margin,
+      marginPct: sales.marginPct,
+      paymentMethod: sales.paymentMethod,
+      paymentStatus: sales.paymentStatus,
+      shippingStatus: sales.shippingStatus,
+      trackingNumber: sales.trackingNumber,
+      invoiceNumber: sales.invoiceNumber,
+      soldAt: sales.soldAt,
+      notes: sales.notes,
+      prepChecklist: sales.prepChecklist,
+      disputeStatus: sales.disputeStatus,
+      disputeReason: sales.disputeReason,
+      disputeOpenedAt: sales.disputeOpenedAt,
+      disputeResolvedAt: sales.disputeResolvedAt,
+      shippingPhotos: sales.shippingPhotos,
+      productTitle: products.title,
+      productBrand: products.brand,
+      productSku: products.sku,
+      productImages: products.images,
+      customerFirstName: customers.firstName,
+      customerLastName: customers.lastName,
+      customerEmail: customers.email,
+      customerPhone: customers.phone,
+      customerAddress: customers.address,
+      customerCity: customers.city,
+      customerPostalCode: customers.postalCode,
+    })
+    .from(sales)
+    .leftJoin(products, eq(sales.productId, products.id))
+    .leftJoin(customers, eq(sales.customerId, customers.id))
+    .where(and(eq(sales.shopId, shopId), eq(sales.id, saleId)))
+    .limit(1);
+  return rows[0] ?? null;
+}
+
+export async function updatePrepChecklist(saleId: string, shopId: string, checklist: Record<string, boolean>) {
+  await db.update(sales).set({ prepChecklist: checklist }).where(and(eq(sales.id, saleId), eq(sales.shopId, shopId)));
+}
+
+export async function setDispute(
+  saleId: string, shopId: string,
+  status: string | null, reason: string | null
+) {
+  const now = new Date();
+  const update: any = { disputeStatus: status, disputeReason: reason };
+  if (status === "ouvert") update.disputeOpenedAt = now;
+  if (status === null || (status && status !== "ouvert")) update.disputeResolvedAt = now;
+  await db.update(sales).set(update).where(and(eq(sales.id, saleId), eq(sales.shopId, shopId)));
+}
+
+export async function setShippingPhotos(saleId: string, shopId: string, photos: string[]) {
+  await db.update(sales).set({ shippingPhotos: photos }).where(and(eq(sales.id, saleId), eq(sales.shopId, shopId)));
 }

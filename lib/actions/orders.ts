@@ -72,3 +72,77 @@ export async function declareReturnAction(saleId: string, restock: boolean) {
     return { error: e.message };
   }
 }
+
+import {
+  updatePrepChecklist as dbUpdatePrep,
+  setDispute as dbSetDispute,
+  setShippingPhotos as dbSetPhotos,
+  getOrderDetail,
+} from "@/lib/db/queries/orders";
+
+// ── Workflow traitement ──
+
+const VALID_CHECKLIST_KEYS = new Set([
+  "article_verifie",
+  "photo_etat",
+  "accessoires",
+  "emballage",
+  "mot_personnalise",
+  "etiquette_imprimee",
+]);
+
+export async function togglePrepChecklistAction(saleId: string, key: string, checked: boolean) {
+  if (!VALID_CHECKLIST_KEYS.has(key)) return { error: "Cle invalide" };
+  const ctx = await getAuthContext();
+  try {
+    const order = await getOrderDetail(ctx.shopId, saleId);
+    if (!order) return { error: "Commande introuvable" };
+    const next = { ...(order.prepChecklist ?? {}), [key]: checked };
+    await dbUpdatePrep(saleId, ctx.shopId, next);
+    revalidatePath(`/orders/${saleId}`);
+    revalidatePath("/orders");
+    return { success: true };
+  } catch (e: any) {
+    return { error: e.message };
+  }
+}
+
+const VALID_DISPUTE_STATUSES = new Set(["ouvert", "rembourse", "resolu", "article_recupere"]);
+
+export async function setDisputeAction(saleId: string, status: string | null, reason?: string) {
+  if (status !== null && !VALID_DISPUTE_STATUSES.has(status)) return { error: "Statut invalide" };
+  const ctx = await getAuthContext();
+  try {
+    await dbSetDispute(saleId, ctx.shopId, status, reason ?? null);
+    revalidatePath(`/orders/${saleId}`);
+    revalidatePath("/orders");
+    return { success: true };
+  } catch (e: any) {
+    return { error: e.message };
+  }
+}
+
+export async function updateShippingPhotosAction(saleId: string, photos: string[]) {
+  const ctx = await getAuthContext();
+  try {
+    await dbSetPhotos(saleId, ctx.shopId, photos);
+    revalidatePath(`/orders/${saleId}`);
+    return { success: true };
+  } catch (e: any) {
+    return { error: e.message };
+  }
+}
+
+export async function updateOrderNotesAction(saleId: string, notes: string) {
+  const ctx = await getAuthContext();
+  try {
+    const { db } = await import("@/lib/db/client");
+    const { sales } = await import("@/lib/db/schema");
+    const { eq, and } = await import("drizzle-orm");
+    await db.update(sales).set({ notes }).where(and(eq(sales.id, saleId), eq(sales.shopId, ctx.shopId)));
+    revalidatePath(`/orders/${saleId}`);
+    return { success: true };
+  } catch (e: any) {
+    return { error: e.message };
+  }
+}
