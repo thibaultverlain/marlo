@@ -16,6 +16,7 @@ import {
   setDisputeAction,
   updateOrderNotesAction,
 } from "@/lib/actions/orders";
+import { getTrackingUrl, getCarrierName } from "@/lib/tracking";
 
 type OrderDetail = {
   id: string;
@@ -436,17 +437,33 @@ export default function OrderDetailClient({ order: initialOrder }: { order: Orde
               <span className="text-zinc-500">Statut expedition</span>
               <span className="text-white font-medium">{order.shippingStatus ?? "—"}</span>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between flex-wrap gap-2">
               <span className="text-zinc-500">Numero de suivi</span>
               {order.trackingNumber ? (
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5 flex-wrap">
                   <code className="text-emerald-400 font-mono text-[12px]">{order.trackingNumber}</code>
                   <button onClick={() => handleCopy(order.trackingNumber!, "tracking")} className="p-0.5 hover:text-zinc-200 text-zinc-500">
                     {copied === "tracking" ? <Check size={11} className="text-emerald-400" /> : <Copy size={11} />}
                   </button>
+                  <a
+                    href={getTrackingUrl(order.trackingNumber)!}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold text-rose-400 bg-rose-500/10 border border-rose-500/20 hover:bg-rose-500/20"
+                    title={getCarrierName(order.trackingNumber) ?? "Suivre"}
+                  >
+                    <ExternalLink size={10} />
+                    Suivre
+                  </a>
                 </div>
               ) : <span className="text-zinc-600">non saisi</span>}
             </div>
+            {order.trackingNumber && (
+              <div className="flex items-center justify-between -mt-1">
+                <span className="text-zinc-500 text-[11px]">Transporteur</span>
+                <span className="text-zinc-400 text-[11px]">{getCarrierName(order.trackingNumber)}</span>
+              </div>
+            )}
             <div className="flex items-center justify-between">
               <span className="text-zinc-500">Statut paiement</span>
               <span className={`font-medium ${order.paymentStatus === "recu" ? "text-emerald-400" : "text-amber-400"}`}>

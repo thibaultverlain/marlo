@@ -6,8 +6,9 @@ import { useRouter } from "next/navigation";
 import {
   Package, Truck, CheckCircle2, RotateCcw, Clock,
   CreditCard, Copy, Check, X, ChevronRight, Search,
-  ArrowUpDown, ChevronDown, AlertTriangle, Flame,
+  ArrowUpDown, ChevronDown, AlertTriangle, Flame, ExternalLink,
 } from "lucide-react";
+import { getTrackingUrl } from "@/lib/tracking";
 import {
   updateShippingStatusAction,
   updatePaymentStatusAction,
@@ -442,6 +443,16 @@ export default function OrdersPageClient({
                           className="p-0.5 rounded hover:bg-[var(--color-bg-hover)] text-zinc-500 hover:text-zinc-300 transition">
                           {copied === order.id ? <Check size={10} className="text-emerald-400" /> : <Copy size={10} />}
                         </button>
+                        <a
+                          href={getTrackingUrl(order.trackingNumber)!}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold text-rose-400 bg-rose-500/10 hover:bg-rose-500/20"
+                        >
+                          <ExternalLink size={9} />
+                          Suivre
+                        </a>
                       </div>
                     )}
                   </Link>
