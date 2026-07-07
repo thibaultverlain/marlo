@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ChevronDown, ChevronUp, Sparkles, X, Plus } from "lucide-react";
-import { getMeasurementFields } from "@/lib/listing/measurement-fields";
+import { getMeasurementFields } from "@/lib/measurement-fields";
 
 const inputClass = "w-full px-3 py-2.5 text-[13px] bg-[var(--color-bg-raised)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:ring-1 focus:ring-rose-500/50 focus:border-rose-500/50 text-zinc-200 placeholder:text-zinc-500";
 const labelClass = "block text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-1.5";

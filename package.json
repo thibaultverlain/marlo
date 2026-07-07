@@ -9,7 +9,6 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.110.0",
     "@hookform/resolvers": "^5.2.2",
     "@imgly/background-removal": "^1.5.5",
     "@react-pdf/renderer": "^4.5.1",
@@ -40,7 +39,6 @@
     "@types/react-dom": "^19",
     "@types/uuid": "^10.0.0",
     "@types/web-push": "^3.6.4",
-    "dotenv": "^17.4.2",
     "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "16.2.3",
