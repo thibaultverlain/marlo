@@ -1,16 +1,14 @@
 /**
- * Test standalone du generateur d'annonces.
- * Usage : depuis le repo racine, avec .env.local rempli (ANTHROPIC_API_KEY).
- *   npx tsx scripts/test-listing.ts
+ * Test standalone du generateur d'annonces (templates statiques, pas de LLM).
+ * Usage : npx tsx scripts/test-listing.ts
  *
- * Ce script utilise la piece d'exemple donnee dans SPEC-generateur-annonces.md :
- * bucket hat Courreges vinyle noir taille S, ref 624ACP014VY0003, facture non dispo,
- * aucun detail signature fourni. On verifie que la sortie sort au format sobre attendu.
+ * Utilise la piece d'exemple donnee dans SPEC-generateur-annonces.md :
+ * bucket hat Courreges vinyle noir taille S, ref 624ACP014VY0003,
+ * facture non dispo, aucun detail signature fourni.
  */
 
-import "dotenv/config";
-import { generateListing } from "../lib/actions/listing";
-import { validateInput, buildUserPrompt, buildSystemPrompt, validateOutput, type ListingInput } from "../lib/listing/build-prompt";
+import { generateListingFromTemplate } from "../lib/listing/build-template";
+import { validateInput, validateOutput, type ListingInput } from "../lib/listing/build-prompt";
 
 const testPiece: ListingInput = {
   marque: "Courreges",
@@ -34,65 +32,54 @@ const testPiece: ListingInput = {
   plateforme: "vinted",
 };
 
-async function main() {
-  console.log("=== TEST 1 : validateInput (a sec) ===");
-  const inputErr = validateInput(testPiece);
-  console.log(inputErr ? `FAIL : ${inputErr}` : "OK — input valide");
+console.log("=== TEST 1 : validateInput ===");
+const inputErr = validateInput(testPiece);
+console.log(inputErr ? `FAIL : ${inputErr}` : "OK — input valide");
 
-  console.log("\n=== TEST 2 : user prompt (a sec) ===");
-  console.log(buildUserPrompt(testPiece));
+console.log("\n=== TEST 2 : generation Vinted ===");
+const vinted = generateListingFromTemplate(testPiece);
+console.log(`--- TITRE (${vinted.titre.length} car.) ---`);
+console.log(vinted.titre);
+console.log("\n--- DESCRIPTION ---");
+console.log(vinted.description);
 
-  console.log("\n=== TEST 3 : appel API Anthropic ===");
-  if (!process.env.ANTHROPIC_API_KEY) {
-    console.log("SKIP — ANTHROPIC_API_KEY non definie dans .env.local");
-    console.log("Renseigne la clef dans .env.local puis relance :");
-    console.log("  npx tsx scripts/test-listing.ts");
-    process.exit(0);
-  }
+console.log("\n=== TEST 3 : validateOutput Vinted ===");
+const outErrV = validateOutput(vinted, testPiece);
+console.log(outErrV ? `FAIL : ${outErrV}` : "OK — sortie conforme aux regles");
 
-  const start = Date.now();
-  const res = await generateListing(testPiece);
-  const elapsed = ((Date.now() - start) / 1000).toFixed(1);
-  console.log(`(${elapsed}s)\n`);
+console.log("\n=== TEST 4 : generation Vestiaire ===");
+const vestiaire = generateListingFromTemplate({ ...testPiece, plateforme: "vestiaire" });
+console.log(`--- TITRE (${vestiaire.titre.length} car.) ---`);
+console.log(vestiaire.titre);
+console.log("\n--- DESCRIPTION ---");
+console.log(vestiaire.description);
 
-  if ("error" in res) {
-    console.error("FAIL — Erreur :", res.error);
-    process.exit(1);
-  }
+console.log("\n=== TEST 5 : validateOutput Vestiaire ===");
+const outErrVs = validateOutput(vestiaire, { ...testPiece, plateforme: "vestiaire" });
+console.log(outErrVs ? `FAIL : ${outErrVs}` : "OK — sortie conforme aux regles");
 
-  console.log("--- TITRE (" + res.titre.length + " car.) ---");
-  console.log(res.titre);
-  console.log("\n--- DESCRIPTION ---");
-  console.log(res.description);
-
-  console.log("\n=== TEST 4 : validateOutput (defense en profondeur) ===");
-  const outErr = validateOutput(res, testPiece);
-  console.log(outErr ? `FAIL : ${outErr}` : "OK — sortie conforme aux regles");
-
-  console.log("\n=== CHECKS FONCTIONNELS ===");
-  const checks = [
-    { name: "Titre commence par Courreges", ok: res.titre.toLowerCase().startsWith("courreges") },
-    { name: "Titre <= 80 caracteres (Vinted)", ok: res.titre.length <= 80 },
-    { name: "Description mentionne le noir", ok: res.description.toLowerCase().includes("noir") },
-    { name: "Description mentionne vinyle", ok: res.description.toLowerCase().includes("vinyle") },
-    { name: "Description mentionne taille S", ok: /\bs\b/i.test(res.description) },
-    { name: "Description mentionne 56 cm (mesure)", ok: res.description.includes("56") },
-    { name: "Description mentionne reference 624ACP014VY0003", ok: res.description.includes("624ACP014VY0003") },
-    { name: "Description mentionne envoi 24h", ok: /24\s*h/i.test(res.description) },
-    { name: "Pas de 'decoloration'", ok: !/decolora/i.test(res.description) },
-    { name: "Pas de 'magnifique/superbe/splendide'", ok: !/magnifique|superbe|splendide/i.test(res.description) },
-    { name: "Pas de facture mentionnee (car facture_disponible=false)", ok: !/facture/i.test(res.description) },
-    { name: "Pas de detail invente (signature omise)", ok: true }, // manuel
-  ];
-  for (const c of checks) {
-    console.log(`  [${c.ok ? "OK" : "FAIL"}] ${c.name}`);
-  }
-
-  const allOk = checks.every((c) => c.ok);
-  console.log(allOk ? "\n=== TOUS LES CHECKS PASSENT ===" : "\n=== ATTENTION : certains checks echouent, verifie manuellement ===");
+console.log("\n=== CHECKS FONCTIONNELS ===");
+const checks = [
+  { name: "Titre Vinted commence par Courreges", ok: vinted.titre.toLowerCase().startsWith("courreges") },
+  { name: "Titre Vinted <= 80 caracteres", ok: vinted.titre.length <= 80 },
+  { name: "Description mentionne le noir", ok: vinted.description.toLowerCase().includes("noir") },
+  { name: "Description mentionne vinyle", ok: vinted.description.toLowerCase().includes("vinyle") },
+  { name: "Description mentionne taille S", ok: /taille\s*s\b/i.test(vinted.description) },
+  { name: "Description mentionne 56 cm (mesure)", ok: vinted.description.includes("56") },
+  { name: "Description mentionne reference 624ACP014VY0003", ok: vinted.description.includes("624ACP014VY0003") },
+  { name: "Description mentionne envoi 24h", ok: /24\s*h/i.test(vinted.description) },
+  { name: "Pas de 'decoloration' (auto-fix)", ok: !/decolora/i.test(vinted.description) && !/décolora/i.test(vinted.description) },
+  { name: "Pas de 'magnifique/superbe/splendide'", ok: !/magnifique|superbe|splendide/i.test(vinted.description) },
+  { name: "Pas de 'facture' mentionnee (car facture_disponible=false)", ok: !/facture/i.test(vinted.description) },
+  { name: "Pas de champ vide affiche en dur", ok: !/aucun\s*:|non\s*disponible|non renseigne/i.test(vinted.description) },
+  { name: "Titre Vestiaire <= 60 caracteres", ok: vestiaire.titre.length <= 60 },
+  { name: "Titre Vestiaire commence par Courreges", ok: vestiaire.titre.toLowerCase().startsWith("courreges") },
+];
+let allOk = true;
+for (const c of checks) {
+  console.log(`  [${c.ok ? "OK" : "FAIL"}] ${c.name}`);
+  if (!c.ok) allOk = false;
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+console.log(allOk ? "\n=== TOUS LES CHECKS PASSENT ===" : "\n=== ECHEC : voir les FAIL ci-dessus ===");
+process.exit(allOk ? 0 : 1);
