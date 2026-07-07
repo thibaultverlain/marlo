@@ -191,12 +191,6 @@ function buildDescription(input: ListingInput): string {
   // Bloc 4 : envoi
   blocks.push("Envoi sous 24h, suivi.");
 
-  // Bloc bonus (optionnel) : prix boutique
-  if (input.prix_boutique) {
-    // On l'insere en fin de bloc 1 pour ne pas casser la structure principale
-    blocks[0] = blocks[0] + `\nPrix boutique : ~${input.prix_boutique} EUR.`;
-  }
-
   return blocks.join("\n\n");
 }
 
