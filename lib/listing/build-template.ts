@@ -165,11 +165,16 @@ function buildDescription(input: ListingInput): string {
   const blocks: string[] = [];
 
   // Bloc 1 : piece
-  const piece1 = `${input.marque} ${input.modele}, ${matiere ? matiere.toLowerCase() + ", " : ""}${couleurFixed.toLowerCase()}.`;
-  const piece2 = input.details_signature && input.details_signature.length > 0
+  const sousCat = input.sous_categorie?.trim();
+  const modeleWithSousCat = sousCat ? `${input.modele} (${sousCat.toLowerCase()})` : input.modele;
+  const piece1 = `${input.marque} ${modeleWithSousCat}, ${matiere ? matiere.toLowerCase() + ", " : ""}${couleurFixed.toLowerCase()}.`;
+  const piece2 = input.pays_fabrication?.trim()
+    ? `Fabrique en ${input.pays_fabrication.trim()}.`
+    : null;
+  const piece3 = input.details_signature && input.details_signature.length > 0
     ? input.details_signature.filter(Boolean).join(". ") + "."
     : null;
-  blocks.push([piece1, piece2].filter(Boolean).join("\n"));
+  blocks.push([piece1, piece2, piece3].filter(Boolean).join("\n"));
 
   // Bloc 2 : authenticite
   blocks.push(buildAuthenticityLine(input));
