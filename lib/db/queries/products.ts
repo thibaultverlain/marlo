@@ -32,7 +32,7 @@ export async function getDormantProducts(shopId: string, thresholdDays: number =
       and(
         eq(products.shopId, shopId),
         inArray(products.status, ["en_stock", "en_vente"]),
-        sql`${products.createdAt} < NOW() - make_interval(days => ${thresholdDays})`
+        sql`coalesce(${products.purchaseDate}::timestamp, ${products.createdAt}) < NOW() - make_interval(days => ${thresholdDays})`
       )
     )
     .orderBy(products.createdAt);
@@ -46,11 +46,11 @@ export async function getDormantStats(shopId: string) {
   const rows = await db
     .select({
       total: sql<number>`count(*)::int`,
-      bucket30: sql<number>`count(*) filter (where created_at < NOW() - INTERVAL '30 days' and created_at >= NOW() - INTERVAL '60 days')::int`,
-      bucket60: sql<number>`count(*) filter (where created_at < NOW() - INTERVAL '60 days' and created_at >= NOW() - INTERVAL '90 days')::int`,
-      bucket90: sql<number>`count(*) filter (where created_at < NOW() - INTERVAL '90 days')::int`,
-      lockedPurchase: sql<number>`coalesce(sum(purchase_price) filter (where created_at < NOW() - INTERVAL '30 days'), 0)::numeric`,
-      lockedTarget: sql<number>`coalesce(sum(target_price) filter (where created_at < NOW() - INTERVAL '30 days'), 0)::numeric`,
+      bucket30: sql<number>`count(*) filter (where coalesce(purchase_date::timestamp, created_at) < NOW() - INTERVAL '30 days' and coalesce(purchase_date::timestamp, created_at) >= NOW() - INTERVAL '60 days')::int`,
+      bucket60: sql<number>`count(*) filter (where coalesce(purchase_date::timestamp, created_at) < NOW() - INTERVAL '60 days' and coalesce(purchase_date::timestamp, created_at) >= NOW() - INTERVAL '90 days')::int`,
+      bucket90: sql<number>`count(*) filter (where coalesce(purchase_date::timestamp, created_at) < NOW() - INTERVAL '90 days')::int`,
+      lockedPurchase: sql<number>`coalesce(sum(purchase_price) filter (where coalesce(purchase_date::timestamp, created_at) < NOW() - INTERVAL '30 days'), 0)::numeric`,
+      lockedTarget: sql<number>`coalesce(sum(target_price) filter (where coalesce(purchase_date::timestamp, created_at) < NOW() - INTERVAL '30 days'), 0)::numeric`,
     })
     .from(products)
     .where(and(eq(products.shopId, shopId), inArray(products.status, ["en_stock", "en_vente"])));
@@ -59,12 +59,16 @@ export async function getDormantStats(shopId: string) {
 }
 
 export async function getNextSku(shopId: string): Promise<string> {
+  // max + 1 sur le suffixe numerique (et non count + 1) : count redescend
+  // apres une suppression et produirait un SKU duplique.
   const result = await db
-    .select({ count: sql<number>`count(*)::int` })
+    .select({
+      maxSku: sql<number>`coalesce(max((substring(${products.sku} from '^MAR-(\\d+)$'))::int), 0)::int`,
+    })
     .from(products)
     .where(eq(products.shopId, shopId));
-  const count = result[0]?.count ?? 0;
-  return `MAR-${String(count + 1).padStart(4, "0")}`;
+  const maxSku = result[0]?.maxSku ?? 0;
+  return `MAR-${String(maxSku + 1).padStart(4, "0")}`;
 }
 
 export async function createProduct(data: Omit<NewProduct, "sku"> & { sku?: string }): Promise<Product> {
@@ -101,7 +105,7 @@ export async function getStockStats(shopId: string) {
       sold: sql<number>`count(*) filter (where status in ('vendu', 'expedie', 'livre'))::int`,
       totalValue: sql<number>`coalesce(sum(purchase_price) filter (where status in ('en_stock', 'en_vente', 'reserve')), 0)::numeric`,
       targetValue: sql<number>`coalesce(sum(target_price) filter (where status in ('en_stock', 'en_vente', 'reserve')), 0)::numeric`,
-      dormant: sql<number>`count(*) filter (where status in ('en_stock', 'en_vente') and created_at < NOW() - INTERVAL '30 days')::int`,
+      dormant: sql<number>`count(*) filter (where status in ('en_stock', 'en_vente') and coalesce(purchase_date::timestamp, created_at) < NOW() - INTERVAL '30 days')::int`,
     })
     .from(products)
     .where(eq(products.shopId, shopId));

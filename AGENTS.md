@@ -6,7 +6,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 # Marlo — Profil cible actuel
 
-Marlo est utilise en mode **solo** par Thibault pour piloter MaisonRoseLin.
+Marlo est utilise en mode **solo** par Thibault pour piloter Nayren.
 - **Pas de multi-user, pas de SaaS**. Pas d'invitations, pas de gestion d'equipe a developper.
 - **Un seul shop par user** : pas de complexite multi-tenant a ajouter dans les nouvelles features.
 - Les tables `team_members`, `team_invitations`, `shops` restent en place (l'auth context en depend) mais leurs UI sont cachees.

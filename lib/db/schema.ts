@@ -94,7 +94,9 @@ export const products = pgTable("products", {
   images: text("images").array(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+}, (table) => [
+  uniqueIndex("products_shop_sku_idx").on(table.shopId, table.sku),
+]);
 
 export const sales = pgTable("sales", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -421,24 +423,6 @@ export const documents = pgTable("documents", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-// ── Order groups (commandes groupees) ────────────────
-
-export const orderGroups = pgTable("order_groups", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  shopId: uuid("shop_id").references(() => shops.id).notNull(),
-  customerId: uuid("customer_id").references(() => customers.id),
-  channel: text("channel").notNull(),
-  totalPrice: decimal("total_price", { precision: 10, scale: 2 }).notNull(),
-  shippingStatus: text("shipping_status").notNull().default("a_expedier"),
-  paymentStatus: text("payment_status").notNull().default("en_attente"),
-  trackingNumber: text("tracking_number"),
-  notes: text("notes"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
-// Add group_id to sales (nullable, for grouped orders)
-// This is done via migration only - drizzle column added here for type safety
-
 // ── Price history ─────────────────────────────────────
 
 export const priceHistory = pgTable("price_history", {
@@ -482,7 +466,6 @@ export type Template = typeof templates.$inferSelect;
 export type NewTemplate = typeof templates.$inferInsert;
 export type Document = typeof documents.$inferSelect;
 export type NewDocument = typeof documents.$inferInsert;
-export type OrderGroup = typeof orderGroups.$inferSelect;
 export type PriceHistory = typeof priceHistory.$inferSelect;
 export type ProcessedInboundEmail = typeof processedInboundEmails.$inferSelect;
 export type NewProcessedInboundEmail = typeof processedInboundEmails.$inferInsert;

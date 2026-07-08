@@ -30,10 +30,10 @@ async function velocityByColumn(
     .select({
       key: sql<string>`${groupCol}::text`,
       salesCount: sql<number>`count(*)::int`,
-      avgDaysToSell: sql<number>`coalesce(avg(extract(epoch from (${sales.soldAt} - ${products.createdAt})) / ${SECONDS_PER_DAY}), 0)::float`,
-      medianDaysToSell: sql<number>`coalesce(percentile_cont(0.5) within group (order by extract(epoch from (${sales.soldAt} - ${products.createdAt})) / ${SECONDS_PER_DAY}), 0)::float`,
-      fastestDays: sql<number>`coalesce(min(extract(epoch from (${sales.soldAt} - ${products.createdAt})) / ${SECONDS_PER_DAY}), 0)::float`,
-      slowestDays: sql<number>`coalesce(max(extract(epoch from (${sales.soldAt} - ${products.createdAt})) / ${SECONDS_PER_DAY}), 0)::float`,
+      avgDaysToSell: sql<number>`coalesce(avg(extract(epoch from (${sales.soldAt} - coalesce(${products.purchaseDate}::timestamp, ${products.createdAt}))) / ${SECONDS_PER_DAY}), 0)::float`,
+      medianDaysToSell: sql<number>`coalesce(percentile_cont(0.5) within group (order by extract(epoch from (${sales.soldAt} - coalesce(${products.purchaseDate}::timestamp, ${products.createdAt}))) / ${SECONDS_PER_DAY}), 0)::float`,
+      fastestDays: sql<number>`coalesce(min(extract(epoch from (${sales.soldAt} - coalesce(${products.purchaseDate}::timestamp, ${products.createdAt}))) / ${SECONDS_PER_DAY}), 0)::float`,
+      slowestDays: sql<number>`coalesce(max(extract(epoch from (${sales.soldAt} - coalesce(${products.purchaseDate}::timestamp, ${products.createdAt}))) / ${SECONDS_PER_DAY}), 0)::float`,
       totalRevenue: sql<number>`coalesce(sum(${sales.salePrice}), 0)::numeric`,
       avgMargin: sql<number>`coalesce(avg(${sales.margin}), 0)::numeric`,
       avgMarginPct: sql<number>`coalesce(avg(${sales.marginPct}), 0)::numeric`,
@@ -85,7 +85,7 @@ export async function getVelocityOverview(shopId: string, sinceMonths = 12) {
     .select({
       totalSales: sql<number>`count(*)::int`,
       matchedSales: sql<number>`count(${sales.productId})::int`,
-      avgDaysToSell: sql<number>`coalesce(avg(extract(epoch from (${sales.soldAt} - ${products.createdAt})) / ${SECONDS_PER_DAY}), 0)::float`,
+      avgDaysToSell: sql<number>`coalesce(avg(extract(epoch from (${sales.soldAt} - coalesce(${products.purchaseDate}::timestamp, ${products.createdAt}))) / ${SECONDS_PER_DAY}), 0)::float`,
       totalRevenue: sql<number>`coalesce(sum(${sales.salePrice}), 0)::numeric`,
     })
     .from(sales)
@@ -128,7 +128,7 @@ async function bestSellersByColumn(
       unitsSold: sql<number>`count(*)::int`,
       totalRevenue: sql<number>`coalesce(sum(${sales.salePrice}), 0)::numeric`,
       totalMargin: sql<number>`coalesce(sum(${sales.margin}), 0)::numeric`,
-      avgDaysToSell: sql<number>`coalesce(avg(extract(epoch from (${sales.soldAt} - ${products.createdAt})) / ${SECONDS_PER_DAY}), 0)::float`,
+      avgDaysToSell: sql<number>`coalesce(avg(extract(epoch from (${sales.soldAt} - coalesce(${products.purchaseDate}::timestamp, ${products.createdAt}))) / ${SECONDS_PER_DAY}), 0)::float`,
       avgSalePrice: sql<number>`coalesce(avg(${sales.salePrice}), 0)::numeric`,
     })
     .from(sales)
@@ -199,7 +199,7 @@ export async function getTopFastestProducts(
       title: products.title,
       brand: products.brand,
       category: products.category,
-      daysToSell: sql<number>`extract(epoch from (${sales.soldAt} - ${products.createdAt})) / ${SECONDS_PER_DAY}`,
+      daysToSell: sql<number>`extract(epoch from (${sales.soldAt} - coalesce(${products.purchaseDate}::timestamp, ${products.createdAt}))) / ${SECONDS_PER_DAY}`,
       salePrice: sales.salePrice,
       purchasePrice: products.purchasePrice,
       margin: sales.margin,
@@ -210,7 +210,7 @@ export async function getTopFastestProducts(
     .from(sales)
     .innerJoin(products, eq(products.id, sales.productId))
     .where(and(eq(sales.shopId, shopId), gte(sales.soldAt, since)))
-    .orderBy(sql`extract(epoch from (${sales.soldAt} - ${products.createdAt})) asc`)
+    .orderBy(sql`extract(epoch from (${sales.soldAt} - coalesce(${products.purchaseDate}::timestamp, ${products.createdAt}))) asc`)
     .limit(limit);
 
   return rows.map((r) => ({
