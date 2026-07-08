@@ -50,6 +50,9 @@ export default async function AccountingPage({ searchParams }: { searchParams: P
         stopBuying={treasury.stopBuying}
         buyingBudget={treasury.buyingBudget}
         buyingThreshold={treasury.buyingThreshold}
+        movements={treasury.movements}
+        monthApports={treasury.monthApports}
+        monthPrelevements={treasury.monthPrelevements}
       />
 
       {/* COMPTABILITE FISCALE */}

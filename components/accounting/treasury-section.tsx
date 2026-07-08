@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import {
   Wallet, Plus, X, Clock, TrendingUp, AlertTriangle, Check,
   Pencil, Trash2, Loader2, Package, Lock, ShoppingBag,
+  ArrowDownUp, ArrowDownLeft, ArrowUpRight, Banknote, SlidersHorizontal,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import {
@@ -11,8 +12,9 @@ import {
   createPendingPayoutAction,
   deletePendingPayoutAction,
   markPayoutReceivedAction,
+  createTreasuryMovementAction,
 } from "@/lib/actions/treasury";
-import type { PendingPayout } from "@/lib/db/schema";
+import type { PendingPayout, TreasuryMovement } from "@/lib/db/schema";
 
 const PLATFORMS = [
   { value: "vinted", label: "Vinted" },
@@ -35,6 +37,9 @@ type TreasuryProps = {
   stopBuying: boolean;
   buyingBudget: number;
   buyingThreshold: number;
+  movements: TreasuryMovement[];
+  monthApports: number;
+  monthPrelevements: number;
 };
 
 export default function TreasurySection(props: TreasuryProps) {
@@ -59,6 +64,13 @@ export default function TreasurySection(props: TreasuryProps) {
         stopBuying={props.stopBuying}
         buyingBudget={props.buyingBudget}
         buyingThreshold={props.buyingThreshold}
+      />
+
+      {/* Mouvements de cash : apports, prelevements, encaissements, ajustements */}
+      <MovementsCard
+        movements={props.movements}
+        monthApports={props.monthApports}
+        monthPrelevements={props.monthPrelevements}
       />
     </div>
   );
@@ -331,6 +343,157 @@ function PendingCard({ payouts, total }: { payouts: PendingPayout[]; total: numb
               </div>
             </div>
           ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ───── Mouvements de cash ───────────────────────────────────── */
+const MOVEMENT_META: Record<string, { label: string; icon: typeof ArrowUpRight; color: string; bg: string }> = {
+  apport: { label: "Apport", icon: ArrowDownLeft, color: "text-emerald-400", bg: "bg-emerald-500/10" },
+  prelevement: { label: "Prelevement", icon: ArrowUpRight, color: "text-red-400", bg: "bg-red-500/10" },
+  encaissement: { label: "Encaissement", icon: Banknote, color: "text-amber-300", bg: "bg-amber-500/10" },
+  ajustement: { label: "Ajustement", icon: SlidersHorizontal, color: "text-zinc-400", bg: "bg-zinc-500/10" },
+};
+
+function MovementsCard({
+  movements, monthApports, monthPrelevements,
+}: {
+  movements: TreasuryMovement[]; monthApports: number; monthPrelevements: number;
+}) {
+  const [adding, setAdding] = useState<"apport" | "prelevement" | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+
+  function handleAdd(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError(null);
+    const form = e.currentTarget;
+    const fd = new FormData(form);
+    startTransition(async () => {
+      const result = await createTreasuryMovementAction(fd);
+      if (result?.error) setError(result.error);
+      else {
+        setAdding(null);
+        form.reset();
+      }
+    });
+  }
+
+  return (
+    <div className="card-static p-5">
+      <div className="flex items-start justify-between mb-3 flex-wrap gap-2">
+        <div className="flex items-center gap-2.5">
+          <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center">
+            <ArrowDownUp size={18} className="text-rose-400" />
+          </div>
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Mouvements de cash</p>
+            <p className="text-[11px] text-zinc-500 mt-0.5">
+              Ce mois-ci : apports{" "}
+              <span className="text-emerald-400 font-semibold tabular-nums">{formatCurrency(monthApports)}</span>
+              {monthPrelevements > 0 && (
+                <>
+                  {" "}· prelevements{" "}
+                  <span className="text-red-400 font-semibold tabular-nums">{formatCurrency(monthPrelevements)}</span>
+                </>
+              )}
+            </p>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => { setAdding("apport"); setError(null); }}
+            className="px-2.5 py-1.5 text-[11px] font-semibold rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 flex items-center gap-1"
+          >
+            <Plus size={12} /> Apport
+          </button>
+          <button
+            onClick={() => { setAdding("prelevement"); setError(null); }}
+            className="px-2.5 py-1.5 text-[11px] font-semibold rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 flex items-center gap-1"
+          >
+            <ArrowUpRight size={12} /> Prelevement
+          </button>
+        </div>
+      </div>
+
+      {/* Form ajout apport / prelevement */}
+      {adding && (
+        <form onSubmit={handleAdd} className="bg-[var(--color-bg-raised)] rounded-lg p-3 mb-3 space-y-2 border border-[var(--color-border)]">
+          <input type="hidden" name="type" value={adding} />
+          <div className="grid grid-cols-1 sm:grid-cols-[1fr_2fr] gap-2">
+            <div className="relative">
+              <input
+                autoFocus
+                type="number"
+                step="0.01"
+                min="0.01"
+                name="amount"
+                required
+                placeholder="Montant"
+                className="w-full px-2 py-1.5 pr-6 text-[12px] bg-[var(--color-bg)] border border-[var(--color-border)] rounded-md text-zinc-200 placeholder-zinc-600 tabular-nums"
+              />
+              <span className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-500 text-[11px]">€</span>
+            </div>
+            <input
+              type="text"
+              name="label"
+              placeholder={adding === "apport" ? "Ex : injection mensuelle salaire" : "Motif du prelevement"}
+              className="px-2 py-1.5 text-[12px] bg-[var(--color-bg)] border border-[var(--color-border)] rounded-md text-zinc-200 placeholder-zinc-600"
+            />
+          </div>
+          {error && <p className="text-[11px] text-red-400">{error}</p>}
+          <div className="flex gap-2">
+            <button
+              type="submit"
+              disabled={isPending}
+              className="px-3 py-1.5 text-[11px] font-semibold text-[var(--color-accent-inverse,#06150f)] bg-rose-500 rounded-md hover:bg-rose-400 disabled:opacity-50"
+            >
+              {isPending ? "Ajout..." : adding === "apport" ? "Ajouter l'apport" : "Enregistrer le prelevement"}
+            </button>
+            <button
+              type="button"
+              onClick={() => { setAdding(null); setError(null); }}
+              className="px-3 py-1.5 text-[11px] font-medium text-zinc-400 hover:text-zinc-200"
+            >
+              Annuler
+            </button>
+          </div>
+        </form>
+      )}
+
+      {/* Historique */}
+      {movements.length === 0 ? (
+        <p className="text-[11px] text-zinc-600">
+          Aucun mouvement trace pour l'instant. Chaque apport, prelevement, encaissement ou mise a jour manuelle du solde apparaitra ici.
+        </p>
+      ) : (
+        <div className="space-y-1.5">
+          {movements.map((m) => {
+            const meta = MOVEMENT_META[m.type] ?? MOVEMENT_META.ajustement;
+            const Icon = meta.icon;
+            const amount = Number(m.amount);
+            return (
+              <div key={m.id} className="flex items-center gap-3 px-3 py-2 bg-[var(--color-bg-raised)]/50 rounded-lg">
+                <div className={`w-7 h-7 rounded-lg ${meta.bg} flex items-center justify-center flex-shrink-0`}>
+                  <Icon size={13} className={meta.color} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[12px] text-zinc-200 truncate">{m.label || meta.label}</p>
+                  <p className="text-[10px] text-zinc-500">
+                    {meta.label} · {new Date(m.createdAt).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}
+                    {m.balanceAfter != null && (
+                      <span className="ml-1">· solde {formatCurrency(Number(m.balanceAfter))}</span>
+                    )}
+                  </p>
+                </div>
+                <p className={`text-[13px] font-semibold tabular-nums ${amount >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                  {amount >= 0 ? "+" : "-"}{formatCurrency(Math.abs(amount))}
+                </p>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

@@ -54,6 +54,9 @@ export const purchaseCategoryEnum = pgEnum("purchase_category", [
 export const shippingPaidByEnum = pgEnum("shipping_paid_by", [
   "vendeur", "acheteur", "offert"
 ]);
+export const treasuryMovementTypeEnum = pgEnum("treasury_movement_type", [
+  "apport", "prelevement", "encaissement", "ajustement"
+]);
 
 // ── Tables ─────────────────────────────────────────────
 // Every table has a user_id column referencing auth.users for multi-tenant isolation.
@@ -286,6 +289,19 @@ export const pendingPayouts = pgTable("pending_payouts", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Mouvements de tresorerie : chaque variation du cash est tracee.
+// amount est SIGNE (delta applique au solde) : apport +, prelevement -,
+// encaissement +, ajustement +/-. balance_after = solde apres application.
+export const treasuryMovements = pgTable("treasury_movements", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  shopId: uuid("shop_id").references(() => shops.id).notNull(),
+  type: treasuryMovementTypeEnum("type").notNull(),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  balanceAfter: decimal("balance_after", { precision: 10, scale: 2 }),
+  label: text("label"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
 // ── Shops & Team ──────────────────────────────────────
 
 export const shops = pgTable("shops", {
@@ -455,6 +471,8 @@ export type ShopSettings = typeof shopSettings.$inferSelect;
 export type NewShopSettings = typeof shopSettings.$inferInsert;
 export type PendingPayout = typeof pendingPayouts.$inferSelect;
 export type NewPendingPayout = typeof pendingPayouts.$inferInsert;
+export type TreasuryMovement = typeof treasuryMovements.$inferSelect;
+export type NewTreasuryMovement = typeof treasuryMovements.$inferInsert;
 export type Shop = typeof shops.$inferSelect;
 export type TeamMember = typeof teamMembers.$inferSelect;
 export type TeamInvitation = typeof teamInvitations.$inferSelect;
