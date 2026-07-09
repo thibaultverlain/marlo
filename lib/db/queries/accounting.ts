@@ -38,7 +38,7 @@ export async function getAccountingStats(shopId: string, year?: number): Promise
         count: sql<number>`count(*)::int`,
       })
       .from(purchases)
-      .where(and(eq(purchases.shopId, shopId), gte(purchases.purchasedAt, startOfYear), lte(purchases.purchasedAt, endOfYear))),
+      .where(and(eq(purchases.shopId, shopId), gte(purchases.purchasedAt, startDateStr), lte(purchases.purchasedAt, endDateStr))),
     db
       .select({
         total: sql<number>`coalesce(sum(purchase_price), 0)::numeric`,
