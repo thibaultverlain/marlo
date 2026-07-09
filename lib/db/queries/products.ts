@@ -1,6 +1,7 @@
 import { db } from "../client";
 import { products, sales, type NewProduct, type Product } from "../schema";
 import { eq, desc, sql, and, inArray } from "drizzle-orm";
+import { recordAutoMovement, reverseAutoMovements } from "./treasury";
 
 export async function getAllProducts(shopId: string): Promise<Product[]> {
   return db.select().from(products).where(eq(products.shopId, shopId)).orderBy(desc(products.createdAt));
@@ -77,7 +78,23 @@ export async function createProduct(data: Omit<NewProduct, "sku"> & { sku?: stri
     .insert(products)
     .values({ ...data, sku })
     .returning();
-  return rows[0];
+  const product = rows[0];
+
+  // Hook tresorerie : achat produit = debit cash automatique
+  if (product?.shopId) {
+    const eurPrice = Number(data.purchasePriceEur ?? data.purchasePrice ?? 0);
+    if (eurPrice > 0) {
+      await recordAutoMovement({
+        shopId: product.shopId,
+        type: "achat_stock",
+        amount: -eurPrice,
+        label: `Achat : ${product.title ?? product.sku}`,
+        sourceType: "product",
+        sourceId: product.id,
+      });
+    }
+  }
+  return product;
 }
 
 export async function updateProduct(id: string, data: Partial<NewProduct>): Promise<Product | undefined> {
@@ -90,11 +107,20 @@ export async function updateProduct(id: string, data: Partial<NewProduct>): Prom
 }
 
 export async function deleteProduct(id: string, shopId?: string): Promise<void> {
+  // Recupere shopId pour annuler les mouvements avant la suppression
+  const [prod] = await db.select({ shopId: products.shopId }).from(products).where(eq(products.id, id)).limit(1);
+  const effectiveShopId = shopId ?? prod?.shopId ?? undefined;
+
   await db.update(sales).set({ productId: null }).where(eq(sales.productId, id));
   const conditions = shopId
     ? and(eq(products.id, id), eq(products.shopId, shopId))
     : eq(products.id, id);
   await db.delete(products).where(conditions);
+
+  // Hook tresorerie : suppression d'un produit = credit inverse (remboursement)
+  if (effectiveShopId) {
+    await reverseAutoMovements(effectiveShopId, "product", id);
+  }
 }
 
 export async function getStockStats(shopId: string) {

@@ -78,7 +78,34 @@ export async function updateShippingStatus(saleId: string, shopId: string, statu
 }
 
 export async function updatePaymentStatus(saleId: string, shopId: string, status: string) {
+  // Recupere l'etat avant modification pour decider du mouvement de tresorerie
+  const [before] = await db
+    .select({ paymentStatus: sales.paymentStatus, netRevenue: sales.netRevenue, salePrice: sales.salePrice })
+    .from(sales)
+    .where(and(eq(sales.id, saleId), eq(sales.shopId, shopId)))
+    .limit(1);
+
   await db.update(sales).set({ paymentStatus: status as any }).where(and(eq(sales.id, saleId), eq(sales.shopId, shopId)));
+
+  if (!before) return;
+  const wasReceived = before.paymentStatus === "recu";
+  const isReceived = status === "recu";
+  const netRevenue = Number(before.netRevenue ?? before.salePrice ?? 0);
+  if (netRevenue <= 0) return;
+
+  const { recordAutoMovement, reverseAutoMovements } = await import("./treasury");
+  // Passage a "recu" -> credit du cash
+  if (!wasReceived && isReceived) {
+    await recordAutoMovement({
+      shopId, type: "encaissement_vente", amount: netRevenue,
+      label: `Encaissement vente #${saleId.slice(0, 8)}`,
+      sourceType: "sale", sourceId: saleId,
+    });
+  }
+  // Passage inverse (annulation d'un recu) -> annule les mouvements lies
+  if (wasReceived && !isReceived) {
+    await reverseAutoMovements(shopId, "sale", saleId);
+  }
 }
 
 export async function getOrderDetail(shopId: string, saleId: string) {

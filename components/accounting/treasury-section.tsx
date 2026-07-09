@@ -1,35 +1,26 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import {
-  Wallet, Plus, X, Clock, TrendingUp, AlertTriangle, Check,
-  Pencil, Trash2, Loader2, Package, Lock, ShoppingBag,
+  Wallet, Plus, Clock, TrendingUp, AlertTriangle,
+  Package, Lock, ShoppingBag,
   ArrowDownUp, ArrowDownLeft, ArrowUpRight, Banknote, SlidersHorizontal,
+  ExternalLink, ShoppingCart,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
-import {
-  updateCashBalanceAction,
-  createPendingPayoutAction,
-  deletePendingPayoutAction,
-  markPayoutReceivedAction,
-  createTreasuryMovementAction,
-} from "@/lib/actions/treasury";
-import type { PendingPayout, TreasuryMovement } from "@/lib/db/schema";
+import { createTreasuryMovementAction } from "@/lib/actions/treasury";
+import type { TreasuryMovement } from "@/lib/db/schema";
+import type { PendingSalePayout } from "@/lib/db/queries/treasury";
 
-const PLATFORMS = [
-  { value: "vinted", label: "Vinted" },
-  { value: "vestiaire", label: "Vestiaire" },
-  { value: "stockx", label: "StockX" },
-  { value: "prive", label: "Client prive" },
-  { value: "autre", label: "Autre" },
-];
-
-const PLATFORM_LABELS: Record<string, string> = Object.fromEntries(PLATFORMS.map((p) => [p.value, p.label]));
+const CHANNELS: Record<string, string> = {
+  vinted: "Vinted", vestiaire: "Vestiaire", stockx: "StockX", prive: "Client prive", autre: "Autre",
+};
 
 type TreasuryProps = {
   cashBalance: number;
   cashUpdatedAt: Date | null;
-  pendingPayouts: PendingPayout[];
+  pendingPayouts: PendingSalePayout[];
   pendingTotal: number;
   stockValue: number;
   capitalTotal: number;
@@ -45,16 +36,13 @@ type TreasuryProps = {
 export default function TreasurySection(props: TreasuryProps) {
   return (
     <div className="space-y-4">
-      {/* Stop achat banner (en premier si actif) */}
       {props.stopBuying && <StopBuyingBanner ratio={props.lockedRatio} />}
 
-      {/* Cash + Pending : 2 colonnes */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-4">
         <CashCard balance={props.cashBalance} updatedAt={props.cashUpdatedAt} />
         <PendingCard payouts={props.pendingPayouts} total={props.pendingTotal} />
       </div>
 
-      {/* Capital + ratio immobilise + budget max */}
       <CapitalSummary
         cash={props.cashBalance}
         stock={props.stockValue}
@@ -66,7 +54,6 @@ export default function TreasurySection(props: TreasuryProps) {
         buyingThreshold={props.buyingThreshold}
       />
 
-      {/* Mouvements de cash : apports, prelevements, encaissements, ajustements */}
       <MovementsCard
         movements={props.movements}
         monthApports={props.monthApports}
@@ -84,9 +71,7 @@ function StopBuyingBanner({ ratio }: { ratio: number }) {
         <AlertTriangle size={22} className="text-red-400" />
       </div>
       <div className="flex-1">
-        <p className="text-[14px] font-bold text-red-300 uppercase tracking-wide">
-          Stop achat
-        </p>
+        <p className="text-[14px] font-bold text-red-300 uppercase tracking-wide">Stop achat</p>
         <p className="text-[12px] text-red-200/80 mt-1">
           {(ratio * 100).toFixed(0)}% de ton capital est immobilise dans le stock (seuil critique : 65%).
           Liquide d'abord avant d'acheter de nouvelles pieces.
@@ -96,24 +81,8 @@ function StopBuyingBanner({ ratio }: { ratio: number }) {
   );
 }
 
-/* ───── Cash card ────────────────────────────────────────────── */
+/* ───── Cash card (lecture seule, calcule dynamiquement) ────── */
 function CashCard({ balance, updatedAt }: { balance: number; updatedAt: Date | null }) {
-  const [editing, setEditing] = useState(false);
-  const [value, setValue] = useState(String(balance));
-  const [error, setError] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
-
-  function handleSave(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setError(null);
-    const fd = new FormData(e.currentTarget);
-    startTransition(async () => {
-      const result = await updateCashBalanceAction(fd);
-      if (result?.error) setError(result.error);
-      else setEditing(false);
-    });
-  }
-
   const stalenessDays = updatedAt
     ? Math.floor((Date.now() - new Date(updatedAt).getTime()) / 86400000)
     : null;
@@ -130,106 +99,25 @@ function CashCard({ balance, updatedAt }: { balance: number; updatedAt: Date | n
             <p className="text-[11px] text-zinc-500 mt-0.5">
               {updatedAt
                 ? stalenessDays === 0
-                  ? "Mis a jour aujourd'hui"
-                  : stalenessDays === 1
-                  ? "Mis a jour hier"
-                  : stalenessDays !== null && stalenessDays > 7
-                  ? <span className="text-amber-400">A jour il y a {stalenessDays}j — pense a actualiser</span>
-                  : `A jour il y a ${stalenessDays}j`
-                : "Jamais renseigne"}
+                  ? "Recalcule aujourd'hui"
+                  : `Dernier mouvement il y a ${stalenessDays}j`
+                : "Aucun mouvement"}
             </p>
           </div>
         </div>
-        {!editing && (
-          <button
-            onClick={() => { setValue(String(balance)); setEditing(true); }}
-            className="text-zinc-500 hover:text-rose-400 p-1.5 rounded-md hover:bg-[var(--color-bg-hover)] transition-colors"
-            title="Modifier"
-          >
-            <Pencil size={13} />
-          </button>
-        )}
       </div>
-
-      {editing ? (
-        <form onSubmit={handleSave} className="space-y-3">
-          <div className="relative">
-            <input
-              autoFocus
-              type="number"
-              step="0.01"
-              name="amount"
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              className="w-full px-3 py-2.5 pr-8 text-[24px] font-bold tabular-nums bg-[var(--color-bg-raised)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:border-rose-500/50 text-white"
-            />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 text-lg">€</span>
-          </div>
-          {error && <p className="text-[11px] text-red-400">{error}</p>}
-          <div className="flex gap-2">
-            <button
-              type="submit"
-              disabled={isPending}
-              className="flex-1 px-3 py-2 text-[12px] font-semibold text-[var(--color-accent-inverse,#06150f)] bg-rose-500 rounded-lg hover:bg-rose-400 disabled:opacity-50"
-            >
-              {isPending ? <Loader2 size={12} className="inline animate-spin" /> : <Check size={12} className="inline" />} Enregistrer
-            </button>
-            <button
-              type="button"
-              onClick={() => { setEditing(false); setError(null); }}
-              className="px-3 py-2 text-[12px] font-medium text-zinc-400 hover:text-zinc-200"
-            >
-              Annuler
-            </button>
-          </div>
-        </form>
-      ) : (
-        <p className="text-[32px] font-bold tabular-nums tracking-tight gradient-text">
-          {formatCurrency(balance)}
-        </p>
-      )}
+      <p className="text-[32px] font-bold tabular-nums tracking-tight gradient-text">
+        {formatCurrency(balance)}
+      </p>
+      <p className="text-[10px] text-zinc-500 mt-2 leading-relaxed">
+        Calcule automatiquement : achats debites, ventes encaissees, apports / prelevements.
+      </p>
     </div>
   );
 }
 
-/* ───── Pending payouts card ─────────────────────────────────── */
-function PendingCard({ payouts, total }: { payouts: PendingPayout[]; total: number }) {
-  const [adding, setAdding] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-
-  function handleAdd(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setError(null);
-    const form = e.currentTarget;
-    const fd = new FormData(form);
-    startTransition(async () => {
-      const result = await createPendingPayoutAction(fd);
-      if (result?.error) setError(result.error);
-      else {
-        setAdding(false);
-        form.reset();
-      }
-    });
-  }
-
-  function handleDelete(id: string) {
-    setDeletingId(id);
-    startTransition(async () => {
-      await deletePendingPayoutAction(id);
-      setDeletingId(null);
-    });
-  }
-
-  function handleReceived(id: string) {
-    setDeletingId(id);
-    startTransition(async () => {
-      await markPayoutReceivedAction(id);
-      setDeletingId(null);
-    });
-  }
-
+/* ───── Pending payouts (dynamique) ──────────────────────────── */
+function PendingCard({ payouts, total }: { payouts: PendingSalePayout[]; total: number }) {
   return (
     <div className="card-static p-5">
       <div className="flex items-start justify-between mb-3">
@@ -241,109 +129,42 @@ function PendingCard({ payouts, total }: { payouts: PendingPayout[]; total: numb
             <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">En cours</p>
             <p className="text-[11px] text-zinc-500 mt-0.5">
               {payouts.length === 0
-                ? "Aucune vente en attente"
+                ? "Aucune vente en attente de paiement"
                 : `${payouts.length} vente${payouts.length > 1 ? "s" : ""} en attente de credit`}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <p className="text-[20px] font-bold tabular-nums text-amber-300">{formatCurrency(total)}</p>
-          {!adding && (
-            <button
-              onClick={() => setAdding(true)}
-              className="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 flex items-center justify-center"
-              title="Ajouter"
-            >
-              <Plus size={14} />
-            </button>
-          )}
-        </div>
+        <p className="text-[20px] font-bold tabular-nums text-amber-300">{formatCurrency(total)}</p>
       </div>
 
-      {/* Form ajout */}
-      {adding && (
-        <form onSubmit={handleAdd} className="bg-[var(--color-bg-raised)] rounded-lg p-3 mb-3 space-y-2 border border-[var(--color-border)]">
-          <div className="grid grid-cols-1 sm:grid-cols-[2fr_1fr_1fr] gap-2">
-            <input
-              type="text"
-              name="label"
-              required
-              placeholder="Nom de la piece"
-              className="px-2 py-1.5 text-[12px] bg-[var(--color-bg)] border border-[var(--color-border)] rounded-md text-zinc-200 placeholder-zinc-600"
-            />
-            <div className="relative">
-              <input
-                type="number"
-                step="0.01"
-                name="amount"
-                required
-                placeholder="Montant"
-                className="w-full px-2 py-1.5 pr-6 text-[12px] bg-[var(--color-bg)] border border-[var(--color-border)] rounded-md text-zinc-200 placeholder-zinc-600 tabular-nums"
-              />
-              <span className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-500 text-[11px]">€</span>
-            </div>
-            <select
-              name="platform"
-              defaultValue="vestiaire"
-              className="px-2 py-1.5 text-[12px] bg-[var(--color-bg)] border border-[var(--color-border)] rounded-md text-zinc-200"
-            >
-              {PLATFORMS.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
-            </select>
-          </div>
-          {error && <p className="text-[11px] text-red-400">{error}</p>}
-          <div className="flex gap-2">
-            <button
-              type="submit"
-              disabled={isPending}
-              className="px-3 py-1.5 text-[11px] font-semibold text-[var(--color-accent-inverse,#06150f)] bg-rose-500 rounded-md hover:bg-rose-400 disabled:opacity-50"
-            >
-              {isPending ? "Ajout..." : "Ajouter"}
-            </button>
-            <button
-              type="button"
-              onClick={() => { setAdding(false); setError(null); }}
-              className="px-3 py-1.5 text-[11px] font-medium text-zinc-400 hover:text-zinc-200"
-            >
-              Annuler
-            </button>
-          </div>
-        </form>
-      )}
-
-      {/* Liste */}
-      {payouts.length > 0 && (
+      {payouts.length > 0 ? (
         <div className="space-y-1.5">
           {payouts.map((p) => (
-            <div
+            <Link
               key={p.id}
-              className="flex items-center gap-3 px-3 py-2 bg-[var(--color-bg-raised)]/50 rounded-lg group"
+              href={`/orders/${p.saleId}`}
+              className="flex items-center gap-3 px-3 py-2 bg-[var(--color-bg-raised)]/50 rounded-lg hover:bg-[var(--color-bg-hover)] transition-colors group"
             >
               <div className="flex-1 min-w-0">
-                <p className="text-[12px] text-zinc-200 truncate">{p.label}</p>
-                <p className="text-[10px] text-zinc-500">{PLATFORM_LABELS[p.platform] ?? p.platform}</p>
+                <p className="text-[12px] text-zinc-200 truncate group-hover:text-white">
+                  {p.productTitle ?? "Article"}
+                  {p.productBrand && <span className="text-zinc-500 font-normal"> · {p.productBrand}</span>}
+                </p>
+                <p className="text-[10px] text-zinc-500">
+                  {CHANNELS[p.channel] ?? p.channel}
+                  {p.customerName && ` · ${p.customerName}`}
+                  {p.shippingStatus && ` · ${p.shippingStatus}`}
+                </p>
               </div>
-              <p className="text-[13px] font-semibold tabular-nums text-amber-300">{formatCurrency(Number(p.amount))}</p>
-              <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button
-                  onClick={() => handleReceived(p.id)}
-                  disabled={deletingId === p.id}
-                  className="p-1 rounded text-emerald-400 hover:bg-emerald-500/10"
-                  title="Marquer comme recu (ajoute au cash)"
-                >
-                  {deletingId === p.id ? <Loader2 size={11} className="animate-spin" /> : <Check size={11} />}
-                </button>
-                <button
-                  onClick={() => handleDelete(p.id)}
-                  disabled={deletingId === p.id}
-                  className="p-1 rounded text-red-400 hover:bg-red-500/10"
-                  title="Supprimer"
-                >
-                  <Trash2 size={11} />
-                </button>
-              </div>
-            </div>
+              <p className="text-[13px] font-semibold tabular-nums text-amber-300">{formatCurrency(p.amount)}</p>
+              <ExternalLink size={11} className="text-zinc-600 group-hover:text-rose-400" />
+            </Link>
           ))}
         </div>
+      ) : (
+        <p className="text-[11px] text-zinc-600 leading-relaxed">
+          Une commande apparait ici automatiquement quand tu la marques expediee ou livree. Passe son statut a "paiement recu" depuis la fiche commande pour ajouter le montant au solde cash.
+        </p>
       )}
     </div>
   );
@@ -351,10 +172,13 @@ function PendingCard({ payouts, total }: { payouts: PendingPayout[]; total: numb
 
 /* ───── Mouvements de cash ───────────────────────────────────── */
 const MOVEMENT_META: Record<string, { label: string; icon: typeof ArrowUpRight; color: string; bg: string }> = {
-  apport: { label: "Apport", icon: ArrowDownLeft, color: "text-emerald-400", bg: "bg-emerald-500/10" },
-  prelevement: { label: "Prelevement", icon: ArrowUpRight, color: "text-red-400", bg: "bg-red-500/10" },
-  encaissement: { label: "Encaissement", icon: Banknote, color: "text-amber-300", bg: "bg-amber-500/10" },
-  ajustement: { label: "Ajustement", icon: SlidersHorizontal, color: "text-zinc-400", bg: "bg-zinc-500/10" },
+  apport:             { label: "Apport",             icon: ArrowDownLeft,     color: "text-emerald-400", bg: "bg-emerald-500/10" },
+  prelevement:        { label: "Prelevement",        icon: ArrowUpRight,      color: "text-red-400",     bg: "bg-red-500/10" },
+  encaissement:       { label: "Encaissement",       icon: Banknote,          color: "text-amber-300",   bg: "bg-amber-500/10" },
+  encaissement_vente: { label: "Encaissement vente", icon: ShoppingCart,      color: "text-emerald-400", bg: "bg-emerald-500/10" },
+  achat_stock:        { label: "Achat stock",        icon: Package,           color: "text-red-400",     bg: "bg-red-500/10" },
+  charge:             { label: "Charge",             icon: ArrowUpRight,      color: "text-red-400",     bg: "bg-red-500/10" },
+  ajustement:         { label: "Ajustement",         icon: SlidersHorizontal, color: "text-zinc-400",    bg: "bg-zinc-500/10" },
 };
 
 function MovementsCard({
@@ -418,43 +242,34 @@ function MovementsCard({
         </div>
       </div>
 
-      {/* Form ajout apport / prelevement */}
       {adding && (
         <form onSubmit={handleAdd} className="bg-[var(--color-bg-raised)] rounded-lg p-3 mb-3 space-y-2 border border-[var(--color-border)]">
           <input type="hidden" name="type" value={adding} />
           <div className="grid grid-cols-1 sm:grid-cols-[1fr_2fr] gap-2">
             <div className="relative">
               <input
-                autoFocus
-                type="number"
-                step="0.01"
-                min="0.01"
-                name="amount"
-                required
+                autoFocus type="number" step="0.01" min="0.01" name="amount" required
                 placeholder="Montant"
                 className="w-full px-2 py-1.5 pr-6 text-[12px] bg-[var(--color-bg)] border border-[var(--color-border)] rounded-md text-zinc-200 placeholder-zinc-600 tabular-nums"
               />
               <span className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-500 text-[11px]">€</span>
             </div>
             <input
-              type="text"
-              name="label"
-              placeholder={adding === "apport" ? "Ex : injection mensuelle salaire" : "Motif du prelevement"}
+              type="text" name="label"
+              placeholder={adding === "apport" ? "Ex : injection mensuelle" : "Motif du prelevement"}
               className="px-2 py-1.5 text-[12px] bg-[var(--color-bg)] border border-[var(--color-border)] rounded-md text-zinc-200 placeholder-zinc-600"
             />
           </div>
           {error && <p className="text-[11px] text-red-400">{error}</p>}
           <div className="flex gap-2">
             <button
-              type="submit"
-              disabled={isPending}
-              className="px-3 py-1.5 text-[11px] font-semibold text-[var(--color-accent-inverse,#06150f)] bg-rose-500 rounded-md hover:bg-rose-400 disabled:opacity-50"
+              type="submit" disabled={isPending}
+              className="px-3 py-1.5 text-[11px] font-semibold text-white bg-rose-500 rounded-md hover:bg-rose-400 disabled:opacity-50"
             >
               {isPending ? "Ajout..." : adding === "apport" ? "Ajouter l'apport" : "Enregistrer le prelevement"}
             </button>
             <button
-              type="button"
-              onClick={() => { setAdding(null); setError(null); }}
+              type="button" onClick={() => { setAdding(null); setError(null); }}
               className="px-3 py-1.5 text-[11px] font-medium text-zinc-400 hover:text-zinc-200"
             >
               Annuler
@@ -463,10 +278,9 @@ function MovementsCard({
         </form>
       )}
 
-      {/* Historique */}
       {movements.length === 0 ? (
         <p className="text-[11px] text-zinc-600">
-          Aucun mouvement trace pour l'instant. Chaque apport, prelevement, encaissement ou mise a jour manuelle du solde apparaitra ici.
+          Aucun mouvement pour l'instant. Chaque achat produit, vente encaissee, apport ou prelevement apparaitra ici automatiquement.
         </p>
       ) : (
         <div className="space-y-1.5">
@@ -526,7 +340,6 @@ function CapitalSummary({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 items-start">
-        {/* 1. Capital total (gradient hero) */}
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5">Total</p>
           <p className="text-[28px] font-bold tabular-nums tracking-tight gradient-text leading-none">
@@ -539,7 +352,6 @@ function CapitalSummary({
           </div>
         </div>
 
-        {/* 2. Budget max disponible */}
         <div>
           <div className="flex items-center gap-1.5 mb-1.5">
             <ShoppingBag size={12} className={stopBuying ? "text-red-400" : "text-emerald-400"} />
@@ -566,7 +378,6 @@ function CapitalSummary({
           </p>
         </div>
 
-        {/* 3. Ratio immobilise */}
         <div>
           <div className="flex items-center justify-between mb-1.5">
             <div className="flex items-center gap-1.5">

@@ -1,10 +1,27 @@
 import { db } from "../client";
 import {
-  shopSettings, pendingPayouts, treasuryMovements,
+  shopSettings, pendingPayouts, treasuryMovements, sales, products, customers,
   type PendingPayout, type NewPendingPayout, type TreasuryMovement,
 } from "../schema";
-import { eq, and, sql, desc, gte } from "drizzle-orm";
+import { eq, and, sql, desc, gte, isNotNull, isNull } from "drizzle-orm";
 import { getStockStats } from "./products";
+
+/**
+ * Une vente en attente de paiement, derivee dynamiquement de sales
+ * (payment_status = 'en_attente' AND shipping_status IS NOT NULL).
+ * Pas de saisie manuelle : c'est calcule depuis les commandes.
+ */
+export type PendingSalePayout = {
+  id: string;             // sale id
+  saleId: string;
+  amount: number;         // netRevenue si dispo, sinon salePrice
+  channel: string;
+  productTitle: string | null;
+  productBrand: string | null;
+  customerName: string | null;
+  soldAt: Date;
+  shippingStatus: string | null;
+};
 
 /**
  * Etat tresorerie complet d'un shop :
@@ -19,17 +36,17 @@ import { getStockStats } from "./products";
 export type TreasuryState = {
   cashBalance: number;
   cashUpdatedAt: Date | null;
-  pendingPayouts: PendingPayout[];
+  pendingPayouts: PendingSalePayout[];  // Dynamique : ventes en_attente
   pendingTotal: number;
   stockValue: number;
   capitalTotal: number;
   lockedRatio: number;
   stopBuying: boolean;
-  buyingBudget: number;     // Budget max disponible pour acheter sans depasser le seuil
-  buyingThreshold: number;  // Le seuil 0.65 reutilisable
-  movements: TreasuryMovement[];  // Derniers mouvements de cash (traces)
-  monthApports: number;           // Apports du mois en cours (discipline d'injection)
-  monthPrelevements: number;      // Prelevements du mois en cours (valeur absolue)
+  buyingBudget: number;
+  buyingThreshold: number;
+  movements: TreasuryMovement[];
+  monthApports: number;
+  monthPrelevements: number;
 };
 
 export async function getTreasuryState(shopId: string): Promise<TreasuryState> {
@@ -45,13 +62,46 @@ export async function getTreasuryState(shopId: string): Promise<TreasuryState> {
   const cashBalance = Number(settingsRow?.cashBalance ?? 0);
   const cashUpdatedAt = settingsRow?.cashUpdatedAt ?? null;
 
-  const payouts = await db
-    .select()
-    .from(pendingPayouts)
-    .where(eq(pendingPayouts.shopId, shopId))
-    .orderBy(desc(pendingPayouts.createdAt));
+  // "En cours" est maintenant derive des ventes en attente de paiement
+  // (payment_status = 'en_attente' AND shipping_status IS NOT NULL, i.e. commandes actives)
+  const pendingRows = await db
+    .select({
+      id: sales.id,
+      amount: sales.netRevenue,
+      salePrice: sales.salePrice,
+      channel: sales.channel,
+      soldAt: sales.soldAt,
+      shippingStatus: sales.shippingStatus,
+      productTitle: products.title,
+      productBrand: products.brand,
+      customerFirstName: customers.firstName,
+      customerLastName: customers.lastName,
+    })
+    .from(sales)
+    .leftJoin(products, eq(sales.productId, products.id))
+    .leftJoin(customers, eq(sales.customerId, customers.id))
+    .where(
+      and(
+        eq(sales.shopId, shopId),
+        isNotNull(sales.shippingStatus),
+        eq(sales.paymentStatus, "en_attente"),
+      )
+    )
+    .orderBy(desc(sales.soldAt));
 
-  const pendingTotal = payouts.reduce((s, p) => s + Number(p.amount), 0);
+  const payouts: PendingSalePayout[] = pendingRows.map((r) => ({
+    id: r.id,
+    saleId: r.id,
+    amount: Number(r.amount ?? r.salePrice ?? 0),
+    channel: r.channel,
+    productTitle: r.productTitle,
+    productBrand: r.productBrand,
+    customerName: r.customerFirstName ? `${r.customerFirstName} ${r.customerLastName ?? ""}`.trim() : null,
+    soldAt: r.soldAt,
+    shippingStatus: r.shippingStatus,
+  }));
+
+  const pendingTotal = payouts.reduce((s, p) => s + p.amount, 0);
 
   const stockStats = await getStockStats(shopId);
   const stockValue = Number(stockStats?.totalValue ?? 0);
@@ -219,5 +269,116 @@ export async function markPayoutReceived(id: string, shopId: string): Promise<vo
     await tx
       .delete(pendingPayouts)
       .where(eq(pendingPayouts.id, id));
+  });
+}
+
+/**
+ * Applique un mouvement de tresorerie automatique lie a un objet source
+ * (produit achete, vente encaissee, charge...). Cree le mouvement + met a jour
+ * le solde. Idempotent si sourceType/sourceId sont fournis (evite les doublons).
+ */
+export async function recordAutoMovement(params: {
+  shopId: string;
+  type: "achat_stock" | "encaissement_vente" | "charge";
+  amount: number;      // signe : negatif pour un debit, positif pour un credit
+  label: string;
+  sourceType: "product" | "sale" | "purchase";
+  sourceId: string;
+}): Promise<void> {
+  const { shopId, type, amount, label, sourceType, sourceId } = params;
+
+  await db.transaction(async (tx) => {
+    // Idempotence : si un mouvement pour cette source existe deja avec ce type, on skip.
+    const existing = await tx
+      .select({ id: treasuryMovements.id })
+      .from(treasuryMovements)
+      .where(
+        and(
+          eq(treasuryMovements.shopId, shopId),
+          eq(treasuryMovements.type, type),
+          sql`source_type = ${sourceType}`,
+          sql`source_id = ${sourceId}`,
+        )
+      )
+      .limit(1);
+    if (existing.length > 0) return;
+
+    const [current] = await tx
+      .select({ cashBalance: shopSettings.cashBalance })
+      .from(shopSettings)
+      .where(eq(shopSettings.shopId, shopId))
+      .limit(1);
+    const newBalance = Number(current?.cashBalance ?? 0) + amount;
+
+    await tx
+      .update(shopSettings)
+      .set({
+        cashBalance: String(newBalance),
+        cashUpdatedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(shopSettings.shopId, shopId));
+
+    await tx.insert(treasuryMovements).values({
+      shopId,
+      type,
+      amount: String(amount),
+      balanceAfter: String(newBalance),
+      label,
+      sourceType,
+      sourceId,
+    });
+  });
+}
+
+/**
+ * Annule un mouvement lie a une source (si le user delete un produit / annule une vente).
+ * Trouve tous les mouvements avec ce sourceType/sourceId, cree un mouvement inverse
+ * pour chacun (label prefixe "Annulation :"), met a jour le solde.
+ */
+export async function reverseAutoMovements(
+  shopId: string,
+  sourceType: "product" | "sale" | "purchase",
+  sourceId: string,
+): Promise<void> {
+  await db.transaction(async (tx) => {
+    const rows = await tx
+      .select()
+      .from(treasuryMovements)
+      .where(
+        and(
+          eq(treasuryMovements.shopId, shopId),
+          sql`source_type = ${sourceType}`,
+          sql`source_id = ${sourceId}`,
+        )
+      );
+    if (rows.length === 0) return;
+
+    for (const m of rows) {
+      const inverse = -Number(m.amount);
+      const [current] = await tx
+        .select({ cashBalance: shopSettings.cashBalance })
+        .from(shopSettings)
+        .where(eq(shopSettings.shopId, shopId))
+        .limit(1);
+      const newBalance = Number(current?.cashBalance ?? 0) + inverse;
+
+      await tx
+        .update(shopSettings)
+        .set({
+          cashBalance: String(newBalance),
+          cashUpdatedAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .where(eq(shopSettings.shopId, shopId));
+
+      await tx.insert(treasuryMovements).values({
+        shopId,
+        type: "ajustement",
+        amount: String(inverse),
+        balanceAfter: String(newBalance),
+        label: `Annulation : ${m.label ?? m.type}`,
+      });
+    }
   });
 }

@@ -55,7 +55,8 @@ export const shippingPaidByEnum = pgEnum("shipping_paid_by", [
   "vendeur", "acheteur", "offert"
 ]);
 export const treasuryMovementTypeEnum = pgEnum("treasury_movement_type", [
-  "apport", "prelevement", "encaissement", "ajustement"
+  "apport", "prelevement", "encaissement", "ajustement",
+  "achat_stock", "encaissement_vente", "charge",
 ]);
 
 // ── Tables ─────────────────────────────────────────────
@@ -299,6 +300,8 @@ export const treasuryMovements = pgTable("treasury_movements", {
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
   balanceAfter: decimal("balance_after", { precision: 10, scale: 2 }),
   label: text("label"),
+  sourceType: text("source_type"), // "product" | "sale" | "purchase" pour tracer l'origine des mouvements automatiques
+  sourceId: uuid("source_id"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
