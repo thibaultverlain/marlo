@@ -107,7 +107,7 @@ export async function createProductAction(formData: FormData) {
       } catch {}
     }
 
-    await createProduct({
+    const created = await createProduct({
       userId: ctx.userId,
       shopId: ctx.shopId,
       title: parsed.data.title,
@@ -141,14 +141,15 @@ export async function createProductAction(formData: FormData) {
         ? parsed.data.keywords
         : null,
     });
+
+    revalidatePath("/products");
+    revalidatePath("/dashboard");
+    return { success: true as const, id: created?.id };
   } catch (err) {
     console.error("createProductAction error:", err);
-    return { error: "Erreur lors de la création. Vérifiez votre connexion à la base de données." };
+    const msg = err instanceof Error ? err.message : String(err);
+    return { error: `Erreur lors de la creation : ${msg}` };
   }
-
-  revalidatePath("/products");
-  revalidatePath("/dashboard");
-  redirect("/products");
 }
 
 export async function updateProductAction(id: string, formData: FormData) {

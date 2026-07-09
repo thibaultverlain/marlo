@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useTransition } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Camera, Save, AlertCircle } from "lucide-react";
 import { formatCurrency, formatPercent } from "@/lib/utils";
 import { LUXURY_BRANDS, CATEGORIES, CONDITIONS, CHANNELS } from "@/lib/data";
@@ -13,6 +14,7 @@ const inputClass = "w-full px-3 py-2.5 text-[13px] bg-[var(--color-bg-raised)] b
 const labelClass = "block text-[11px] font-medium text-zinc-500 uppercase tracking-wider mb-1.5";
 
 export default function NewProductForm() {
+  const router = useRouter();
   const [form, setForm] = useState({
     title: "", brand: "", model: "", category: "sacs", size: "", color: "",
     condition: "tres_bon", purchasePrice: "", purchaseFees: "", targetPrice: "",
@@ -72,7 +74,16 @@ export default function NewProductForm() {
     premium.signatureDetails.forEach((d) => formData.append("signatureDetails", d));
     premium.keywords.forEach((k) => formData.append("keywords", k));
 
-    startTransition(async () => { const result = await createProductAction(formData); if (result?.error) setError(result.error); });
+    startTransition(async () => {
+      const result = await createProductAction(formData);
+      if (result?.error) {
+        setError(result.error);
+        return;
+      }
+      // Succes : redirection cote client (plus fiable que redirect() dans un startTransition avec Next 16 + Turbopack)
+      router.push("/products");
+      router.refresh();
+    });
   }
 
   return (
