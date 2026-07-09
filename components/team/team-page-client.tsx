@@ -6,7 +6,7 @@ import {
   Copy, Check, Clock, X, Activity, Store, Settings2,
   LayoutDashboard, Package, ShoppingCart, Users, Search,
   ShoppingBag, FileText, Calculator, BarChart3, ListTodo,
-  ClipboardList, FolderOpen, Users2, AlertCircle, ChevronDown,
+  FolderOpen, Users2, AlertCircle, ChevronDown,
   Info,
 } from "lucide-react";
 import {
@@ -56,7 +56,6 @@ const PERM_CONFIG: { key: string; label: string; icon: React.ElementType }[] = [
   { key: "sourcing", label: "Sourcing", icon: Search },
   { key: "personal_shopping", label: "Personal Shop.", icon: ShoppingBag },
   { key: "tasks", label: "Taches", icon: ListTodo },
-  { key: "templates", label: "Templates", icon: ClipboardList },
   { key: "invoices", label: "Factures", icon: FileText },
   { key: "accounting", label: "Comptabilite", icon: Calculator },
   { key: "documents", label: "Documents", icon: FolderOpen },
@@ -65,7 +64,7 @@ const PERM_CONFIG: { key: string; label: string; icon: React.ElementType }[] = [
 ];
 
 const DEFAULT_PERMS: Record<string, string[]> = {
-  manager: ["dashboard", "products", "sales", "customers", "analytics", "sourcing", "personal_shopping", "tasks", "templates", "invoices"],
+  manager: ["dashboard", "products", "sales", "customers", "analytics", "sourcing", "personal_shopping", "tasks", "invoices"],
   seller: ["dashboard", "products", "sales", "tasks"],
 };
 
@@ -321,7 +320,7 @@ export default function TeamPageClient({
         {showRoleHelp && (
           <div className="mb-4 p-3 rounded-lg bg-emerald-500/[0.05] border border-emerald-500/15 text-[11px] text-emerald-300/80 space-y-1.5">
             <p><span className="inline-flex items-center gap-1 font-semibold text-amber-400"><ShieldCheck size={10} /> Proprietaire</span> · Acces total a tout, ne peut pas etre modifie.</p>
-            <p><span className="inline-flex items-center gap-1 font-semibold text-emerald-400"><Shield size={10} /> Manager</span> · Acces a Dashboard, Stock, Ventes, Clients, Analytique, Sourcing, PS, Taches, Templates, Factures. Pas comptabilite, equipe, reglages.</p>
+            <p><span className="inline-flex items-center gap-1 font-semibold text-emerald-400"><Shield size={10} /> Manager</span> · Acces a Dashboard, Stock, Ventes, Clients, Analytique, Sourcing, PS, Taches, Factures. Pas comptabilite, equipe, reglages.</p>
             <p><span className="inline-flex items-center gap-1 font-semibold text-zinc-400"><User size={10} /> Vendeur</span> · Acces a Dashboard, Stock, Ventes, Taches. Permissions ajustables individuellement.</p>
           </div>
         )}

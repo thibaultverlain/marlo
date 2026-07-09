@@ -409,20 +409,6 @@ export const notifications = pgTable("notifications", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-// ── Templates ─────────────────────────────────────────
-
-export const templates = pgTable("templates", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  shopId: uuid("shop_id").references(() => shops.id).notNull(),
-  type: text("type").notNull(),
-  name: text("name").notNull(),
-  content: text("content").notNull(),
-  variables: text("variables"),
-  createdBy: uuid("created_by").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
-
 // ── Documents ─────────────────────────────────────────
 
 export const documents = pgTable("documents", {
@@ -480,8 +466,6 @@ export type ActivityLogEntry = typeof activityLog.$inferSelect;
 export type Task = typeof tasks.$inferSelect;
 export type NewTask = typeof tasks.$inferInsert;
 export type Notification = typeof notifications.$inferSelect;
-export type Template = typeof templates.$inferSelect;
-export type NewTemplate = typeof templates.$inferInsert;
 export type Document = typeof documents.$inferSelect;
 export type NewDocument = typeof documents.$inferInsert;
 export type PriceHistory = typeof priceHistory.$inferSelect;
@@ -495,7 +479,7 @@ export type TeamRole = "owner" | "manager" | "seller";
 export const ALL_PERMISSIONS = [
   "dashboard", "products", "sales", "customers", "analytics",
   "sourcing", "personal_shopping", "tasks", "invoices",
-  "accounting", "templates", "documents",
+  "accounting", "documents",
   "team", "settings",
 ] as const;
 export type Permission = typeof ALL_PERMISSIONS[number];
