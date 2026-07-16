@@ -41,18 +41,18 @@
      ║  Style luxe classique (Hermes / Smythson / Goyard).          ║
      ║                                                              ║
      ║  Note : on DECALE l'echelle pour que rose-500 soit la        ║
-     ║  version CLAIRE (visible sur dark ET light). Le #14233F brut ║
+     ║  version CLAIRE (visible sur dark ET light). Le #1D4ED8 brut ║
      ║  est trop fonce pour fonctionner sur fond charbon — on le    ║
      ║  reserve aux niveaux 700-800 (texte foncé, hover light).     ║
      ╚══════════════════════════════════════════════════════════════╝ */
   --color-rose-50:  #f0f3f8;
   --color-rose-100: #d6dde8;
   --color-rose-200: #b3bed1;
-  --color-rose-300: #8595b5;
-  --color-rose-400: #7a8caa;  /* hover / texte clair */
-  --color-rose-500: #5a6e96;  /* accent principal — visible partout */
+  --color-rose-300: #60A5FA;
+  --color-rose-400: #3B82F6;  /* hover / texte clair */
+  --color-rose-500: #2563EB;  /* accent principal — bleu roi */
   --color-rose-600: #475a82;  /* hover */
-  --color-rose-700: #14233F;  /* couleur du brief (utilisable comme texte fonce sur light) */
+  --color-rose-700: #1D4ED8;  /* couleur foncee (utilisable comme texte fonce sur light) */
   --color-rose-800: #0c1626;
   --color-rose-900: #050913;
   --color-rose-950: #02040a;
@@ -72,7 +72,7 @@
 
 /* ╔══════════════════════════════════════════════════════════════════╗
    ║  MARLO DESIGN SYSTEM                                              ║
-   ║  Palette FINALE : bleu marine (#14233F) + blanc + charbon (#0F0E0C)║
+   ║  Palette FINALE : bleu roi (#2563EB) + blanc + charbon (#0F0E0C)  ║
    ║  Style : luxe classique, intemporel, sobre                        ║
    ║  Note : classes Tailwind "rose-*" sont remappees vers bleu marine ║
    ║  via @theme, on garde text-rose-X dans le code.                  ║
@@ -94,7 +94,7 @@
   --color-border: rgba(255, 255, 255, 0.06);
   --color-border-hover: rgba(255, 255, 255, 0.12);
   --color-border-subtle: rgba(255, 255, 255, 0.03);
-  --color-border-accent: rgba(90, 110, 150, 0.40);
+  --color-border-accent: rgba(37, 99, 235, 0.40);
 
   /* Text — base #FFFFFF + nuances */
   --color-text: #FFFFFF;            /* Primary (blanc pur du brief) */
@@ -104,11 +104,11 @@
   --color-text-inverse: #FFFFFF;    /* blanc : texte sur bouton bleu marine (contraste max) */
 
   /* Accent (bleu marine — clarifie pour visibilite sur fond charbon) */
-  --color-accent: #5a6e96;
-  --color-accent-hover: #7a8caa;
-  --color-accent-muted: rgba(90, 110, 150, 0.14);
-  --color-accent-text: #b3bed1;
-  --color-accent-glow: rgba(90, 110, 150, 0.30);
+  --color-accent: #2563EB;
+  --color-accent-hover: #3B82F6;
+  --color-accent-muted: rgba(37, 99, 235, 0.14);
+  --color-accent-text: #93C5FD;
+  --color-accent-glow: rgba(37, 99, 235, 0.30);
 
   /* Gold (highlight secondaire) — conserve pour podium / badges premium */
   --color-gold: #c9a961;
@@ -135,7 +135,7 @@
   /* Shadows */
   --shadow-card: 0 1px 3px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.03);
   --shadow-card-hover: 0 8px 24px rgba(0,0,0,0.5), 0 0 0 1px rgba(90,110,150,0.25);
-  --shadow-glow-accent: 0 0 24px rgba(90, 110, 150, 0.18);
+  --shadow-glow-accent: 0 0 24px rgba(37, 99, 235, 0.18);
   --shadow-sidebar: none;
 
   /* Radius — 4 valeurs */
@@ -162,7 +162,7 @@
   --color-border: rgba(15, 14, 12, 0.08);
   --color-border-hover: rgba(15, 14, 12, 0.18);
   --color-border-subtle: rgba(15, 14, 12, 0.04);
-  --color-border-accent: rgba(20, 35, 63, 0.30);
+  --color-border-accent: rgba(29, 78, 216, 0.30);
 
   /* Text — base #0F0E0C (charbon, contraste max sur fond blanc) */
   --color-text: #0F0E0C;
@@ -171,12 +171,12 @@
   --color-text-disabled: #9a9892;
   --color-text-inverse: #FFFFFF;     /* blanc sur bouton bleu marine */
 
-  /* Accent (bleu marine — #14233F direct sur fond blanc) */
-  --color-accent: #14233F;
-  --color-accent-hover: #0c1626;
-  --color-accent-muted: rgba(20, 35, 63, 0.08);
-  --color-accent-text: #14233F;
-  --color-accent-glow: rgba(20, 35, 63, 0.10);
+  /* Accent (bleu roi #2563EB, version foncee pour lisibilite sur fond blanc) */
+  --color-accent: #1D4ED8;
+  --color-accent-hover: #1E40AF;
+  --color-accent-muted: rgba(29, 78, 216, 0.08);
+  --color-accent-text: #1D4ED8;
+  --color-accent-glow: rgba(29, 78, 216, 0.10);
 
   --color-gold: #a88a47;
   --color-gold-bright: #c9a961;
@@ -200,8 +200,8 @@
 
   --shadow-card: 0 1px 3px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.04);
   --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.06), 0 0 0 1px rgba(20,35,63,0.12);
-  --shadow-glow-accent: 0 0 16px rgba(20, 35, 63, 0.06);
-  --shadow-sidebar: 1px 0 12px rgba(20, 35, 63, 0.04), 1px 0 0 rgba(20, 35, 63, 0.06);
+  --shadow-glow-accent: 0 0 16px rgba(29, 78, 216, 0.06);
+  --shadow-sidebar: 1px 0 12px rgba(29, 78, 216, 0.04), 1px 0 0 rgba(29, 78, 216, 0.06);
 
   color-scheme: light;
 }
