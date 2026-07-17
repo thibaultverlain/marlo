@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Calendar, ShoppingCart } from "lucide-react";
 import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine,
+  BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine,
 } from "recharts";
 import CalendarPicker from "./calendar-picker";
 import { formatCurrency } from "@/lib/utils";
@@ -241,16 +241,17 @@ export default function RevenueChart({ initialData }: { initialData?: DataPoint[
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={data} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
+            <BarChart data={data} margin={{ top: 8, right: 12, left: 0, bottom: 0 }} barCategoryGap="20%">
               <defs>
-                <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="var(--color-accent)" stopOpacity={0.45} />
-                  <stop offset="50%" stopColor="var(--color-accent)" stopOpacity={0.15} />
-                  <stop offset="100%" stopColor="var(--color-accent)" stopOpacity={0} />
+                {/* Degrade barres passees : bleu roi plein en haut -> quasi transparent en bas */}
+                <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="var(--color-accent-hover)" stopOpacity={1} />
+                  <stop offset="100%" stopColor="var(--color-accent)" stopOpacity={0.15} />
                 </linearGradient>
-                <linearGradient id="revenueStroke" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stopColor="var(--color-accent)" stopOpacity={1} />
-                  <stop offset="100%" stopColor="var(--color-accent-hover)" stopOpacity={1} />
+                {/* Degrade highlight barre courante : bleu clair vif -> transparent */}
+                <linearGradient id="barGradientHighlight" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#60A5FA" stopOpacity={1} />
+                  <stop offset="100%" stopColor="var(--color-accent)" stopOpacity={0.25} />
                 </linearGradient>
               </defs>
 
@@ -281,7 +282,7 @@ export default function RevenueChart({ initialData }: { initialData?: DataPoint[
 
               <Tooltip
                 content={<CustomTooltip />}
-                cursor={{ stroke: "var(--color-accent)", strokeWidth: 1, strokeDasharray: "3 3", opacity: 0.5 }}
+                cursor={{ fill: "var(--color-accent)", fillOpacity: 0.06 }}
               />
 
               {/* Reference line sur le pic */}
@@ -294,24 +295,20 @@ export default function RevenueChart({ initialData }: { initialData?: DataPoint[
                 />
               )}
 
-              <Area
-                type="monotone"
+              <Bar
                 dataKey="revenue"
-                stroke="url(#revenueStroke)"
-                strokeWidth={2.5}
-                fill="url(#revenueGradient)"
-                fillOpacity={1}
+                radius={[3, 3, 0, 0]}
                 animationDuration={600}
                 animationEasing="ease-out"
-                activeDot={{
-                  r: 5,
-                  fill: "var(--color-accent)",
-                  stroke: "var(--color-bg-card)",
-                  strokeWidth: 2,
-                }}
-                dot={false}
-              />
-            </AreaChart>
+              >
+                {data.map((_, i) => (
+                  <Cell
+                    key={`cell-${i}`}
+                    fill={i === data.length - 1 ? "url(#barGradientHighlight)" : "url(#barGradient)"}
+                  />
+                ))}
+              </Bar>
+            </BarChart>
           </ResponsiveContainer>
         )}
       </div>
