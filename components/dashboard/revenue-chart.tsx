@@ -282,7 +282,7 @@ export default function RevenueChart({ initialData }: { initialData?: DataPoint[
 
               <Tooltip
                 content={<CustomTooltip />}
-                cursor={{ fill: "var(--color-accent)", fillOpacity: 0.06 }}
+                cursor={false}
               />
 
               {/* Reference line sur le pic */}
