@@ -241,7 +241,7 @@ export default function RevenueChart({ initialData }: { initialData?: DataPoint[
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data} margin={{ top: 8, right: 12, left: 0, bottom: 0 }} barCategoryGap="20%">
+            <BarChart data={data} margin={{ top: 8, right: 12, left: 0, bottom: 0 }} barCategoryGap="8%" maxBarSize={60}>
               <defs>
                 {/* Degrade barres passees : bleu roi plein en haut -> quasi transparent en bas */}
                 <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
