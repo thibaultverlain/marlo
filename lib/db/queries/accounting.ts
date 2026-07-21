@@ -10,10 +10,10 @@ import { eq, desc, sql, and, gte, lte } from "drizzle-orm";
  * Barème URSSAF et abattement peuvent evoluer entre lois de finances.
  */
 export const MICRO = {
-  /** Plafond franchise en base de TVA — vente de biens (2026). */
-  VAT_THRESHOLD:       85_800,
-  /** Plafond majore (seuil de sortie apres N-1 depasse). */
-  VAT_THRESHOLD_MAJ:   94_300,
+  /** Seuil franchise en base de TVA — vente de biens (2026, source impots.gouv.fr). */
+  VAT_THRESHOLD:       85_000,
+  /** Seuil majore de franchise TVA vente de biens (bascule TVA en cours d'annee). */
+  VAT_THRESHOLD_MAJ:   93_500,
   /** Plafond global du regime micro vente de biens (sortie totale au-dela). */
   MICRO_CEILING:      188_700,
   /** Cotisations sociales URSSAF vente de biens (%). */
