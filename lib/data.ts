@@ -117,20 +117,31 @@ export function calculatePlatformFees(channel: string, salePrice: number): numbe
   return Math.round((salePrice * (fees.sellerFeePct + fees.processingFeePct) + fees.fixedFee) * 100) / 100;
 }
 
+/**
+ * Cotisations sociales micro-entreprise vente de biens (BIC) 2026 :
+ *   URSSAF 12,3% + CFP 0,1% = 12,4% du CA brut.
+ * Base de calcul = prix de vente brut (avant frais plateforme).
+ * Reflete la charge reelle a payer aux cotisations trimestrielles URSSAF.
+ */
+export const MICRO_SOCIAL_CHARGE_RATE = 0.124;
+
 export function calculateMargin(
   purchasePrice: number,
   salePrice: number,
   platformFees: number,
   shippingCost: number,
-  shippingPaidBySeller: boolean
-): { netRevenue: number; margin: number; marginPct: number } {
+  shippingPaidBySeller: boolean,
+  socialChargeRate: number = MICRO_SOCIAL_CHARGE_RATE,
+): { netRevenue: number; margin: number; marginPct: number; socialCharges: number } {
   const shippingCharge = shippingPaidBySeller ? shippingCost : 0;
-  const netRevenue = salePrice - platformFees - shippingCharge;
+  const socialCharges = Math.round(salePrice * socialChargeRate * 100) / 100;
+  const netRevenue = salePrice - platformFees - shippingCharge - socialCharges;
   const margin = netRevenue - purchasePrice;
   const marginPct = purchasePrice > 0 ? (margin / purchasePrice) * 100 : 0;
   return {
     netRevenue: Math.round(netRevenue * 100) / 100,
     margin: Math.round(margin * 100) / 100,
     marginPct: Math.round(marginPct * 10) / 10,
+    socialCharges,
   };
 }
