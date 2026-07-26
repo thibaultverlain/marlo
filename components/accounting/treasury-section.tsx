@@ -9,7 +9,7 @@ import {
   ExternalLink, ShoppingCart,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
-import { createTreasuryMovementAction } from "@/lib/actions/treasury";
+import { createTreasuryMovementAction, reconcileCashBalanceAction } from "@/lib/actions/treasury";
 import type { TreasuryMovement } from "@/lib/db/schema";
 import type { PendingSalePayout } from "@/lib/db/queries/treasury";
 
@@ -81,11 +81,26 @@ function StopBuyingBanner({ ratio }: { ratio: number }) {
   );
 }
 
-/* ───── Cash card (lecture seule, calcule dynamiquement) ────── */
+/* ───── Cash card (calcule + recalage sur releve bancaire) ──── */
 function CashCard({ balance, updatedAt }: { balance: number; updatedAt: Date | null }) {
+  const [reconciling, setReconciling] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+
   const stalenessDays = updatedAt
     ? Math.floor((Date.now() - new Date(updatedAt).getTime()) / 86400000)
     : null;
+
+  function handleReconcile(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError(null);
+    const fd = new FormData(e.currentTarget);
+    startTransition(async () => {
+      const result = await reconcileCashBalanceAction(fd);
+      if (result?.error) setError(result.error);
+      else setReconciling(false);
+    });
+  }
 
   return (
     <div className="card-static p-5">
@@ -105,13 +120,71 @@ function CashCard({ balance, updatedAt }: { balance: number; updatedAt: Date | n
             </p>
           </div>
         </div>
+        {!reconciling && (
+          <button
+            onClick={() => setReconciling(true)}
+            className="text-[11px] text-zinc-500 hover:text-rose-400 px-2 py-1 rounded-md hover:bg-[var(--color-bg-hover)] transition-colors whitespace-nowrap"
+            title="Aligner Marlo sur le solde reel de ton compte"
+          >
+            Recaler
+          </button>
+        )}
       </div>
-      <p className="text-[32px] font-bold tabular-nums tracking-tight gradient-text">
-        {formatCurrency(balance)}
-      </p>
-      <p className="text-[10px] text-zinc-500 mt-2 leading-relaxed">
-        Calcule automatiquement : achats debites, ventes encaissees, apports / prelevements.
-      </p>
+
+      {reconciling ? (
+        <form onSubmit={handleReconcile} className="space-y-2.5">
+          <div>
+            <label className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 block mb-1.5">
+              Solde reel sur ton compte
+            </label>
+            <div className="relative">
+              <input
+                autoFocus
+                type="number"
+                step="0.01"
+                name="amount"
+                required
+                defaultValue={balance.toFixed(2)}
+                className="w-full px-3 py-2.5 pr-8 text-[22px] font-bold tabular-nums bg-[var(--color-bg-raised)] border border-[var(--color-border)] rounded-lg focus:outline-none focus:border-rose-500/50 text-white"
+              />
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 text-lg">€</span>
+            </div>
+          </div>
+          <input
+            type="text"
+            name="note"
+            placeholder="Motif de l'ecart (optionnel)"
+            className="w-full px-3 py-2 text-[12px] bg-[var(--color-bg-raised)] border border-[var(--color-border)] rounded-lg text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-rose-500/50"
+          />
+          {error && <p className="text-[11px] text-red-400">{error}</p>}
+          <div className="flex gap-2">
+            <button
+              type="submit"
+              disabled={isPending}
+              className="flex-1 px-3 py-2 text-[12px] font-semibold text-white bg-rose-500 rounded-lg hover:bg-rose-400 disabled:opacity-50"
+            >
+              {isPending ? "Recalage..." : "Recaler le solde"}
+            </button>
+            <button
+              type="button"
+              onClick={() => { setReconciling(false); setError(null); }}
+              className="px-3 py-2 text-[12px] font-medium text-zinc-400 hover:text-zinc-200"
+            >
+              Annuler
+            </button>
+          </div>
+        </form>
+      ) : (
+        <>
+          <p className="text-[32px] font-bold tabular-nums tracking-tight gradient-text">
+            {formatCurrency(balance)}
+          </p>
+          <p className="text-[10px] text-zinc-500 mt-2 leading-relaxed">
+            Calcule automatiquement : achats debites, ventes encaissees, apports / prelevements.
+            Si ton releve differe, utilise « Recaler » — l'ecart sera trace.
+          </p>
+        </>
+      )}
     </div>
   );
 }

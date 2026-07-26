@@ -193,14 +193,20 @@ export async function applyCashMovement(
  * Mise a jour manuelle du solde : tracee comme "ajustement" (delta = nouveau - ancien).
  * Un ajustement recurrent ou important = ecart de caisse a expliquer.
  */
-export async function updateCashBalance(shopId: string, amount: number): Promise<void> {
+/**
+ * Recalage sur le releve bancaire reel.
+ * Ecrit le solde exact et trace l'ecart comme un ajustement, pour qu'on
+ * puisse toujours voir de combien Marlo avait derive et quand.
+ */
+export async function updateCashBalance(shopId: string, amount: number, note?: string | null): Promise<void> {
   await db.transaction(async (tx) => {
     const [current] = await tx
       .select({ cashBalance: shopSettings.cashBalance })
       .from(shopSettings)
       .where(eq(shopSettings.shopId, shopId))
       .limit(1);
-    const delta = amount - Number(current?.cashBalance ?? 0);
+    const previous = Number(current?.cashBalance ?? 0);
+    const delta = Math.round((amount - previous) * 100) / 100;
 
     await tx
       .update(shopSettings)
@@ -212,12 +218,14 @@ export async function updateCashBalance(shopId: string, amount: number): Promise
       .where(eq(shopSettings.shopId, shopId));
 
     if (delta !== 0) {
+      const sign = delta > 0 ? "+" : "";
+      const base = `Recalage releve bancaire (ecart ${sign}${delta.toFixed(2)} EUR)`;
       await tx.insert(treasuryMovements).values({
         shopId,
         type: "ajustement",
         amount: String(delta),
         balanceAfter: String(amount),
-        label: "Mise a jour manuelle du solde",
+        label: note?.trim() ? `${base} — ${note.trim()}` : base,
       });
     }
   });

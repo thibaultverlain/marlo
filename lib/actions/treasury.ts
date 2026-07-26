@@ -3,7 +3,34 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getAuthContext } from "@/lib/auth/require-role";
-import { applyCashMovement } from "@/lib/db/queries/treasury";
+import { applyCashMovement, updateCashBalance } from "@/lib/db/queries/treasury";
+
+const reconcileSchema = z.object({
+  amount: z.coerce.number().min(-1000000).max(10000000),
+  note: z.string().nullish(),
+});
+
+/**
+ * Recale le solde Marlo sur le solde reel du compte bancaire.
+ * L'ecart est trace comme un mouvement d'ajustement.
+ */
+export async function reconcileCashBalanceAction(formData: FormData) {
+  const ctx = await getAuthContext();
+  const parsed = reconcileSchema.safeParse({
+    amount: formData.get("amount"),
+    note: formData.get("note"),
+  });
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Montant invalide" };
+  }
+  try {
+    await updateCashBalance(ctx.shopId, parsed.data.amount, parsed.data.note);
+    revalidatePath("/accounting");
+    return { success: true };
+  } catch (err: any) {
+    return { error: err.message ?? "Erreur lors du recalage" };
+  }
+}
 
 const movementSchema = z.object({
   type: z.enum(["apport", "prelevement"]),
