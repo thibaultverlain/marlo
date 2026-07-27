@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getAuthContext } from "@/lib/auth/require-role";
-import { applyCashMovement, updateCashBalance } from "@/lib/db/queries/treasury";
+import { applyCashMovement, updateCashBalance, setVpMode } from "@/lib/db/queries/treasury";
 
 const reconcileSchema = z.object({
   amount: z.coerce.number().min(-1000000).max(10000000),
@@ -29,6 +29,33 @@ export async function reconcileCashBalanceAction(formData: FormData) {
     return { success: true };
   } catch (err: any) {
     return { error: err.message ?? "Erreur lors du recalage" };
+  }
+}
+
+const vpModeSchema = z.object({
+  days: z.coerce.number().int().min(0).max(60),
+  label: z.string().optional().nullable(),
+});
+
+/**
+ * Derogation vente privee : releve le seuil d'immobilisation de 65% a 80%
+ * pour une duree limitee (max 60 jours). Decision actee le 27/07/2026.
+ */
+export async function setVpModeAction(formData: FormData) {
+  const ctx = await getAuthContext();
+  const parsed = vpModeSchema.safeParse({
+    days: formData.get("days"),
+    label: formData.get("label"),
+  });
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Donnees invalides" };
+  }
+  try {
+    await setVpMode(ctx.shopId, parsed.data.days, parsed.data.label || null);
+    revalidatePath("/accounting");
+    return { success: true };
+  } catch (err: any) {
+    return { error: err.message ?? "Erreur lors de l'activation" };
   }
 }
 

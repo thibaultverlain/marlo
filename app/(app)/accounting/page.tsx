@@ -54,6 +54,9 @@ export default async function AccountingPage({ searchParams }: { searchParams: P
         stopBuying={treasury.stopBuying}
         buyingBudget={treasury.buyingBudget}
         buyingThreshold={treasury.buyingThreshold}
+        vpModeActive={treasury.vpModeActive}
+        vpModeUntil={treasury.vpModeUntil}
+        vpModeLabel={treasury.vpModeLabel}
         movements={treasury.movements}
         monthApports={treasury.monthApports}
         monthPrelevements={treasury.monthPrelevements}

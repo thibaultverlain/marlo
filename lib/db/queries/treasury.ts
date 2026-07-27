@@ -6,6 +6,19 @@ import {
 import { eq, and, sql, desc, gte, isNotNull, isNull } from "drizzle-orm";
 import { getStockStats } from "./products";
 
+/** Seuil d'immobilisation du capital en regime normal. */
+export const NORMAL_THRESHOLD = 0.65;
+/**
+ * Seuil pendant une derogation vente privee (decision du 27/07/2026).
+ * Justification : en VP les pieces sont achetees a -70/-80% du prix boutique,
+ * la rotation est rapide et la marge elevee — le garde-fou anti-sur-stockage
+ * se retournerait contre son objectif en bloquant la meilleure opportunite
+ * de marge de l'annee. Contrepartie : duree limitee, retour automatique a 65%.
+ */
+export const VP_MODE_THRESHOLD = 0.80;
+/** Duree maximale d'une derogation, en jours. */
+export const VP_MODE_MAX_DAYS = 60;
+
 /**
  * Une vente en attente de paiement, derivee dynamiquement de sales
  * (payment_status = 'en_attente' AND shipping_status IS NOT NULL).
@@ -43,7 +56,10 @@ export type TreasuryState = {
   lockedRatio: number;
   stopBuying: boolean;
   buyingBudget: number;
-  buyingThreshold: number;
+  buyingThreshold: number;    // 0.65 en normal, 0.80 pendant une derogation VP
+  vpModeActive: boolean;      // Derogation vente privee en cours ?
+  vpModeUntil: Date | null;   // Date de fin de la derogation
+  vpModeLabel: string | null; // Motif (ex: "VP Kering multimarques Paris")
   movements: TreasuryMovement[];
   monthApports: number;
   monthPrelevements: number;
@@ -54,6 +70,8 @@ export async function getTreasuryState(shopId: string): Promise<TreasuryState> {
     .select({
       cashBalance: shopSettings.cashBalance,
       cashUpdatedAt: shopSettings.cashUpdatedAt,
+      vpModeUntil: shopSettings.vpModeUntil,
+      vpModeLabel: shopSettings.vpModeLabel,
     })
     .from(shopSettings)
     .where(eq(shopSettings.shopId, shopId))
@@ -61,6 +79,8 @@ export async function getTreasuryState(shopId: string): Promise<TreasuryState> {
 
   const cashBalance = Number(settingsRow?.cashBalance ?? 0);
   const cashUpdatedAt = settingsRow?.cashUpdatedAt ?? null;
+  const vpModeUntil = settingsRow?.vpModeUntil ?? null;
+  const vpModeLabel = settingsRow?.vpModeLabel ?? null;
 
   // "En cours" est maintenant derive des ventes en attente de paiement
   // (payment_status = 'en_attente' AND shipping_status IS NOT NULL, i.e. commandes actives)
@@ -120,7 +140,10 @@ export async function getTreasuryState(shopId: string): Promise<TreasuryState> {
     .where(and(eq(treasuryMovements.shopId, shopId), gte(treasuryMovements.createdAt, startOfMonth)));
 
   const capitalTotal = cashBalance + stockValue + pendingTotal;
-  const buyingThreshold = 0.65; // 65% de capital max immobilise
+  // Seuil d'immobilisation : 65% en regime normal, 80% pendant une derogation
+  // vente privee (decision du 27/07/2026). La derogation expire d'elle-meme.
+  const vpModeActive = vpModeUntil !== null && vpModeUntil.getTime() > Date.now();
+  const buyingThreshold = vpModeActive ? VP_MODE_THRESHOLD : NORMAL_THRESHOLD;
   const lockedRatio = capitalTotal > 0 ? stockValue / capitalTotal : 0;
   // Budget max = capital * seuil - stock actuel (combien tu peux acheter avant de depasser 65%)
   const buyingBudget = capitalTotal * buyingThreshold - stockValue;
@@ -137,10 +160,46 @@ export async function getTreasuryState(shopId: string): Promise<TreasuryState> {
     stopBuying,
     buyingBudget,
     buyingThreshold,
+    vpModeActive,
+    vpModeUntil,
+    vpModeLabel,
     movements,
     monthApports: Number(monthTotals?.apports ?? 0),
     monthPrelevements: Number(monthTotals?.prelevements ?? 0),
   };
+}
+
+/**
+ * Active une derogation vente privee : le seuil d'immobilisation passe a 80%
+ * pendant `days` jours (max VP_MODE_MAX_DAYS). Trace un mouvement pour que la
+ * decision reste visible dans l'historique. Passer days = 0 pour annuler.
+ */
+export async function setVpMode(
+  shopId: string,
+  days: number,
+  label: string | null,
+): Promise<void> {
+  const capped = Math.min(Math.max(days, 0), VP_MODE_MAX_DAYS);
+  const until = capped > 0 ? new Date(Date.now() + capped * 86400000) : null;
+
+  await db
+    .update(shopSettings)
+    .set({
+      vpModeUntil: until,
+      vpModeLabel: until ? label : null,
+      updatedAt: new Date(),
+    })
+    .where(eq(shopSettings.shopId, shopId));
+
+  await db.insert(treasuryMovements).values({
+    shopId,
+    type: "ajustement",
+    amount: "0",
+    balanceAfter: null,
+    label: until
+      ? `Derogation VP activee ${capped} j (seuil 80%) — ${label ?? "sans motif"}`
+      : "Derogation VP annulee (retour seuil 65%)",
+  });
 }
 
 export async function getTreasuryMovements(shopId: string, limit = 20): Promise<TreasuryMovement[]> {

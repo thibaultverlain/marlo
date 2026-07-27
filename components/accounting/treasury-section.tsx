@@ -9,7 +9,7 @@ import {
   ExternalLink, ShoppingCart,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
-import { createTreasuryMovementAction, reconcileCashBalanceAction } from "@/lib/actions/treasury";
+import { createTreasuryMovementAction, reconcileCashBalanceAction, setVpModeAction } from "@/lib/actions/treasury";
 import type { TreasuryMovement } from "@/lib/db/schema";
 import type { PendingSalePayout } from "@/lib/db/queries/treasury";
 
@@ -28,6 +28,9 @@ type TreasuryProps = {
   stopBuying: boolean;
   buyingBudget: number;
   buyingThreshold: number;
+  vpModeActive: boolean;
+  vpModeUntil: Date | null;
+  vpModeLabel: string | null;
   movements: TreasuryMovement[];
   monthApports: number;
   monthPrelevements: number;
@@ -52,6 +55,9 @@ export default function TreasurySection(props: TreasuryProps) {
         stopBuying={props.stopBuying}
         buyingBudget={props.buyingBudget}
         buyingThreshold={props.buyingThreshold}
+        vpModeActive={props.vpModeActive}
+        vpModeUntil={props.vpModeUntil}
+        vpModeLabel={props.vpModeLabel}
       />
 
       <MovementsCard
@@ -390,27 +396,122 @@ function MovementsCard({
 /* ───── Capital total + ratio + budget max ──────────────────── */
 function CapitalSummary({
   cash, stock, pending, capitalTotal, lockedRatio, stopBuying, buyingBudget, buyingThreshold,
+  vpModeActive, vpModeUntil, vpModeLabel,
 }: {
   cash: number; stock: number; pending: number;
   capitalTotal: number; lockedRatio: number; stopBuying: boolean;
   buyingBudget: number; buyingThreshold: number;
+  vpModeActive: boolean; vpModeUntil: Date | null; vpModeLabel: string | null;
 }) {
   const pct = lockedRatio * 100;
   const thresholdPct = buyingThreshold * 100;
   const safe = pct < 50;
   const warning = pct >= 50 && pct <= thresholdPct;
 
+  const [vpForm, setVpForm] = useState(false);
+  const [vpError, setVpError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+
+  function handleVp(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setVpError(null);
+    const fd = new FormData(e.currentTarget);
+    startTransition(async () => {
+      const r = await setVpModeAction(fd);
+      if (r?.error) setVpError(r.error);
+      else setVpForm(false);
+    });
+  }
+
+  function cancelVp() {
+    const fd = new FormData();
+    fd.set("days", "0");
+    startTransition(async () => { await setVpModeAction(fd); });
+  }
+
+  const daysLeft = vpModeUntil
+    ? Math.max(0, Math.ceil((new Date(vpModeUntil).getTime() - Date.now()) / 86400000))
+    : 0;
+
   return (
     <div className="card-static p-5">
-      <div className="flex items-center gap-2.5 mb-4">
-        <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center">
-          <TrendingUp size={18} className="text-rose-400" />
+      <div className="flex items-start justify-between mb-4 flex-wrap gap-2">
+        <div className="flex items-center gap-2.5">
+          <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center">
+            <TrendingUp size={18} className="text-rose-400" />
+          </div>
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Capital total</p>
+            <p className="text-[11px] text-zinc-500 mt-0.5">Cash + stock + ventes en cours</p>
+          </div>
         </div>
-        <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Capital total</p>
-          <p className="text-[11px] text-zinc-500 mt-0.5">Cash + stock + ventes en cours</p>
-        </div>
+        {!vpModeActive && !vpForm && (
+          <button
+            onClick={() => { setVpForm(true); setVpError(null); }}
+            className="px-2.5 py-1.5 text-[11px] font-semibold rounded-lg bg-amber-500/10 text-amber-400 hover:bg-amber-500/20"
+            title="Relève temporairement le seuil d'immobilisation à 80 % pour une vente privée"
+          >
+            Mode vente privée
+          </button>
+        )}
       </div>
+
+      {/* Bandeau dérogation active */}
+      {vpModeActive && (
+        <div className="flex items-center gap-3 p-3 mb-4 bg-amber-500/10 border border-amber-500/30 rounded-xl">
+          <ShoppingBag size={16} className="text-amber-400 flex-shrink-0" />
+          <div className="flex-1 min-w-0">
+            <p className="text-[12px] font-bold text-amber-300">
+              Dérogation vente privée active — seuil relevé à 80 %
+            </p>
+            <p className="text-[11px] text-amber-200/80 mt-0.5">
+              {vpModeLabel ? `${vpModeLabel} · ` : ""}
+              {daysLeft} jour{daysLeft > 1 ? "s" : ""} restant{daysLeft > 1 ? "s" : ""} —
+              retour automatique à 65 % ensuite. Objectif : repasser sous 65 % avant l&apos;échéance.
+            </p>
+          </div>
+          <button
+            onClick={cancelVp}
+            disabled={isPending}
+            className="text-[11px] font-medium text-amber-300/70 hover:text-amber-200 whitespace-nowrap"
+          >
+            Annuler
+          </button>
+        </div>
+      )}
+
+      {/* Form activation */}
+      {vpForm && (
+        <form onSubmit={handleVp} className="bg-[var(--color-bg-raised)] rounded-lg p-3 mb-4 space-y-2 border border-[var(--color-border)]">
+          <p className="text-[11px] text-zinc-400">
+            Relève le seuil d&apos;immobilisation de 65 % à 80 % le temps d&apos;une vente privée.
+            Décision du 27/07/2026 : durée limitée, retour automatique ensuite, et la règle
+            des 30 % max sur une seule pièce reste absolue.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-[1fr_2fr] gap-2">
+            <select name="days" defaultValue="60" className="px-2 py-1.5 text-[12px] bg-[var(--color-bg)] border border-[var(--color-border)] rounded-md text-zinc-200">
+              <option value="30">30 jours</option>
+              <option value="45">45 jours</option>
+              <option value="60">60 jours</option>
+            </select>
+            <input
+              type="text"
+              name="label"
+              placeholder="Motif (ex : VP Kering multimarques Paris)"
+              className="px-2 py-1.5 text-[12px] bg-[var(--color-bg)] border border-[var(--color-border)] rounded-md text-zinc-200 placeholder-zinc-600"
+            />
+          </div>
+          {vpError && <p className="text-[11px] text-red-400">{vpError}</p>}
+          <div className="flex gap-2">
+            <button type="submit" disabled={isPending} className="px-3 py-1.5 text-[11px] font-semibold text-[var(--color-accent-inverse,#06150f)] bg-amber-500 rounded-md hover:bg-amber-400 disabled:opacity-50">
+              {isPending ? "Activation..." : "Activer la dérogation"}
+            </button>
+            <button type="button" onClick={() => setVpForm(false)} className="px-3 py-1.5 text-[11px] font-medium text-zinc-400 hover:text-zinc-200">
+              Annuler
+            </button>
+          </div>
+        </form>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 items-start">
         <div>

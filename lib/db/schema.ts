@@ -275,6 +275,11 @@ export const shopSettings = pgTable("shop_settings", {
   // Tresorerie : solde cash mis a jour manuellement
   cashBalance: decimal("cash_balance", { precision: 10, scale: 2 }).default("0"),
   cashUpdatedAt: timestamp("cash_updated_at"),
+  // Derogation vente privee (decision du 27/07/2026) : tant que vpModeUntil est
+  // dans le futur, le seuil d'immobilisation passe de 65% a 80%. Au-dela de la
+  // date, retour automatique a 65% — la derogation ne peut pas s'oublier.
+  vpModeUntil: timestamp("vp_mode_until", { withTimezone: true }),
+  vpModeLabel: text("vp_mode_label"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
