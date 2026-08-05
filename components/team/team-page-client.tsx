@@ -6,7 +6,7 @@ import {
   Copy, Check, Clock, X, Activity, Store, Settings2,
   LayoutDashboard, Package, ShoppingCart, Users, Search,
   ShoppingBag, FileText, Calculator, BarChart3, ListTodo,
-  FolderOpen, Users2, AlertCircle, ChevronDown,
+  Users2, AlertCircle, ChevronDown,
   Info,
 } from "lucide-react";
 import {
@@ -58,7 +58,6 @@ const PERM_CONFIG: { key: string; label: string; icon: React.ElementType }[] = [
   { key: "tasks", label: "Taches", icon: ListTodo },
   { key: "invoices", label: "Factures", icon: FileText },
   { key: "accounting", label: "Comptabilite", icon: Calculator },
-  { key: "documents", label: "Documents", icon: FolderOpen },
   { key: "team", label: "Equipe", icon: Users2 },
   { key: "settings", label: "Reglages", icon: Settings2 },
 ];

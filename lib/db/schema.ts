@@ -316,120 +316,6 @@ export const shops = pgTable("shops", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: text("name").notNull(),
   ownerId: uuid("owner_id").notNull(),
-  inboundEmailToken: uuid("inbound_email_token").defaultRandom().notNull().unique(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
-// Idempotence pour le polling email : Message-Id deja traites.
-export const processedInboundEmails = pgTable("processed_inbound_emails", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  shopId: uuid("shop_id").references(() => shops.id).notNull(),
-  messageId: text("message_id").notNull().unique(),
-  saleId: uuid("sale_id"),
-  receivedAt: timestamp("received_at").defaultNow().notNull(),
-});
-
-// Credentials IMAP par shop (chiffres AES-256-GCM avant insertion).
-export const shopEmailCredentials = pgTable("shop_email_credentials", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  shopId: uuid("shop_id").references(() => shops.id).notNull().unique(),
-  imapHost: text("imap_host").notNull(),
-  imapPort: integer("imap_port").notNull().default(993),
-  imapUseTls: boolean("imap_use_tls").notNull().default(true),
-  imapUsername: text("imap_username").notNull(),
-  // Password encrypted: format "iv:authTag:ciphertext" (hex)
-  imapPasswordEncrypted: text("imap_password_encrypted").notNull(),
-  // Folder to scan, default INBOX
-  imapFolder: text("imap_folder").notNull().default("INBOX"),
-  active: boolean("active").notNull().default(true),
-  lastPollAt: timestamp("last_poll_at"),
-  lastPollStatus: text("last_poll_status"), // "ok" | "error: ..."
-  lastError: text("last_error"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
-
-export const teamMembers = pgTable("team_members", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  shopId: uuid("shop_id").references(() => shops.id).notNull(),
-  userId: uuid("user_id").notNull(),
-  role: teamRoleEnum("role").notNull().default("seller"),
-  permissions: text("permissions"),
-  joinedAt: timestamp("joined_at").defaultNow().notNull(),
-}, (table) => [
-  uniqueIndex("team_members_shop_user_idx").on(table.shopId, table.userId),
-]);
-
-export const teamInvitations = pgTable("team_invitations", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  shopId: uuid("shop_id").references(() => shops.id).notNull(),
-  email: text("email").notNull(),
-  role: teamRoleEnum("role").notNull().default("seller"),
-  invitedBy: uuid("invited_by").notNull(),
-  status: invitationStatusEnum("status").notNull().default("pending"),
-  token: text("token").notNull().unique(),
-  expiresAt: timestamp("expires_at").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
-export const activityLog = pgTable("activity_log", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  shopId: uuid("shop_id").references(() => shops.id).notNull(),
-  userId: uuid("user_id").notNull(),
-  userName: text("user_name"),
-  action: text("action").notNull(),
-  entity: text("entity"),
-  entityId: uuid("entity_id"),
-  details: text("details"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
-// ── Tasks ─────────────────────────────────────────────
-
-export const tasks = pgTable("tasks", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  shopId: uuid("shop_id").references(() => shops.id).notNull(),
-  createdBy: uuid("created_by").notNull(),
-  assignedTo: uuid("assigned_to"),
-  title: text("title").notNull(),
-  description: text("description"),
-  status: taskStatusEnum("status").notNull().default("a_faire"),
-  priority: taskPriorityEnum("priority").notNull().default("normale"),
-  relatedEntity: text("related_entity"),
-  relatedEntityId: uuid("related_entity_id"),
-  dueDate: date("due_date"),
-  completedAt: timestamp("completed_at"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
-
-// ── Notifications ─────────────────────────────────────
-
-export const notifications = pgTable("notifications", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  shopId: uuid("shop_id").references(() => shops.id).notNull(),
-  userId: uuid("user_id").notNull(),
-  type: text("type").notNull(),
-  title: text("title").notNull(),
-  body: text("body"),
-  href: text("href"),
-  read: boolean("read").notNull().default(false),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
-// ── Documents ─────────────────────────────────────────
-
-export const documents = pgTable("documents", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  shopId: uuid("shop_id").references(() => shops.id).notNull(),
-  category: text("category").notNull(),
-  name: text("name").notNull(),
-  fileName: text("file_name").notNull(),
-  fileUrl: text("file_url").notNull(),
-  fileSize: integer("file_size"),
-  mimeType: text("mime_type"),
-  uploadedBy: uuid("uploaded_by").notNull(),
-  expiresAt: date("expires_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -474,20 +360,14 @@ export type ActivityLogEntry = typeof activityLog.$inferSelect;
 export type Task = typeof tasks.$inferSelect;
 export type NewTask = typeof tasks.$inferInsert;
 export type Notification = typeof notifications.$inferSelect;
-export type Document = typeof documents.$inferSelect;
-export type NewDocument = typeof documents.$inferInsert;
 export type PriceHistory = typeof priceHistory.$inferSelect;
-export type ProcessedInboundEmail = typeof processedInboundEmails.$inferSelect;
-export type NewProcessedInboundEmail = typeof processedInboundEmails.$inferInsert;
-export type ShopEmailCredentials = typeof shopEmailCredentials.$inferSelect;
-export type NewShopEmailCredentials = typeof shopEmailCredentials.$inferInsert;
 export type TeamRole = "owner" | "manager" | "seller";
 
 // All available permissions
 export const ALL_PERMISSIONS = [
   "dashboard", "products", "sales", "customers", "analytics",
   "sourcing", "personal_shopping", "tasks", "invoices",
-  "accounting", "documents",
+  "accounting",
   "team", "settings",
 ] as const;
 export type Permission = typeof ALL_PERMISSIONS[number];
