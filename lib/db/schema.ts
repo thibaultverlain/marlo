@@ -285,15 +285,6 @@ export const shopSettings = pgTable("shop_settings", {
 });
 
 // Ventes en cours (paiement plateforme non encore credite)
-export const pendingPayouts = pgTable("pending_payouts", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  shopId: uuid("shop_id").references(() => shops.id).notNull(),
-  label: text("label").notNull(),
-  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
-  platform: text("platform").notNull(), // vinted / vestiaire / stockx / autre
-  notes: text("notes"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
 
 // Mouvements de tresorerie : chaque variation du cash est tracee.
 // amount est SIGNE (delta applique au solde) : apport +, prelevement -,
@@ -316,6 +307,74 @@ export const shops = pgTable("shops", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: text("name").notNull(),
   ownerId: uuid("owner_id").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const teamMembers = pgTable("team_members", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  shopId: uuid("shop_id").references(() => shops.id).notNull(),
+  userId: uuid("user_id").notNull(),
+  role: teamRoleEnum("role").notNull().default("seller"),
+  permissions: text("permissions"),
+  joinedAt: timestamp("joined_at").defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex("team_members_shop_user_idx").on(table.shopId, table.userId),
+]);
+
+export const teamInvitations = pgTable("team_invitations", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  shopId: uuid("shop_id").references(() => shops.id).notNull(),
+  email: text("email").notNull(),
+  role: teamRoleEnum("role").notNull().default("seller"),
+  invitedBy: uuid("invited_by").notNull(),
+  status: invitationStatusEnum("status").notNull().default("pending"),
+  token: text("token").notNull().unique(),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const activityLog = pgTable("activity_log", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  shopId: uuid("shop_id").references(() => shops.id).notNull(),
+  userId: uuid("user_id").notNull(),
+  userName: text("user_name"),
+  action: text("action").notNull(),
+  entity: text("entity"),
+  entityId: uuid("entity_id"),
+  details: text("details"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// ── Tasks ─────────────────────────────────────────────
+
+export const tasks = pgTable("tasks", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  shopId: uuid("shop_id").references(() => shops.id).notNull(),
+  createdBy: uuid("created_by").notNull(),
+  assignedTo: uuid("assigned_to"),
+  title: text("title").notNull(),
+  description: text("description"),
+  status: taskStatusEnum("status").notNull().default("a_faire"),
+  priority: taskPriorityEnum("priority").notNull().default("normale"),
+  relatedEntity: text("related_entity"),
+  relatedEntityId: uuid("related_entity_id"),
+  dueDate: date("due_date"),
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// ── Notifications ─────────────────────────────────────
+
+export const notifications = pgTable("notifications", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  shopId: uuid("shop_id").references(() => shops.id).notNull(),
+  userId: uuid("user_id").notNull(),
+  type: text("type").notNull(),
+  title: text("title").notNull(),
+  body: text("body"),
+  href: text("href"),
+  read: boolean("read").notNull().default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -349,8 +408,6 @@ export type PsItem = typeof psItems.$inferSelect;
 export type Purchase = typeof purchases.$inferSelect;
 export type ShopSettings = typeof shopSettings.$inferSelect;
 export type NewShopSettings = typeof shopSettings.$inferInsert;
-export type PendingPayout = typeof pendingPayouts.$inferSelect;
-export type NewPendingPayout = typeof pendingPayouts.$inferInsert;
 export type TreasuryMovement = typeof treasuryMovements.$inferSelect;
 export type NewTreasuryMovement = typeof treasuryMovements.$inferInsert;
 export type Shop = typeof shops.$inferSelect;

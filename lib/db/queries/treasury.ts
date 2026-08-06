@@ -1,7 +1,7 @@
 import { db } from "../client";
 import {
-  shopSettings, pendingPayouts, treasuryMovements, sales, products, customers,
-  type PendingPayout, type NewPendingPayout, type TreasuryMovement,
+  shopSettings, treasuryMovements, sales, products, customers,
+  type TreasuryMovement,
 } from "../schema";
 import { eq, and, sql, desc, gte, isNotNull, isNull } from "drizzle-orm";
 import { getStockStats } from "./products";
@@ -290,54 +290,6 @@ export async function updateCashBalance(shopId: string, amount: number, note?: s
   });
 }
 
-export async function createPendingPayout(data: NewPendingPayout): Promise<PendingPayout> {
-  const [row] = await db.insert(pendingPayouts).values(data).returning();
-  return row;
-}
-
-export async function deletePendingPayout(id: string, shopId: string): Promise<void> {
-  await db
-    .delete(pendingPayouts)
-    .where(and(eq(pendingPayouts.id, id), eq(pendingPayouts.shopId, shopId)));
-}
-
-/**
- * "Marquer comme recu" : supprime le pending + ajoute le montant au cash.
- * Helper pratique pour quand le virement plateforme arrive.
- */
-export async function markPayoutReceived(id: string, shopId: string): Promise<void> {
-  const [payout] = await db
-    .select()
-    .from(pendingPayouts)
-    .where(and(eq(pendingPayouts.id, id), eq(pendingPayouts.shopId, shopId)))
-    .limit(1);
-  if (!payout) throw new Error("Paiement introuvable");
-
-  await db.transaction(async (tx) => {
-    // Ajouter au cash et recuperer le nouveau solde
-    const [updated] = await tx
-      .update(shopSettings)
-      .set({
-        cashBalance: sql`coalesce(${shopSettings.cashBalance}, 0) + ${payout.amount}`,
-        cashUpdatedAt: new Date(),
-        updatedAt: new Date(),
-      })
-      .where(eq(shopSettings.shopId, shopId))
-      .returning({ cashBalance: shopSettings.cashBalance });
-    // Tracer l'encaissement
-    await tx.insert(treasuryMovements).values({
-      shopId,
-      type: "encaissement",
-      amount: String(payout.amount),
-      balanceAfter: updated?.cashBalance ?? null,
-      label: `${payout.label} (${payout.platform})`,
-    });
-    // Supprimer le pending
-    await tx
-      .delete(pendingPayouts)
-      .where(eq(pendingPayouts.id, id));
-  });
-}
 
 /**
  * Applique un mouvement de tresorerie automatique lie a un objet source
