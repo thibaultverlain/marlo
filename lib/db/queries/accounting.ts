@@ -67,7 +67,11 @@ export async function getRecipeBook(shopId: string, year?: number): Promise<Reci
       paidAt: sales.paidAt,
       invoiceNumber: sales.invoiceNumber,
       channel: sales.channel,
-      amount: sales.salePrice,
+      // CA declarable = montant REELLEMENT PERCU, pas le prix affiche.
+      // Regle confirmee par l'URSSAF le 11/08/2026 : sur une vente Vestiaire
+      // a 261,90 EUR dont 52,38 EUR de commission, on declare 209,52 EUR.
+      // Fallback sur salePrice pour les ventes sans frais (Vinted, direct).
+      amount: sql<string>`coalesce(${sales.netRevenue}, ${sales.salePrice})`,
       paymentMethod: sales.paymentMethod,
       productTitle: products.title,
       customerFirstName: customers.firstName,
