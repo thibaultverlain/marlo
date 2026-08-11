@@ -85,11 +85,21 @@ export async function updatePaymentStatus(saleId: string, shopId: string, status
     .where(and(eq(sales.id, saleId), eq(sales.shopId, shopId)))
     .limit(1);
 
-  await db.update(sales).set({ paymentStatus: status as any }).where(and(eq(sales.id, saleId), eq(sales.shopId, shopId)));
+  const wasReceivedBefore = before?.paymentStatus === "recu";
+  const isReceivedNow = status === "recu";
+
+  // paidAt = date d'encaissement reel. C'est elle qui determine la periode
+  // de declaration en micro-entreprise, donc on l'horodate au moment ou le
+  // paiement est confirme (et on l'efface si l'encaissement est annule).
+  const update: Record<string, unknown> = { paymentStatus: status as any };
+  if (!wasReceivedBefore && isReceivedNow) update.paidAt = new Date();
+  if (wasReceivedBefore && !isReceivedNow) update.paidAt = null;
+
+  await db.update(sales).set(update).where(and(eq(sales.id, saleId), eq(sales.shopId, shopId)));
 
   if (!before) return;
-  const wasReceived = before.paymentStatus === "recu";
-  const isReceived = status === "recu";
+  const wasReceived = wasReceivedBefore;
+  const isReceived = isReceivedNow;
   const netRevenue = Number(before.netRevenue ?? before.salePrice ?? 0);
   if (netRevenue <= 0) return;
 

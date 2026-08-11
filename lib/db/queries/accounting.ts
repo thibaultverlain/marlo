@@ -1,6 +1,6 @@
 import { db } from "../client";
 import { sales, products, customers, purchases } from "../schema";
-import { eq, desc, sql, and, gte, lte } from "drizzle-orm";
+import { eq, desc, sql, and, gte, lte, isNotNull } from "drizzle-orm";
 
 /**
  * Constantes micro-entreprise VENTE DE BIENS (BIC) 2026.
@@ -48,10 +48,14 @@ export type PurchaseEntry = {
 };
 
 /**
- * Livre de recettes — compta d'ENCAISSEMENT (date de reception du paiement,
- * pas date de vente). En micro, on ne comptabilise que ce qui est reellement
- * encaisse. On filtre sur payment_status = 'recu' et on prend sold_at comme
- * proxy si la date d'encaissement precise n'est pas stockee.
+ * Livre de recettes — compta d'ENCAISSEMENT.
+ *
+ * En micro-entreprise, une recette appartient a la periode ou l'argent est
+ * REELLEMENT ENCAISSE, pas a celle de la vente. Une piece vendue le 25 juillet
+ * et payee le 11 aout se declare en aout.
+ *
+ * On filtre donc sur paid_at, jamais sur sold_at. Les ventes non encaissees
+ * (paid_at NULL) sont exclues : elles ne sont pas encore declarables.
  */
 export async function getRecipeBook(shopId: string, year?: number): Promise<RecipeEntry[]> {
   const y = year ?? new Date().getFullYear();
@@ -60,12 +64,11 @@ export async function getRecipeBook(shopId: string, year?: number): Promise<Reci
 
   const rows = await db
     .select({
-      soldAt: sales.soldAt,
+      paidAt: sales.paidAt,
       invoiceNumber: sales.invoiceNumber,
       channel: sales.channel,
       amount: sales.salePrice,
       paymentMethod: sales.paymentMethod,
-      paymentStatus: sales.paymentStatus,
       productTitle: products.title,
       customerFirstName: customers.firstName,
       customerLastName: customers.lastName,
@@ -73,20 +76,24 @@ export async function getRecipeBook(shopId: string, year?: number): Promise<Reci
     .from(sales)
     .leftJoin(products, eq(sales.productId, products.id))
     .leftJoin(customers, eq(sales.customerId, customers.id))
-    .where(and(eq(sales.shopId, shopId), gte(sales.soldAt, startOfYear), lte(sales.soldAt, endOfYear)))
-    .orderBy(sales.soldAt);
+    .where(and(
+      eq(sales.shopId, shopId),
+      eq(sales.paymentStatus, "recu"),
+      isNotNull(sales.paidAt),
+      gte(sales.paidAt, startOfYear),
+      lte(sales.paidAt, endOfYear),
+    ))
+    .orderBy(sales.paidAt);
 
-  return rows
-    .filter((r) => r.paymentStatus === "recu") // en micro on ne compte que ce qui est encaisse
-    .map((r) => ({
-      date: r.soldAt,
-      invoiceNumber: r.invoiceNumber,
-      customerName: r.customerFirstName && r.customerLastName ? `${r.customerFirstName} ${r.customerLastName}` : null,
-      productTitle: r.productTitle,
-      channel: r.channel,
-      amount: Number(r.amount),
-      paymentMethod: r.paymentMethod,
-    }));
+  return rows.map((r) => ({
+    date: r.paidAt!,
+    invoiceNumber: r.invoiceNumber,
+    customerName: r.customerFirstName && r.customerLastName ? `${r.customerFirstName} ${r.customerLastName}` : null,
+    productTitle: r.productTitle,
+    channel: r.channel,
+    amount: Number(r.amount),
+    paymentMethod: r.paymentMethod,
+  }));
 }
 
 /**

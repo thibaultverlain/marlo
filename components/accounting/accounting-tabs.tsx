@@ -182,13 +182,13 @@ export default function AccountingTabs({
               <div className="p-12 text-center">
                 <BookOpen size={40} className="mx-auto text-zinc-700 mb-3" />
                 <p className="text-zinc-500 text-sm">Aucune recette encaissee sur cette periode</p>
-                <p className="text-zinc-600 text-[11px] mt-1">Seules les ventes avec paiement recu apparaissent ici (compta d'encaissement).</p>
+                <p className="text-zinc-600 text-[11px] mt-1">Une vente apparait ici a sa date d'encaissement, pas a sa date de vente — c'est la periode qui compte pour ta declaration.</p>
               </div>
             ) : (
               <table className="w-full text-[13px]">
                 <thead>
                   <tr className="bg-[var(--color-bg-hover)]/50 border-b border-[var(--color-border)]">
-                    {["Date", "Facture", "Client", "Article", "Canal", "Paiement", "Montant"].map((h, i) => (
+                    {["Encaisse le", "Facture", "Client", "Article", "Canal", "Paiement", "Montant"].map((h, i) => (
                       <th key={h} className={`${i === 6 ? "text-right" : "text-left"} px-5 py-2.5 text-[11px] font-medium text-zinc-500 uppercase tracking-wider`}>{h}</th>
                     ))}
                   </tr>

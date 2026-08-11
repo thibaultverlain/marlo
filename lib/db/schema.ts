@@ -122,6 +122,10 @@ export const sales = pgTable("sales", {
   shippingStatus: shippingStatusEnum("shipping_status"),
   invoiceNumber: text("invoice_number"),
   soldAt: timestamp("sold_at").defaultNow().notNull(),
+  // Date d'ENCAISSEMENT reel : c'est elle qui determine la periode de
+  // declaration en micro-entreprise (compta de tresorerie), pas soldAt.
+  // NULL tant que le paiement n'est pas recu.
+  paidAt: timestamp("paid_at", { withTimezone: true }),
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   // Workflow traitement de commande
