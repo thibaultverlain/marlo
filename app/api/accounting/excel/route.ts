@@ -44,7 +44,10 @@ export async function GET(request: NextRequest) {
       filename = `registre-achats-micro-${year}.csv`;
     } else {
       const recipes = await getRecipeBook(shopId, year);
-      const headers = ["Date encaissement", "N Facture", "Client", "Article", "Canal", "Paiement", "Montant (EUR)"];
+      const headers = [
+        "Date encaissement", "N Facture", "Client", "Article", "Canal", "Paiement",
+        "Net percu (EUR)", "A declarer - CA brut (EUR)",
+      ];
       const rows = recipes.map((r) => [
         new Date(r.date).toLocaleDateString("fr-FR"),
         r.invoiceNumber ?? "",
@@ -52,6 +55,7 @@ export async function GET(request: NextRequest) {
         r.productTitle ?? "",
         CHANNELS.find((c) => c.value === r.channel)?.label ?? r.channel,
         r.paymentMethod ?? "",
+        fr(r.netReceived),
         fr(r.amount),
       ]);
       csv = "﻿" + headers.map(escapeCsv).join(",") + "\n" + rows.map((r) => r.map(escapeCsv).join(",")).join("\n");

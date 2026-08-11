@@ -235,6 +235,7 @@ export default async function AccountingPage({ searchParams }: { searchParams: P
           channel: r.channel,
           channelLabel: CHANNELS.find((c) => c.value === r.channel)?.label ?? r.channel,
           amount: r.amount,
+          netReceived: r.netReceived,
           paymentMethod: r.paymentMethod,
         }))}
         purchases={purchasesRows.map((p) => ({

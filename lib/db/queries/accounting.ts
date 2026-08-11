@@ -32,7 +32,10 @@ export type RecipeEntry = {
   customerName: string | null;
   productTitle: string | null;
   channel: string;
+  /** CA DECLARABLE = prix brut paye par l'acheteur, commission incluse. */
   amount: number;
+  /** Ce qui arrive reellement sur le compte, apres commission. Informatif. */
+  netReceived: number;
   paymentMethod: string | null;
 };
 
@@ -50,12 +53,18 @@ export type PurchaseEntry = {
 /**
  * Livre de recettes — compta d'ENCAISSEMENT.
  *
- * En micro-entreprise, une recette appartient a la periode ou l'argent est
- * REELLEMENT ENCAISSE, pas a celle de la vente. Une piece vendue le 25 juillet
- * et payee le 11 aout se declare en aout.
+ * PERIODE : une recette appartient au mois ou l'argent est REELLEMENT ENCAISSE,
+ * pas a celui de la vente. Une piece vendue le 25 juillet et payee le 11 aout
+ * se declare en aout. On filtre donc sur paid_at, jamais sur sold_at.
+ * Les ventes non encaissees (paid_at NULL) sont exclues : pas encore declarables.
  *
- * On filtre donc sur paid_at, jamais sur sold_at. Les ventes non encaissees
- * (paid_at NULL) sont exclues : elles ne sont pas encore declarables.
+ * MONTANT : on declare le CA BRUT, commission plateforme INCLUSE.
+ * En micro-entreprise aucune charge n'est deductible du CA declare — c'est
+ * l'abattement forfaitaire de 71% qui est cense les couvrir. Une vente
+ * Vestiaire a 261,90 EUR dont 52,38 EUR de commission se declare 261,90 EUR,
+ * meme si seuls 209,52 EUR arrivent sur le compte.
+ * Le net percu est expose separement (netReceived) pour le pilotage et le
+ * rapprochement bancaire, jamais comme base de declaration.
  */
 export async function getRecipeBook(shopId: string, year?: number): Promise<RecipeEntry[]> {
   const y = year ?? new Date().getFullYear();
@@ -67,11 +76,10 @@ export async function getRecipeBook(shopId: string, year?: number): Promise<Reci
       paidAt: sales.paidAt,
       invoiceNumber: sales.invoiceNumber,
       channel: sales.channel,
-      // CA declarable = montant REELLEMENT PERCU, pas le prix affiche.
-      // Regle confirmee par l'URSSAF le 11/08/2026 : sur une vente Vestiaire
-      // a 261,90 EUR dont 52,38 EUR de commission, on declare 209,52 EUR.
-      // Fallback sur salePrice pour les ventes sans frais (Vinted, direct).
-      amount: sql<string>`coalesce(${sales.netRevenue}, ${sales.salePrice})`,
+      // Base declarable : prix brut paye par l'acheteur, commission incluse.
+      amount: sales.salePrice,
+      // Ce qui atterrit sur le compte apres commission — informatif.
+      netReceived: sql<string>`coalesce(${sales.netRevenue}, ${sales.salePrice})`,
       paymentMethod: sales.paymentMethod,
       productTitle: products.title,
       customerFirstName: customers.firstName,
@@ -96,6 +104,7 @@ export async function getRecipeBook(shopId: string, year?: number): Promise<Reci
     productTitle: r.productTitle,
     channel: r.channel,
     amount: Number(r.amount),
+    netReceived: Number(r.netReceived),
     paymentMethod: r.paymentMethod,
   }));
 }

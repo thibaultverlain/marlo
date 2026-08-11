@@ -11,7 +11,10 @@ type RecipeEntry = {
   productTitle: string | null;
   channel: string;
   channelLabel: string;
+  /** CA declarable : brut, commission incluse. */
   amount: number;
+  /** Net reellement percu sur le compte. Informatif. */
+  netReceived: number;
   paymentMethod: string | null;
 };
 
@@ -64,6 +67,7 @@ export default function AccountingTabs({
   const filteredPurchases = useMemo(() => purchases.filter((p) => inPeriod(p.date, period)), [purchases, period]);
 
   const totalRecipes = filteredRecipes.reduce((s, r) => s + r.amount, 0);
+  const totalNetReceived = filteredRecipes.reduce((s, r) => s + r.netReceived, 0);
   const totalPurchases = filteredPurchases.reduce((s, p) => s + p.amount, 0);
 
   // Graphique mensuel (encaissements)
@@ -188,8 +192,10 @@ export default function AccountingTabs({
               <table className="w-full text-[13px]">
                 <thead>
                   <tr className="bg-[var(--color-bg-hover)]/50 border-b border-[var(--color-border)]">
-                    {["Encaisse le", "Facture", "Client", "Article", "Canal", "Paiement", "Montant"].map((h, i) => (
-                      <th key={h} className={`${i === 6 ? "text-right" : "text-left"} px-5 py-2.5 text-[11px] font-medium text-zinc-500 uppercase tracking-wider`}>{h}</th>
+                    {["Encaisse le", "Facture", "Client", "Article", "Canal", "Net percu", "A declarer"].map((h, i) => (
+                      <th key={h}
+                        title={h === "A declarer" ? "CA brut, commission plateforme incluse — c'est ce montant qui va sur ta declaration URSSAF" : h === "Net percu" ? "Ce qui arrive reellement sur ton compte, apres commission" : undefined}
+                        className={`${i >= 5 ? "text-right" : "text-left"} px-5 py-2.5 text-[11px] font-medium ${h === "A declarer" ? "text-zinc-300" : "text-zinc-500"} uppercase tracking-wider`}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -201,15 +207,23 @@ export default function AccountingTabs({
                       <td className="px-5 py-2.5 text-zinc-300">{r.customerName ?? "—"}</td>
                       <td className="px-5 py-2.5 text-zinc-400 max-w-xs truncate">{r.productTitle ?? "—"}</td>
                       <td className="px-5 py-2.5 text-zinc-500">{r.channelLabel}</td>
-                      <td className="px-5 py-2.5 text-zinc-500">{r.paymentMethod ?? "—"}</td>
-                      <td className="px-5 py-2.5 text-white font-medium text-right tabular-nums whitespace-nowrap">{formatCurrency(r.amount)}</td>
+                      <td className="px-5 py-2.5 text-zinc-500 text-right tabular-nums whitespace-nowrap">
+                        {r.netReceived < r.amount ? formatCurrency(r.netReceived) : "—"}
+                      </td>
+                      <td className="px-5 py-2.5 text-white font-semibold text-right tabular-nums whitespace-nowrap">{formatCurrency(r.amount)}</td>
                     </tr>
                   ))}
                 </tbody>
                 <tfoot>
                   <tr className="bg-[var(--color-bg-hover)] border-t-2 border-[var(--color-border)]">
-                    <td colSpan={6} className="px-5 py-3 text-sm font-semibold text-zinc-400 text-right">Total encaisse</td>
+                    <td colSpan={5} className="px-5 py-3 text-sm font-semibold text-zinc-400 text-right">Totaux</td>
+                    <td className="px-5 py-3 text-right text-[13px] text-zinc-400 tabular-nums">{formatCurrency(totalNetReceived)}</td>
                     <td className="px-5 py-3 text-right text-lg font-semibold text-white tabular-nums">{formatCurrency(totalRecipes)}</td>
+                  </tr>
+                  <tr className="bg-[var(--color-bg-hover)]/50">
+                    <td colSpan={7} className="px-5 pb-3 text-[11px] text-zinc-500 text-right">
+                      Le montant a declarer a l'URSSAF est le brut ({formatCurrency(totalRecipes)}), commission plateforme incluse.
+                    </td>
                   </tr>
                 </tfoot>
               </table>
